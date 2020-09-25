@@ -10,7 +10,7 @@ def makeSkim(inputFile,outputFile,cutString,test=False):
         print "DON'T OVERWRITE THE INPUT!"
         exit()
     inputFile = r.TFile(inputFile)
-    tree = inputFile.Get("timeTree")
+    tree = inputFile.Get("MuonSystem")
     if test:
         tree.Draw(">>eList",cutString,"entryList",1000);
     else:
@@ -25,6 +25,9 @@ def makeSkim(inputFile,outputFile,cutString,test=False):
         newTree.Fill()
 
     newTree.AutoSave()
+    oHist = inputFile.Get("NEvents")
+    newFile.cd()
+    oHist.Write()
 
 if __name__ == "__main__":
     defaultCutString = "nDtRechitClusters>0"
