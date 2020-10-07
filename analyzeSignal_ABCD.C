@@ -407,11 +407,16 @@ void analyzeSignal_ABCD(){
       TFile *_file;
       if(strcmp(years[itr_year],"MC_Summer16")==0){
         _file = TFile::Open(dir+years[itr_year]+"/v1/v3/normalized/ggH_HToSSTobbbb_MH-125_MS-"+mX[itr_mX]+"_ctau-"+ctau+"_TuneCUETP8M1_13TeV-powheg-pythia8_1pb_weighted.root");
+        cout << dir+years[itr_year]+"/v1/v3/normalized/ggH_HToSSTobbbb_MH-125_MS-"+mX[itr_mX]+"_ctau-"+ctau+"_TuneCUETP8M1_13TeV-powheg-pythia8\
+_1pb_weighted.root" << endl;
       }
       else{
         // _file = TFile::Open(dir+years[itr_year]+"/v1/v3/normalized/ggH_HToSSTobbbb_MH-125_MS-"+mX[itr_mX]+"_ctau-"+ctau+"_TuneCP5_13TeV-powheg-pythia8_1pb_weighted.root");
-        _file = TFile::Open(TString(skimsignalfiles[itr_year]));
+        cout << dir+years[itr_year]+"/v1/v3/normalized/ggH_HToSSTobbbb_MH-125_MS-"+mX[itr_mX]+"_ctau-"+ctau+"_TuneCP5_13TeV-powheg-pythia8_1pb_weighted.root" << endl;
+        //        cout << "Opening " << TString(skimsignalfiles[itr_year]) << endl;
+        //        _file = TFile::Open(TString(skimsignalfiles[itr_year]));
       }
+      continue;
 
       TTreeReader treeReader("MuonSystem",_file);
 
@@ -486,6 +491,7 @@ void analyzeSignal_ABCD(){
 
       _ofile->cd();
       totalNum += treeReader.GetEntries(1);
+      cout << "Processing " <<  totalNum << " entries" << endl;
       while(treeReader.Next()){
         if(evtNum%100000==0){ cout << evtNum << " of " << totalNum << endl; }
         passFullVeto_clusterCR = false;
