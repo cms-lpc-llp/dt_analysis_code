@@ -11,4 +11,12 @@ git clone git@github.com:dildick/dt_analysis_code.git
 
 Running the signal analysis
 
-root -l -q -b analyzeSignal.C++
+<PRE>
+root -l -q -b analyzeSignal_ABCD.C++
+</PRE>
+
+Running the data analysis
+
+<PRE>
+root -l -q -b analyzeData_ABCD.C++
+</PRE>
