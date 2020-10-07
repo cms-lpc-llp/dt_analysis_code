@@ -1,6 +1,7 @@
 R__LOAD_LIBRARY(libTreePlayer)
 
 #include "helpers.h"
+#include "signalfiles.h"
 #include <string>
 #include <vector>
 #include <map>
@@ -408,7 +409,8 @@ void analyzeSignal_ABCD(){
         _file = TFile::Open(dir+years[itr_year]+"/v1/v3/normalized/ggH_HToSSTobbbb_MH-125_MS-"+mX[itr_mX]+"_ctau-"+ctau+"_TuneCUETP8M1_13TeV-powheg-pythia8_1pb_weighted.root");
       }
       else{
-        _file = TFile::Open(dir+years[itr_year]+"/v1/v3/normalized/ggH_HToSSTobbbb_MH-125_MS-"+mX[itr_mX]+"_ctau-"+ctau+"_TuneCP5_13TeV-powheg-pythia8_1pb_weighted.root");
+        // _file = TFile::Open(dir+years[itr_year]+"/v1/v3/normalized/ggH_HToSSTobbbb_MH-125_MS-"+mX[itr_mX]+"_ctau-"+ctau+"_TuneCP5_13TeV-powheg-pythia8_1pb_weighted.root");
+        _file = TFile::Open(TString(skimsignalfiles[itr_year]));
       }
 
       TTreeReader treeReader("MuonSystem",_file);
@@ -471,13 +473,13 @@ void analyzeSignal_ABCD(){
       TTreeReaderArray<int> RPCRechitBx(treeReader,"rpcBx");
 
       /*TTreeReaderValue<int> nHORechits(treeReader,"nHORechits");
-      TTreeReaderArray<float> hoRechitX(treeReader,"hoRechit_X");
-      TTreeReaderArray<float> hoRechitY(treeReader,"hoRechit_Y");
-      TTreeReaderArray<float> hoRechitZ(treeReader,"hoRechit_Z");
-      TTreeReaderArray<float> hoRechitEta(treeReader,"hoRechit_Eta");
-      TTreeReaderArray<float> hoRechitPhi(treeReader,"hoRechit_Phi");
-      TTreeReaderArray<float> hoRechitE(treeReader,"hoRechit_E");
-      TTreeReaderArray<float> hoRechitT(treeReader,"hoRechit_T");
+        TTreeReaderArray<float> hoRechitX(treeReader,"hoRechit_X");
+        TTreeReaderArray<float> hoRechitY(treeReader,"hoRechit_Y");
+        TTreeReaderArray<float> hoRechitZ(treeReader,"hoRechit_Z");
+        TTreeReaderArray<float> hoRechitEta(treeReader,"hoRechit_Eta");
+        TTreeReaderArray<float> hoRechitPhi(treeReader,"hoRechit_Phi");
+        TTreeReaderArray<float> hoRechitE(treeReader,"hoRechit_E");
+        TTreeReaderArray<float> hoRechitT(treeReader,"hoRechit_T");
       */
       TTreeReaderValue<int> nLeptons(treeReader,"nLeptons");
       //TTreeReaderValue<int> nMuons(treeReader,"nMuons");
@@ -485,519 +487,519 @@ void analyzeSignal_ABCD(){
       _ofile->cd();
       totalNum += treeReader.GetEntries(1);
       while(treeReader.Next()){
-	if(evtNum%100000==0){ cout << evtNum << " of " << totalNum << endl; }
-	passFullVeto_clusterCR = false;
-	passRPCMatch_clusterCR = false;
-	passRPCSpread_clusterCR = false;
-	passRPCBx_clusterCR = false;
-	passMaxStation_clusterCR = false;
-	passLepton_clusterCR = false;
-	pass50Hits_clusterCR = false;
-	pass25Hits_clusterCR = false;
-	passFullVeto_rpcCR = false;
-	passRPCCR = false;
-	passClusterMET_rpcCR = false;
-	passMaxStation_rpcCR = false;
-	passJetMET_rpcCR = false;
-	passLepton_rpcCR = false;
-	pass50Hits_rpcCR = false;
-	pass25Hits_rpcCR = false;
-	nWheels1=0;
-	nWheels25=0;
-	nWheels50=0;
-	nStations1=0;
-	nStations25=0;
-	nStations50=0;
-	hitStation1=0;
-	hitStation2=0;
-	hitStation3=0;
-	hitStation4=0;
-	hitWheelm2=0;
-	hitWheelm1=0;
-	hitWheel0=0;
-	hitWheel1=0;
-	hitWheel2=0;
+        if(evtNum%100000==0){ cout << evtNum << " of " << totalNum << endl; }
+        passFullVeto_clusterCR = false;
+        passRPCMatch_clusterCR = false;
+        passRPCSpread_clusterCR = false;
+        passRPCBx_clusterCR = false;
+        passMaxStation_clusterCR = false;
+        passLepton_clusterCR = false;
+        pass50Hits_clusterCR = false;
+        pass25Hits_clusterCR = false;
+        passFullVeto_rpcCR = false;
+        passRPCCR = false;
+        passClusterMET_rpcCR = false;
+        passMaxStation_rpcCR = false;
+        passJetMET_rpcCR = false;
+        passLepton_rpcCR = false;
+        pass50Hits_rpcCR = false;
+        pass25Hits_rpcCR = false;
+        nWheels1=0;
+        nWheels25=0;
+        nWheels50=0;
+        nStations1=0;
+        nStations25=0;
+        nStations50=0;
+        hitStation1=0;
+        hitStation2=0;
+        hitStation3=0;
+        hitStation4=0;
+        hitWheelm2=0;
+        hitWheelm1=0;
+        hitWheel0=0;
+        hitWheel1=0;
+        hitWheel2=0;
 
-	nRPCWheels1=0;
-	nRPCWheels5=0;
-	nRPCWheels10=0;
-	nRPCStations1=0;
-	nRPCStations5=0;
-	nRPCStations10=0;
-	hitRPCStation1=0;
-	hitRPCStation2=0;
-	hitRPCStation3=0;
-	hitRPCStation4=0;
-	hitRPCWheelm2=0;
-	hitRPCWheelm1=0;
-	hitRPCWheel0=0;
-	hitRPCWheel1=0;
-	hitRPCWheel2=0;
+        nRPCWheels1=0;
+        nRPCWheels5=0;
+        nRPCWheels10=0;
+        nRPCStations1=0;
+        nRPCStations5=0;
+        nRPCStations10=0;
+        hitRPCStation1=0;
+        hitRPCStation2=0;
+        hitRPCStation3=0;
+        hitRPCStation4=0;
+        hitRPCWheelm2=0;
+        hitRPCWheelm1=0;
+        hitRPCWheel0=0;
+        hitRPCWheel1=0;
+        hitRPCWheel2=0;
 
-	maxClusterSize=0;
+        maxClusterSize=0;
 
-	if(*MET > 200){
-	  dPhi_min = 999.;
-	  dPhiClusterMET = 0.0;
-	  dPhiClusterMET_max = 0.0;
-	  if(*nDtRechitClusters>0){
-	    nPassNoVeto+=1;
-	    for(Int_t itr_clust = 0; itr_clust<*nDtRechitClusters; itr_clust++){
-	      dPhiClusterMET = dtRechitClusterPhi[itr_clust] - *METphi;
-	      if(dPhiClusterMET > TMath::Pi()){ dPhiClusterMET -= 2*TMath::Pi(); }
-	      if(dPhiClusterMET < -1.0*TMath::Pi()){ dPhiClusterMET += 2*TMath::Pi(); }
-	      if(fabs(dPhiClusterMET)>dPhiClusterMET_max){ dPhiClusterMET_max=fabs(dPhiClusterMET); }
-	      if(dtRechitClusterSize[itr_clust]>maxClusterSize){ maxClusterSize = dtRechitClusterSize[itr_clust]; }
-	    }
-	    for(Int_t itr_jet = 0; itr_jet<*nJets; itr_jet++){
-	      if(fabs(jetEta[itr_jet])<3.0 && jetPt[itr_jet]>30.0){
-		dPhi_tmp = jetPhi[itr_jet] - *METphi;
-		if(dPhi_tmp > TMath::Pi()){ dPhi_tmp -= 2*TMath::Pi(); }
-		if(dPhi_tmp < -1.0*TMath::Pi()){ dPhi_tmp += 2*TMath::Pi(); }
-		if(fabs(dPhi_tmp) < dPhi_min){
-		  dPhi_min = fabs(dPhi_tmp);
-		}
-	      }
-	    }
-	  }
-	  if(fabs(dPhiClusterMET)<1.0){ nPassClusterCR+=1; }
+        if(*MET > 200) {
+          dPhi_min = 999.;
+          dPhiClusterMET = 0.0;
+          dPhiClusterMET_max = 0.0;
+          if(*nDtRechitClusters>0){
+            nPassNoVeto+=1;
+            for(Int_t itr_clust = 0; itr_clust<*nDtRechitClusters; itr_clust++){
+              dPhiClusterMET = dtRechitClusterPhi[itr_clust] - *METphi;
+              if(dPhiClusterMET > TMath::Pi()){ dPhiClusterMET -= 2*TMath::Pi(); }
+              if(dPhiClusterMET < -1.0*TMath::Pi()){ dPhiClusterMET += 2*TMath::Pi(); }
+              if(fabs(dPhiClusterMET)>dPhiClusterMET_max){ dPhiClusterMET_max=fabs(dPhiClusterMET); }
+              if(dtRechitClusterSize[itr_clust]>maxClusterSize){ maxClusterSize = dtRechitClusterSize[itr_clust]; }
+            }
+            for(Int_t itr_jet = 0; itr_jet<*nJets; itr_jet++){
+              if(fabs(jetEta[itr_jet])<3.0 && jetPt[itr_jet]>30.0){
+                dPhi_tmp = jetPhi[itr_jet] - *METphi;
+                if(dPhi_tmp > TMath::Pi()){ dPhi_tmp -= 2*TMath::Pi(); }
+                if(dPhi_tmp < -1.0*TMath::Pi()){ dPhi_tmp += 2*TMath::Pi(); }
+                if(fabs(dPhi_tmp) < dPhi_min){
+                  dPhi_min = fabs(dPhi_tmp);
+                }
+              }
+            }
+          }
+          if(fabs(dPhiClusterMET)<1.0){ nPassClusterCR+=1; }
 
-	  for(Int_t itr_clust=0; itr_clust<*nDtRechitClusters; itr_clust++){
-	    if(dtRechitClusterSize[itr_clust]>50){
-	      passMuon=false;
-	      passMuon_alt=false;
-	      passJet=false;
-	      rpcBx.clear();
-	      rpcSpread = 99;
-	      rpcMedian = 99;
-	      dPhiClusterRPC = -0.1;
-	      dZClusterRPC = -1.;
-	      nStations25 = 0;
-	      nStations50 = 0;
-	      hoMatchedEnergy = 0.;
+          for(Int_t itr_clust=0; itr_clust<*nDtRechitClusters; itr_clust++){
+            if(dtRechitClusterSize[itr_clust]>50){
+              passMuon=false;
+              passMuon_alt=false;
+              passJet=false;
+              rpcBx.clear();
+              rpcSpread = 99;
+              rpcMedian = 99;
+              dPhiClusterRPC = -0.1;
+              dZClusterRPC = -1.;
+              nStations25 = 0;
+              nStations50 = 0;
+              hoMatchedEnergy = 0.;
 
-	      dPhiClusterMET = dtRechitClusterPhi[itr_clust] - *METphi;
-	      if(dPhiClusterMET > TMath::Pi()){ dPhiClusterMET -= 2*TMath::Pi(); }
-	      if(dPhiClusterMET < -1.0*TMath::Pi()){ dPhiClusterMET += 2*TMath::Pi(); }
+              dPhiClusterMET = dtRechitClusterPhi[itr_clust] - *METphi;
+              if(dPhiClusterMET > TMath::Pi()){ dPhiClusterMET -= 2*TMath::Pi(); }
+              if(dPhiClusterMET < -1.0*TMath::Pi()){ dPhiClusterMET += 2*TMath::Pi(); }
 
-	      if(dtRechitClusterJetVetoPt[itr_clust]<20.){ passJet = true; }
-	      if(dtRechitClusterMuonVetoPt[itr_clust]<10.){ passMuon = true; }
-	      if(*nLeptons==0){ passMuon_alt = true; }
+              if(dtRechitClusterJetVetoPt[itr_clust]<20.){ passJet = true; }
+              if(dtRechitClusterMuonVetoPt[itr_clust]<10.){ passMuon = true; }
+              if(*nLeptons==0){ passMuon_alt = true; }
 
-	      /*passMB1 = false;
-	      for(Int_t itr_ho = 0; itr_ho<*nHORechits; itr_ho++){
-		dPhi_tmp = hoRechitPhi[itr_ho] - dtRechitClusterPhi[itr_clust];
-		if(dPhi_tmp > TMath::Pi()){ dPhi_tmp -= 2*TMath::Pi(); }
-		if(dPhi_tmp < -1.0*TMath::Pi()){ dPhi_tmp += 2*TMath::Pi(); }
-		if(sqrt(pow(dPhi_tmp,2)+pow(hoRechitEta[itr_ho]-dtRechitClusterEta[itr_clust],2))<0.5){
-		  hoMatchedEnergy+=hoRechitE[itr_ho];
-		}
-	      }
-	      if(hoMatchedEnergy>40.0){ passMB1 = true; }
-	      */
-	      passMB1 = true;
-	      for(Int_t itr_dt = 0; itr_dt<*nDtRechits; itr_dt++){
-		if(sqrt(pow(dtRechitX[itr_dt],2)+pow(dtRechitY[itr_dt],2))>400. && sqrt(pow(dtRechitX[itr_dt],2)+pow(dtRechitY[itr_dt],2))<480.){
-		  dPhi_tmp = dtRechitPhi[itr_dt] - dtRechitClusterPhi[itr_clust];
-		  if(dPhi_tmp > TMath::Pi()){ dPhi_tmp -= 2*TMath::Pi(); }
-		  if(dPhi_tmp < -1.0*TMath::Pi()){ dPhi_tmp += 2*TMath::Pi(); }
-		  if(sqrt(pow(dPhi_tmp,2)+pow(dtRechitEta[itr_dt]-dtRechitClusterEta[itr_clust],2))<0.4){
-		    passMB1 = false;
-		    break;
-		  }
-		}
-		/*if(itr_clust==0 && *nDtRechits<750){
-		  dtStation=getStation(dtRechitX[itr_dt],dtRechitY[itr_dt]);
-		  dtWheel=getWheel(dtRechitZ[itr_dt]);
-		  if(dtStation==1){ hitStation1+=1; }
-		  else if(dtStation==2){ hitStation2+=1; }
-		  else if(dtStation==3){ hitStation3+=1; }
-		  else if(dtStation==4){ hitStation4+=1; }
-		  if(dtWheel==-2){ hitWheelm2+=1; }
-		  else if(dtWheel==-1){ hitWheelm1+=1; }
-		  else if(dtWheel==0){ hitWheel0+=1; }
-		  else if(dtWheel==1){ hitWheel1+=1; }
-		  else if(dtWheel==2){ hitWheel2+=1; }
-		  }*/
-	      }
-	      if(itr_clust==0){
-		if(hitStation1>0){
-		  nStations1+=1;
-		  if(hitStation1>25){
-		    nStations25+=1;
-		    if(hitStation1>50){
-		      nStations50+=1;
-		    }
-		  }
-		}
-		if(hitStation2>0){
-		  nStations1+=1;
-		  if(hitStation2>25){
-		    nStations25+=1;
-		    if(hitStation2>50){
-		      nStations50+=1;
-		    }
-		  }
-		}
-		if(hitStation3>0){
-		  nStations1+=1;
-		  if(hitStation3>25){
-		    nStations25+=1;
-		    if(hitStation3>50){
-		      nStations50+=1;
-		    }
-		  }
-		}
-		if(hitStation4>0){
-		  nStations1+=1;
-		  if(hitStation4>25){
-		    nStations25+=1;
-		    if(hitStation4>50){
-		      nStations50+=1;
-		    }
-		  }
-		}
-		if(hitWheel1>0){
-		  nWheels1+=1;
-		  if(hitWheel1>25){
-		    nWheels25+=1;
-		    if(hitWheel1>50){
-		      nWheels50+=1;
-		    }
-		  }
-		}
-		if(hitWheel2>0){
-		  nWheels1+=1;
-		  if(hitWheel2>25){
-		    nWheels25+=1;
-		    if(hitWheel2>50){
-		      nWheels50+=1;
-		    }
-		  }
-		}
-		if(hitWheel0>0){
-		  nWheels1+=1;
-		  if(hitWheel0>25){
-		    nWheels25+=1;
-		    if(hitWheel0>50){
-		      nWheels50+=1;
-		    }
-		  }
-		}
-		if(hitWheelm1>0){
-		  nWheels1+=1;
-		  if(hitWheelm1>25){
-		    nWheels25+=1;
-		    if(hitWheelm1>50){
-		      nWheels50+=1;
-		    }
-		  }
-		}
-		if(hitWheelm2>0){
-		  nWheels1+=1;
-		  if(hitWheelm2>25){
-		    nWheels25+=1;
-		    if(hitWheelm2>50){
-		      nWheels50+=1;
-		    }
-		  }
-		}
-	      }
-	      /*if(*nDtRechits>=750){
-		nStations1=4;
-		nStations25=4;
-		nStations50=4;
-		nWheels1=5;
-		nWheels25=5;
-		nWheels50=5;
-		}*/
-	      if(dtRechitClusterNSegmentStation1[itr_clust]>0){ passMB1 = false; }
+              /*passMB1 = false;
+                for(Int_t itr_ho = 0; itr_ho<*nHORechits; itr_ho++){
+                dPhi_tmp = hoRechitPhi[itr_ho] - dtRechitClusterPhi[itr_clust];
+                if(dPhi_tmp > TMath::Pi()){ dPhi_tmp -= 2*TMath::Pi(); }
+                if(dPhi_tmp < -1.0*TMath::Pi()){ dPhi_tmp += 2*TMath::Pi(); }
+                if(sqrt(pow(dPhi_tmp,2)+pow(hoRechitEta[itr_ho]-dtRechitClusterEta[itr_clust],2))<0.5){
+                hoMatchedEnergy+=hoRechitE[itr_ho];
+                }
+                }
+                if(hoMatchedEnergy>40.0){ passMB1 = true; }
+              */
+              passMB1 = true;
+              for(Int_t itr_dt = 0; itr_dt<*nDtRechits; itr_dt++){
+                if(sqrt(pow(dtRechitX[itr_dt],2)+pow(dtRechitY[itr_dt],2))>400. && sqrt(pow(dtRechitX[itr_dt],2)+pow(dtRechitY[itr_dt],2))<480.){
+                  dPhi_tmp = dtRechitPhi[itr_dt] - dtRechitClusterPhi[itr_clust];
+                  if(dPhi_tmp > TMath::Pi()){ dPhi_tmp -= 2*TMath::Pi(); }
+                  if(dPhi_tmp < -1.0*TMath::Pi()){ dPhi_tmp += 2*TMath::Pi(); }
+                  if(sqrt(pow(dPhi_tmp,2)+pow(dtRechitEta[itr_dt]-dtRechitClusterEta[itr_clust],2))<0.4){
+                    passMB1 = false;
+                    break;
+                  }
+                }
+                /*if(itr_clust==0 && *nDtRechits<750){
+                  dtStation=getStation(dtRechitX[itr_dt],dtRechitY[itr_dt]);
+                  dtWheel=getWheel(dtRechitZ[itr_dt]);
+                  if(dtStation==1){ hitStation1+=1; }
+                  else if(dtStation==2){ hitStation2+=1; }
+                  else if(dtStation==3){ hitStation3+=1; }
+                  else if(dtStation==4){ hitStation4+=1; }
+                  if(dtWheel==-2){ hitWheelm2+=1; }
+                  else if(dtWheel==-1){ hitWheelm1+=1; }
+                  else if(dtWheel==0){ hitWheel0+=1; }
+                  else if(dtWheel==1){ hitWheel1+=1; }
+                  else if(dtWheel==2){ hitWheel2+=1; }
+                  }*/
+              }
+              if(itr_clust==0){
+                if(hitStation1>0){
+                  nStations1+=1;
+                  if(hitStation1>25){
+                    nStations25+=1;
+                    if(hitStation1>50){
+                      nStations50+=1;
+                    }
+                  }
+                }
+                if(hitStation2>0){
+                  nStations1+=1;
+                  if(hitStation2>25){
+                    nStations25+=1;
+                    if(hitStation2>50){
+                      nStations50+=1;
+                    }
+                  }
+                }
+                if(hitStation3>0){
+                  nStations1+=1;
+                  if(hitStation3>25){
+                    nStations25+=1;
+                    if(hitStation3>50){
+                      nStations50+=1;
+                    }
+                  }
+                }
+                if(hitStation4>0){
+                  nStations1+=1;
+                  if(hitStation4>25){
+                    nStations25+=1;
+                    if(hitStation4>50){
+                      nStations50+=1;
+                    }
+                  }
+                }
+                if(hitWheel1>0){
+                  nWheels1+=1;
+                  if(hitWheel1>25){
+                    nWheels25+=1;
+                    if(hitWheel1>50){
+                      nWheels50+=1;
+                    }
+                  }
+                }
+                if(hitWheel2>0){
+                  nWheels1+=1;
+                  if(hitWheel2>25){
+                    nWheels25+=1;
+                    if(hitWheel2>50){
+                      nWheels50+=1;
+                    }
+                  }
+                }
+                if(hitWheel0>0){
+                  nWheels1+=1;
+                  if(hitWheel0>25){
+                    nWheels25+=1;
+                    if(hitWheel0>50){
+                      nWheels50+=1;
+                    }
+                  }
+                }
+                if(hitWheelm1>0){
+                  nWheels1+=1;
+                  if(hitWheelm1>25){
+                    nWheels25+=1;
+                    if(hitWheelm1>50){
+                      nWheels50+=1;
+                    }
+                  }
+                }
+                if(hitWheelm2>0){
+                  nWheels1+=1;
+                  if(hitWheelm2>25){
+                    nWheels25+=1;
+                    if(hitWheelm2>50){
+                      nWheels50+=1;
+                    }
+                  }
+                }
+              }
+              /*if(*nDtRechits>=750){
+                nStations1=4;
+                nStations25=4;
+                nStations50=4;
+                nWheels1=5;
+                nWheels25=5;
+                nWheels50=5;
+                }*/
+              if(dtRechitClusterNSegmentStation1[itr_clust]>0){ passMB1 = false; }
 
-	      //cout << "doing rpc" << endl;
-	      for(Int_t itr_rpc=0; itr_rpc<*nRPCRechits; itr_rpc++){
-		dPhi_tmp = RPCRechitPhi[itr_rpc] - dtRechitClusterPhi[itr_clust];
-		if(dPhi_tmp > TMath::Pi()){ dPhi_tmp -= 2*TMath::Pi(); }
-		if(dPhi_tmp < -1.0*TMath::Pi()){ dPhi_tmp += 2*TMath::Pi(); }
-		if(fabs(dPhi_tmp)<dPhiClusterRPC || dPhiClusterRPC==-0.1){ dPhiClusterRPC=fabs(dPhi_tmp); }
-		if(fabs(RPCRechitZ[itr_rpc] - dtRechitClusterZ[itr_clust])<dZClusterRPC || dZClusterRPC==-1.){ dZClusterRPC=fabs(RPCRechitZ[itr_rpc]-dtRechitClusterZ[itr_rpc]); }
-		if(fabs(RPCRechitZ[itr_rpc] - dtRechitClusterZ[itr_clust])<5. && fabs(dPhi_tmp)<0.4){
-		  rpcBx.push_back(RPCRechitBx[itr_rpc]);
-		}
-		/*if(itr_clust==0 && *nRPCRechits<500){
-		  rpcStation=getRPCLayer(RPCRechitX[itr_rpc],RPCRechitY[itr_rpc]);
-		  rpcWheel=getWheel(RPCRechitZ[itr_rpc]);
-		  if(abs(rpcWheel)<=2){
-		    if(rpcStation==1 || rpcStation==2){ hitRPCStation1+=1; }
-		    else if(rpcStation==3 || rpcStation==4){ hitRPCStation2+=1; }
-		    else if(rpcStation==5){ hitRPCStation3+=1; }
-		    else if(rpcStation==6){ hitRPCStation4+=1; }
-		    if(rpcWheel==-2){ hitRPCWheelm2+=1; }
-		    else if(rpcWheel==-1){ hitRPCWheelm1+=1; }
-		    else if(rpcWheel==0){ hitRPCWheel0+=1; }
-		    else if(rpcWheel==1){ hitRPCWheel1+=1; }
-		    else if(rpcWheel==2){ hitRPCWheel2+=1; }
-		  }
-		  }*/
-	      }
-	      if(!rpcBx.empty()){
-		rpcSpread = max_element(rpcBx.begin(), rpcBx.end()) - min_element(rpcBx.begin(), rpcBx.end());
-		if(rpcBx.size()%2 == 0){ rpcMedian = float(rpcBx[rpcBx.size()/2 - 1] + rpcBx[rpcBx.size()/2]) / 2.0; }
-		else{ rpcMedian = rpcBx[rpcBx.size()/2]; }
-	      }
-	      if(!rpcBx.empty() && rpcSpread>0){ passRPCCR=true; }
-	      if(itr_clust==0){
-		if(hitRPCStation1>0){
-		  nRPCStations1+=1;
-		  if(hitRPCStation1>5){
-		    nRPCStations5+=1;
-		    if(hitRPCStation1>10){
-		      nRPCStations10+=1;
-		    }
-		  }
-		}
-		if(hitRPCStation2>0){
-		  nRPCStations1+=1;
-		  if(hitRPCStation2>5){
-		    nRPCStations5+=1;
-		    if(hitRPCStation2>10){
-		      nRPCStations10+=1;
-		    }
-		  }
-		}
-		if(hitRPCStation3>0){
-		  nRPCStations1+=1;
-		  if(hitRPCStation3>5){
-		    nRPCStations5+=1;
-		    if(hitRPCStation3>10){
-		      nRPCStations10+=1;
-		    }
-		  }
-		}
-		if(hitRPCStation4>0){
-		  nRPCStations1+=1;
-		  if(hitRPCStation4>5){
-		    nRPCStations5+=1;
-		    if(hitRPCStation4>10){
-		      nRPCStations10+=1;
-		    }
-		  }
-		}
-		if(hitRPCWheel1>0){
-		  nRPCWheels1+=1;
-		  if(hitRPCWheel1>5){
-		    nRPCWheels5+=1;
-		    if(hitRPCWheel1>10){
-		      nRPCWheels10+=1;
-		    }
-		  }
-		}
-		if(hitRPCWheel2>0){
-		  nRPCWheels1+=1;
-		  if(hitRPCWheel2>5){
-		    nRPCWheels5+=1;
-		    if(hitRPCWheel2>10){
-		      nRPCWheels10+=1;
-		    }
-		  }
-		}
-		if(hitRPCWheel0>0){
-		  nRPCWheels1+=1;
-		  if(hitRPCWheel0>5){
-		    nRPCWheels5+=1;
-		    if(hitRPCWheel0>10){
-		      nRPCWheels10+=1;
-		    }
-		  }
-		}
-		if(hitRPCWheelm1>0){
-		  nRPCWheels1+=1;
-		  if(hitRPCWheelm1>5){
-		    nRPCWheels5+=1;
-		    if(hitRPCWheelm1>10){
-		      nRPCWheels10+=1;
-		    }
-		  }
-		}
-		if(hitRPCWheelm2>0){
-		  nRPCWheels1+=1;
-		  if(hitRPCWheelm2>5){
-		    nRPCWheels5+=1;
-		    if(hitRPCWheelm2>10){
-		      nRPCWheels10+=1;
-		    }
-		  }
-		}
-	      }
-	      /*if(*nRPCRechits>750){
-		nRPCStations1=4;
-		nRPCStations5=4;
-		nRPCStations10=4;
-		nRPCWheels1=5;
-		nRPCWheels5=5;
-		nRPCWheels10=5;
-		}*/
+              //cout << "doing rpc" << endl;
+              for(Int_t itr_rpc=0; itr_rpc<*nRPCRechits; itr_rpc++){
+                dPhi_tmp = RPCRechitPhi[itr_rpc] - dtRechitClusterPhi[itr_clust];
+                if(dPhi_tmp > TMath::Pi()){ dPhi_tmp -= 2*TMath::Pi(); }
+                if(dPhi_tmp < -1.0*TMath::Pi()){ dPhi_tmp += 2*TMath::Pi(); }
+                if(fabs(dPhi_tmp)<dPhiClusterRPC || dPhiClusterRPC==-0.1){ dPhiClusterRPC=fabs(dPhi_tmp); }
+                if(fabs(RPCRechitZ[itr_rpc] - dtRechitClusterZ[itr_clust])<dZClusterRPC || dZClusterRPC==-1.){ dZClusterRPC=fabs(RPCRechitZ[itr_rpc]-dtRechitClusterZ[itr_rpc]); }
+                if(fabs(RPCRechitZ[itr_rpc] - dtRechitClusterZ[itr_clust])<5. && fabs(dPhi_tmp)<0.4){
+                  rpcBx.push_back(RPCRechitBx[itr_rpc]);
+                }
+                /*if(itr_clust==0 && *nRPCRechits<500){
+                  rpcStation=getRPCLayer(RPCRechitX[itr_rpc],RPCRechitY[itr_rpc]);
+                  rpcWheel=getWheel(RPCRechitZ[itr_rpc]);
+                  if(abs(rpcWheel)<=2){
+                  if(rpcStation==1 || rpcStation==2){ hitRPCStation1+=1; }
+                  else if(rpcStation==3 || rpcStation==4){ hitRPCStation2+=1; }
+                  else if(rpcStation==5){ hitRPCStation3+=1; }
+                  else if(rpcStation==6){ hitRPCStation4+=1; }
+                  if(rpcWheel==-2){ hitRPCWheelm2+=1; }
+                  else if(rpcWheel==-1){ hitRPCWheelm1+=1; }
+                  else if(rpcWheel==0){ hitRPCWheel0+=1; }
+                  else if(rpcWheel==1){ hitRPCWheel1+=1; }
+                  else if(rpcWheel==2){ hitRPCWheel2+=1; }
+                  }
+                  }*/
+              }
+              if(!rpcBx.empty()){
+                rpcSpread = max_element(rpcBx.begin(), rpcBx.end()) - min_element(rpcBx.begin(), rpcBx.end());
+                if(rpcBx.size()%2 == 0){ rpcMedian = float(rpcBx[rpcBx.size()/2 - 1] + rpcBx[rpcBx.size()/2]) / 2.0; }
+                else{ rpcMedian = rpcBx[rpcBx.size()/2]; }
+              }
+              if(!rpcBx.empty() && rpcSpread>0){ passRPCCR=true; }
+              if(itr_clust==0){
+                if(hitRPCStation1>0){
+                  nRPCStations1+=1;
+                  if(hitRPCStation1>5){
+                    nRPCStations5+=1;
+                    if(hitRPCStation1>10){
+                      nRPCStations10+=1;
+                    }
+                  }
+                }
+                if(hitRPCStation2>0){
+                  nRPCStations1+=1;
+                  if(hitRPCStation2>5){
+                    nRPCStations5+=1;
+                    if(hitRPCStation2>10){
+                      nRPCStations10+=1;
+                    }
+                  }
+                }
+                if(hitRPCStation3>0){
+                  nRPCStations1+=1;
+                  if(hitRPCStation3>5){
+                    nRPCStations5+=1;
+                    if(hitRPCStation3>10){
+                      nRPCStations10+=1;
+                    }
+                  }
+                }
+                if(hitRPCStation4>0){
+                  nRPCStations1+=1;
+                  if(hitRPCStation4>5){
+                    nRPCStations5+=1;
+                    if(hitRPCStation4>10){
+                      nRPCStations10+=1;
+                    }
+                  }
+                }
+                if(hitRPCWheel1>0){
+                  nRPCWheels1+=1;
+                  if(hitRPCWheel1>5){
+                    nRPCWheels5+=1;
+                    if(hitRPCWheel1>10){
+                      nRPCWheels10+=1;
+                    }
+                  }
+                }
+                if(hitRPCWheel2>0){
+                  nRPCWheels1+=1;
+                  if(hitRPCWheel2>5){
+                    nRPCWheels5+=1;
+                    if(hitRPCWheel2>10){
+                      nRPCWheels10+=1;
+                    }
+                  }
+                }
+                if(hitRPCWheel0>0){
+                  nRPCWheels1+=1;
+                  if(hitRPCWheel0>5){
+                    nRPCWheels5+=1;
+                    if(hitRPCWheel0>10){
+                      nRPCWheels10+=1;
+                    }
+                  }
+                }
+                if(hitRPCWheelm1>0){
+                  nRPCWheels1+=1;
+                  if(hitRPCWheelm1>5){
+                    nRPCWheels5+=1;
+                    if(hitRPCWheelm1>10){
+                      nRPCWheels10+=1;
+                    }
+                  }
+                }
+                if(hitRPCWheelm2>0){
+                  nRPCWheels1+=1;
+                  if(hitRPCWheelm2>5){
+                    nRPCWheels5+=1;
+                    if(hitRPCWheelm2>10){
+                      nRPCWheels10+=1;
+                    }
+                  }
+                }
+              }
+              /*if(*nRPCRechits>750){
+                nRPCStations1=4;
+                nRPCStations5=4;
+                nRPCStations10=4;
+                nRPCWheels1=5;
+                nRPCWheels5=5;
+                nRPCWheels10=5;
+                }*/
 
-	      if(passJet && passMB1){
+              if(passJet && passMB1){
 
-		if(fabs(dPhiClusterMET)<1.0 && passMuon){
-		  passFullVeto_clusterCR=true;
-		  h_nRPCMatched_fullVeto_clusterMETCR[itr_mX]->Fill(rpcBx.size());
-		  h_rpcSpread_fullVeto_clusterMETCR[itr_mX]->Fill(rpcSpread);
-		  h_rpcBx_fullVeto_clusterMETCR[itr_mX]->Fill(rpcMedian);
-		  h_dPhiJetMET_fullVeto_clusterMETCR[itr_mX]->Fill(fabs(dPhi_min));
-		  h_dtRechitClusterMaxStation_fullVeto_clusterMETCR[itr_mX]->Fill(dtRechitClusterMaxStation[itr_clust]);
+                if(fabs(dPhiClusterMET)<1.0 && passMuon){
+                  passFullVeto_clusterCR=true;
+                  h_nRPCMatched_fullVeto_clusterMETCR[itr_mX]->Fill(rpcBx.size());
+                  h_rpcSpread_fullVeto_clusterMETCR[itr_mX]->Fill(rpcSpread);
+                  h_rpcBx_fullVeto_clusterMETCR[itr_mX]->Fill(rpcMedian);
+                  h_dPhiJetMET_fullVeto_clusterMETCR[itr_mX]->Fill(fabs(dPhi_min));
+                  h_dtRechitClusterMaxStation_fullVeto_clusterMETCR[itr_mX]->Fill(dtRechitClusterMaxStation[itr_clust]);
 
-		  if(dtRechitClusterMaxStation[itr_clust]>2){
-		    passMaxStation_clusterCR=true;
-		    if(!rpcBx.empty()){
-		      passRPCMatch_clusterCR=true;
-		      if(rpcSpread==0){
-			passRPCSpread_clusterCR=true;
-			if(rpcMedian>=0.){
-			  passRPCBx_clusterCR=true;
-			  if(*nLeptons==0){
-			    passLepton_clusterCR=true;
-			    if(nStations50<3 && nWheels50<3){
-			      pass50Hits_clusterCR=true;
-			      if(nStations25<3 && nWheels25<3){
-				pass25Hits_clusterCR=true;
-			      }
-			    }
-			  }
-			}
-		      }
-		    }
-		  }
+                  if(dtRechitClusterMaxStation[itr_clust]>2){
+                    passMaxStation_clusterCR=true;
+                    if(!rpcBx.empty()){
+                      passRPCMatch_clusterCR=true;
+                      if(rpcSpread==0){
+                        passRPCSpread_clusterCR=true;
+                        if(rpcMedian>=0.){
+                          passRPCBx_clusterCR=true;
+                          if(*nLeptons==0){
+                            passLepton_clusterCR=true;
+                            if(nStations50<3 && nWheels50<3){
+                              pass50Hits_clusterCR=true;
+                              if(nStations25<3 && nWheels25<3){
+                                pass25Hits_clusterCR=true;
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
 
-		  if(!rpcBx.empty() && rpcSpread==0 && rpcMedian>=0.){ h_dtRechitClusterMaxStation_Nminus1_clusterMETCR[itr_mX]->Fill(dtRechitClusterMaxStation[itr_clust]); }
-		  if(!rpcBx.empty() && rpcSpread==0 && rpcMedian>=0.){ h_dPhiJetMET_Nminus1_clusterMETCR[itr_mX]->Fill(fabs(dPhi_min)); }
-		  if(!rpcBx.empty() && rpcSpread==0 && dtRechitClusterMaxStation[itr_clust]>2){ h_rpcBx_Nminus1_clusterMETCR[itr_mX]->Fill(rpcMedian); }
-		  if(!rpcBx.empty() && rpcMedian>=0. && dtRechitClusterMaxStation[itr_clust]>2){ h_rpcSpread_Nminus1_clusterMETCR[itr_mX]->Fill(rpcSpread); }
-		  if(dtRechitClusterMaxStation[itr_clust]>2){ h_nRPCMatched_Nminus1_clusterMETCR[itr_mX]->Fill(rpcBx.size()); }
-		}
+                  if(!rpcBx.empty() && rpcSpread==0 && rpcMedian>=0.){ h_dtRechitClusterMaxStation_Nminus1_clusterMETCR[itr_mX]->Fill(dtRechitClusterMaxStation[itr_clust]); }
+                  if(!rpcBx.empty() && rpcSpread==0 && rpcMedian>=0.){ h_dPhiJetMET_Nminus1_clusterMETCR[itr_mX]->Fill(fabs(dPhi_min)); }
+                  if(!rpcBx.empty() && rpcSpread==0 && dtRechitClusterMaxStation[itr_clust]>2){ h_rpcBx_Nminus1_clusterMETCR[itr_mX]->Fill(rpcMedian); }
+                  if(!rpcBx.empty() && rpcMedian>=0. && dtRechitClusterMaxStation[itr_clust]>2){ h_rpcSpread_Nminus1_clusterMETCR[itr_mX]->Fill(rpcSpread); }
+                  if(dtRechitClusterMaxStation[itr_clust]>2){ h_nRPCMatched_Nminus1_clusterMETCR[itr_mX]->Fill(rpcBx.size()); }
+                }
 
-		if(!rpcBx.empty() && rpcSpread==0 && passMuon){
-		  passFullVeto_rpcCR=true;
-		  h_dPhiClusterMET_fullVeto_rpcCR[itr_mX]->Fill(fabs(dPhiClusterMET));
-		  h_dPhiJetMET_fullVeto_rpcCR[itr_mX]->Fill(fabs(dPhi_min));
-		  h_dtRechitClusterMaxStation_fullVeto_rpcCR[itr_mX]->Fill(dtRechitClusterMaxStation[itr_clust]);
+                if(!rpcBx.empty() && rpcSpread==0 && passMuon){
+                  passFullVeto_rpcCR=true;
+                  h_dPhiClusterMET_fullVeto_rpcCR[itr_mX]->Fill(fabs(dPhiClusterMET));
+                  h_dPhiJetMET_fullVeto_rpcCR[itr_mX]->Fill(fabs(dPhi_min));
+                  h_dtRechitClusterMaxStation_fullVeto_rpcCR[itr_mX]->Fill(dtRechitClusterMaxStation[itr_clust]);
 
-		  if(dtRechitClusterMaxStation[itr_clust]>2){
-		    passMaxStation_rpcCR=true;
-		    h_dPhiClusterMET_Nminus1_rpcCR[itr_mX]->Fill(fabs(dPhiClusterMET));
-		    h_dPhiJetMET_Nminus1_rpcCR[itr_mX]->Fill(fabs(dPhi_min));
-		    if(fabs(dPhiClusterMET)<1.0){
-		      passClusterMET_rpcCR=true;
-		      if(fabs(dPhi_min)>0.6){
-			passJetMET_rpcCR=true;
-			if(*nLeptons==0){
-			  passLepton_rpcCR=true;
-			  if(nStations50<3 && nWheels50<3){
-			    pass50Hits_rpcCR=true;
-			    if(nStations25<4 && nWheels25<3){
-			      pass25Hits_rpcCR=true;
-			    }
-			  }
-			}
-		      }
-		    }
-		  }
-		  if(fabs(dPhiClusterMET)<1.0){
-		    h_dtRechitClusterMaxStation_Nminus1_rpcCR[itr_mX]->Fill(dtRechitClusterMaxStation[itr_clust]);
-		  }
-		}
+                  if(dtRechitClusterMaxStation[itr_clust]>2){
+                    passMaxStation_rpcCR=true;
+                    h_dPhiClusterMET_Nminus1_rpcCR[itr_mX]->Fill(fabs(dPhiClusterMET));
+                    h_dPhiJetMET_Nminus1_rpcCR[itr_mX]->Fill(fabs(dPhi_min));
+                    if(fabs(dPhiClusterMET)<1.0){
+                      passClusterMET_rpcCR=true;
+                      if(fabs(dPhi_min)>0.6){
+                        passJetMET_rpcCR=true;
+                        if(*nLeptons==0){
+                          passLepton_rpcCR=true;
+                          if(nStations50<3 && nWheels50<3){
+                            pass50Hits_rpcCR=true;
+                            if(nStations25<4 && nWheels25<3){
+                              pass25Hits_rpcCR=true;
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                  if(fabs(dPhiClusterMET)<1.0){
+                    h_dtRechitClusterMaxStation_Nminus1_rpcCR[itr_mX]->Fill(dtRechitClusterMaxStation[itr_clust]);
+                  }
+                }
 
-		if(passMuon){
-		  if(!rpcBx.empty() && rpcSpread==0){
-		    if(rpcMedian>=0.){
-		      if(dtRechitClusterMaxStation[itr_clust]>2){
-			if(fabs(dPhi_min)>0.6){
-			  if(fabs(dPhiClusterMET)<1.0){
-			    if(*nLeptons==0){
-			      if(nStations50<3 && nWheels50<3){
-				if(nStations25<4 && nWheels25<3){
-				  h_dtRechitClusterSize_signalRegion[itr_mX]->Fill(dtRechitClusterSize[itr_clust]);
-				  h_dtRechitClusterSize_fullSelection_rpcCR[itr_mX]->Fill(dtRechitClusterSize[itr_clust]);
-				  h_dtRechitClusterSize_fullSelection_clusterMETCR[itr_mX]->Fill(dtRechitClusterSize[itr_clust]);
-				}
-			      }
-			    }
-			  }
-			}
-		      }
-		    }
-		  }
-		}
+                if(passMuon){
+                  if(!rpcBx.empty() && rpcSpread==0){
+                    if(rpcMedian>=0.){
+                      if(dtRechitClusterMaxStation[itr_clust]>2){
+                        if(fabs(dPhi_min)>0.6){
+                          if(fabs(dPhiClusterMET)<1.0){
+                            if(*nLeptons==0){
+                              if(nStations50<3 && nWheels50<3){
+                                if(nStations25<4 && nWheels25<3){
+                                  h_dtRechitClusterSize_signalRegion[itr_mX]->Fill(dtRechitClusterSize[itr_clust]);
+                                  h_dtRechitClusterSize_fullSelection_rpcCR[itr_mX]->Fill(dtRechitClusterSize[itr_clust]);
+                                  h_dtRechitClusterSize_fullSelection_clusterMETCR[itr_mX]->Fill(dtRechitClusterSize[itr_clust]);
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
 
-	      }
-	    }
-	  }
-	}
-	if(passFullVeto_clusterCR){ nPassFullVeto_clusterCR+=1; }
-	if(passRPCMatch_clusterCR){ nPassRPCMatch_clusterCR+=1; }
-	if(passRPCSpread_clusterCR){ nPassRPCSpread_clusterCR+=1; }
-	if(passRPCBx_clusterCR){ nPassRPCBx_clusterCR+=1; }
-	if(passMaxStation_clusterCR){
-	  nPassMaxStation_clusterCR+=1;
-	  if(maxClusterSize>150){
-	    h_nStations1_150hits_clusterMETCR[itr_mX]->Fill(nStations1);
-	    h_nStations25_150hits_clusterMETCR[itr_mX]->Fill(nStations25);
-	    h_nStations50_150hits_clusterMETCR[itr_mX]->Fill(nStations50);
-	    h_nWheels1_150hits_clusterMETCR[itr_mX]->Fill(nWheels1);
-	    h_nWheels25_150hits_clusterMETCR[itr_mX]->Fill(nWheels25);
-	    h_nWheels50_150hits_clusterMETCR[itr_mX]->Fill(nWheels50);
+              }
+            }
+          }
+        }
+        if(passFullVeto_clusterCR){ nPassFullVeto_clusterCR+=1; }
+        if(passRPCMatch_clusterCR){ nPassRPCMatch_clusterCR+=1; }
+        if(passRPCSpread_clusterCR){ nPassRPCSpread_clusterCR+=1; }
+        if(passRPCBx_clusterCR){ nPassRPCBx_clusterCR+=1; }
+        if(passMaxStation_clusterCR){
+          nPassMaxStation_clusterCR+=1;
+          if(maxClusterSize>150){
+            h_nStations1_150hits_clusterMETCR[itr_mX]->Fill(nStations1);
+            h_nStations25_150hits_clusterMETCR[itr_mX]->Fill(nStations25);
+            h_nStations50_150hits_clusterMETCR[itr_mX]->Fill(nStations50);
+            h_nWheels1_150hits_clusterMETCR[itr_mX]->Fill(nWheels1);
+            h_nWheels25_150hits_clusterMETCR[itr_mX]->Fill(nWheels25);
+            h_nWheels50_150hits_clusterMETCR[itr_mX]->Fill(nWheels50);
 
-	    h_nRPCStations1_150hits_clusterMETCR[itr_mX]->Fill(nRPCStations1);
-	    h_nRPCStations5_150hits_clusterMETCR[itr_mX]->Fill(nRPCStations5);
-	    h_nRPCStations10_150hits_clusterMETCR[itr_mX]->Fill(nRPCStations10);
-	    h_nRPCWheels1_150hits_clusterMETCR[itr_mX]->Fill(nRPCWheels1);
-	    h_nRPCWheels5_150hits_clusterMETCR[itr_mX]->Fill(nRPCWheels5);
-	    h_nRPCWheels10_150hits_clusterMETCR[itr_mX]->Fill(nRPCWheels10);
-	  }
-	  else if(maxClusterSize>100){
-	    h_nStations1_100hits_clusterMETCR[itr_mX]->Fill(nStations1);
-	    h_nStations25_100hits_clusterMETCR[itr_mX]->Fill(nStations25);
-	    h_nStations50_100hits_clusterMETCR[itr_mX]->Fill(nStations50);
-	    h_nWheels1_100hits_clusterMETCR[itr_mX]->Fill(nWheels1);
-	    h_nWheels25_100hits_clusterMETCR[itr_mX]->Fill(nWheels25);
-	    h_nWheels50_100hits_clusterMETCR[itr_mX]->Fill(nWheels50);
+            h_nRPCStations1_150hits_clusterMETCR[itr_mX]->Fill(nRPCStations1);
+            h_nRPCStations5_150hits_clusterMETCR[itr_mX]->Fill(nRPCStations5);
+            h_nRPCStations10_150hits_clusterMETCR[itr_mX]->Fill(nRPCStations10);
+            h_nRPCWheels1_150hits_clusterMETCR[itr_mX]->Fill(nRPCWheels1);
+            h_nRPCWheels5_150hits_clusterMETCR[itr_mX]->Fill(nRPCWheels5);
+            h_nRPCWheels10_150hits_clusterMETCR[itr_mX]->Fill(nRPCWheels10);
+          }
+          else if(maxClusterSize>100){
+            h_nStations1_100hits_clusterMETCR[itr_mX]->Fill(nStations1);
+            h_nStations25_100hits_clusterMETCR[itr_mX]->Fill(nStations25);
+            h_nStations50_100hits_clusterMETCR[itr_mX]->Fill(nStations50);
+            h_nWheels1_100hits_clusterMETCR[itr_mX]->Fill(nWheels1);
+            h_nWheels25_100hits_clusterMETCR[itr_mX]->Fill(nWheels25);
+            h_nWheels50_100hits_clusterMETCR[itr_mX]->Fill(nWheels50);
 
-	    h_nRPCStations1_100hits_clusterMETCR[itr_mX]->Fill(nRPCStations1);
-	    h_nRPCStations5_100hits_clusterMETCR[itr_mX]->Fill(nRPCStations5);
-	    h_nRPCStations10_100hits_clusterMETCR[itr_mX]->Fill(nRPCStations10);
-	    h_nRPCWheels1_100hits_clusterMETCR[itr_mX]->Fill(nRPCWheels1);
-	    h_nRPCWheels5_100hits_clusterMETCR[itr_mX]->Fill(nRPCWheels5);
-	    h_nRPCWheels10_100hits_clusterMETCR[itr_mX]->Fill(nRPCWheels10);
-	  }
-	  else{
-	    h_nStations1_50hits_clusterMETCR[itr_mX]->Fill(nStations1);
-	    h_nStations25_50hits_clusterMETCR[itr_mX]->Fill(nStations25);
-	    h_nStations50_50hits_clusterMETCR[itr_mX]->Fill(nStations50);
-	    h_nWheels1_50hits_clusterMETCR[itr_mX]->Fill(nWheels1);
-	    h_nWheels25_50hits_clusterMETCR[itr_mX]->Fill(nWheels25);
-	    h_nWheels50_50hits_clusterMETCR[itr_mX]->Fill(nWheels50);
+            h_nRPCStations1_100hits_clusterMETCR[itr_mX]->Fill(nRPCStations1);
+            h_nRPCStations5_100hits_clusterMETCR[itr_mX]->Fill(nRPCStations5);
+            h_nRPCStations10_100hits_clusterMETCR[itr_mX]->Fill(nRPCStations10);
+            h_nRPCWheels1_100hits_clusterMETCR[itr_mX]->Fill(nRPCWheels1);
+            h_nRPCWheels5_100hits_clusterMETCR[itr_mX]->Fill(nRPCWheels5);
+            h_nRPCWheels10_100hits_clusterMETCR[itr_mX]->Fill(nRPCWheels10);
+          }
+          else{
+            h_nStations1_50hits_clusterMETCR[itr_mX]->Fill(nStations1);
+            h_nStations25_50hits_clusterMETCR[itr_mX]->Fill(nStations25);
+            h_nStations50_50hits_clusterMETCR[itr_mX]->Fill(nStations50);
+            h_nWheels1_50hits_clusterMETCR[itr_mX]->Fill(nWheels1);
+            h_nWheels25_50hits_clusterMETCR[itr_mX]->Fill(nWheels25);
+            h_nWheels50_50hits_clusterMETCR[itr_mX]->Fill(nWheels50);
 
-	    h_nRPCStations1_50hits_clusterMETCR[itr_mX]->Fill(nRPCStations1);
-	    h_nRPCStations5_50hits_clusterMETCR[itr_mX]->Fill(nRPCStations5);
-	    h_nRPCStations10_50hits_clusterMETCR[itr_mX]->Fill(nRPCStations10);
-	    h_nRPCWheels1_50hits_clusterMETCR[itr_mX]->Fill(nRPCWheels1);
-	    h_nRPCWheels5_50hits_clusterMETCR[itr_mX]->Fill(nRPCWheels5);
-	    h_nRPCWheels10_50hits_clusterMETCR[itr_mX]->Fill(nRPCWheels10);
-	  }
-	}
-	if(passLepton_clusterCR){ nPassLepton_clusterCR+=1; }
-	if(pass50Hits_clusterCR){ nPass50Hits_clusterCR+=1; }
-	if(pass25Hits_clusterCR){ nPass25Hits_clusterCR+=1; }
+            h_nRPCStations1_50hits_clusterMETCR[itr_mX]->Fill(nRPCStations1);
+            h_nRPCStations5_50hits_clusterMETCR[itr_mX]->Fill(nRPCStations5);
+            h_nRPCStations10_50hits_clusterMETCR[itr_mX]->Fill(nRPCStations10);
+            h_nRPCWheels1_50hits_clusterMETCR[itr_mX]->Fill(nRPCWheels1);
+            h_nRPCWheels5_50hits_clusterMETCR[itr_mX]->Fill(nRPCWheels5);
+            h_nRPCWheels10_50hits_clusterMETCR[itr_mX]->Fill(nRPCWheels10);
+          }
+        }
+        if(passLepton_clusterCR){ nPassLepton_clusterCR+=1; }
+        if(pass50Hits_clusterCR){ nPass50Hits_clusterCR+=1; }
+        if(pass25Hits_clusterCR){ nPass25Hits_clusterCR+=1; }
 
-	if(passRPCCR){ nPassRPCCR+=1; }
-	if(passFullVeto_rpcCR){ nPassFullVeto_rpcCR+=1; }
-	if(passClusterMET_rpcCR){ nPassClusterMET_rpcCR+=1; }
-	if(passMaxStation_rpcCR){ nPassMaxStation_rpcCR+=1; }
-	if(passJetMET_rpcCR){ nPassJetMET_rpcCR+=1; }
-	if(passLepton_rpcCR){ nPassLepton_rpcCR+=1; }
-	if(pass50Hits_rpcCR){ nPass50Hits_rpcCR+=1; }
-	if(pass25Hits_rpcCR){ nPass25Hits_rpcCR+=1; }
-	evtNum+=1;
+        if(passRPCCR){ nPassRPCCR+=1; }
+        if(passFullVeto_rpcCR){ nPassFullVeto_rpcCR+=1; }
+        if(passClusterMET_rpcCR){ nPassClusterMET_rpcCR+=1; }
+        if(passMaxStation_rpcCR){ nPassMaxStation_rpcCR+=1; }
+        if(passJetMET_rpcCR){ nPassJetMET_rpcCR+=1; }
+        if(passLepton_rpcCR){ nPassLepton_rpcCR+=1; }
+        if(pass50Hits_rpcCR){ nPass50Hits_rpcCR+=1; }
+        if(pass25Hits_rpcCR){ nPass25Hits_rpcCR+=1; }
+        evtNum+=1;
       }
     }
 
