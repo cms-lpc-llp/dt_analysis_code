@@ -4,12 +4,23 @@ R__LOAD_LIBRARY(libTreePlayer)
 
 void analyzeSignal_ABCD(){
 
+  const bool useHDFS(false);
+  const bool useCERN(false);
+  TString fsPreFix;
+  if (useHDFS) {
+    fsPreFix = "/mnt/hadoop";
+  }
+  else {
+    fsPreFix = "root://cmsxrootd.fnal.gov/";
+    if (useCERN) fsPreFix = "root://cms-xrd-global.cern.ch//";
+  }
+
   char name[50];
   char title[100];
   char mX[3][10] = {"15","40","55"};
   char ctau[10] = "10000";
   char years[3][20] = {"MC_Summer16","MC_Fall17","MC_Fall18"};
-  TString dir("/mnt/hadoop/store/group/phys_exotica/delayedjets/displacedJetMuonAnalyzer/driftTube/V1p17/");
+  TString dir(fsPreFix + "/store/group/phys_exotica/delayedjets/displacedJetMuonAnalyzer/driftTube/V1p17/");
   TFile *_ofile = TFile::Open("outSig_ABCD.root","RECREATE");
 
   TH1D *h_dtRechitClusterSize_signalRegion[4];

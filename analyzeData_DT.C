@@ -1,45 +1,26 @@
 R__LOAD_LIBRARY(libTreePlayer)
 
-int getStation(float hitX, float hitY){
-  float hitR = sqrt(pow(hitX,2)+pow(hitY,2));
-  if(hitR > 400. && hitR < 480.){ return 1; }
-  else if(hitR > 485. && hitR < 560.){ return 2; }
-  else if(hitR > 590. && hitR < 650.){ return 3; }
-  else if(hitR > 690. && hitR < 800.){ return 4; }
-  else{ return -1; }
-}
-
-int getWheel(float hitZ){
-  if(hitZ > 0){
-    if(hitZ < 127.){ return 0; }
-    else if(hitZ < 395.){ return 1; }
-    else if(hitZ < 661.){ return 2; }
-    else{ return -99; }
-  }
-  else{
-    return -1*getWheel(-1.0*hitZ);
-  }
-}
-
-int getRPCLayer(float hitX, float hitY){
-  float hitR = sqrt(pow(hitX,2)+pow(hitY,2));
-  if(hitR > 410. && hitR < 440.){ return 1; }
-  else if(hitR > 445. && hitR < 475.){ return 2; }
-  else if(hitR > 490. && hitR < 520.){ return 3; }
-  else if(hitR > 525. && hitR < 555.){ return 4; }
-  else if(hitR > 600. && hitR < 630.){ return 5; }
-  else if(hitR > 700. && hitR < 770.){ return 6; }
-  else{ return -1; }
-}
+#include "helpers.h"
 
 void analyzeData_beamHalo(){
+
+  const bool useHDFS(false);
+  const bool useCERN(false);
+  TString fsPreFix;
+  if (useHDFS) {
+    fsPreFix = "/mnt/hadoop";
+  }
+  else {
+    fsPreFix = "root://cmsxrootd.fnal.gov/";
+    if (useCERN) fsPreFix = "root://cms-xrd-global.cern.ch//";
+  }
 
   char name[50];
   char title[100];
   char years[4][10] = {"2018","2017","2016"};
   char runNames[3][20] = {"17Sept2018_Run2018","Run2017","Run2016"};
   char dates[3][20] = {"17Sep2018","17Nov2017","07Aug17"};
-  TString dir("/mnt/hadoop/store/group/phys_exotica/delayedjets/displacedJetMuonAnalyzer/driftTube/V1p17/Data");
+  TString dir(fsPreFix + "/store/group/phys_exotica/delayedjets/displacedJetMuonAnalyzer/driftTube/V1p17/Data");
   TFile *_ofile = TFile::Open("outData_beamHalo.root","RECREATE");
 
   TH2D *h_jetRechitT_jetEta[4];
@@ -64,7 +45,7 @@ void analyzeData_beamHalo(){
   TH1D *h_nRpcRechits_Layer2[4];
   TH1D *h_nRpcRechits_Layer3[4];
   TH1D *h_nRpcRechits_Layer4[4];
-  TH1D *h_nRpcRechits_Layer5[4];  
+  TH1D *h_nRpcRechits_Layer5[4];
   TH1D *h_nRpcRechits_Layer6[4];
   TH1D *h_nStation[4];
   TH1D *h_nStationLowThresh[4];
@@ -94,7 +75,7 @@ void analyzeData_beamHalo(){
   Int_t nStation = -1;
   Int_t nStationLowThresh = -1;
   Int_t nStationThresh = -1;
- 
+
   Double_t dPhi_tmp = 0.0;
   Double_t dPhi_min = 0.0;
   Double_t dPhiClusterMET = 0.0;
@@ -209,7 +190,7 @@ void analyzeData_beamHalo(){
 
     sprintf(name,"h_rpcRechitX_rpcRechitY_%s",years[itr_year]);
     h_rpcRechitX_rpcRechitY[itr_year] = new TH2D(name,"",320,-800,800,320,-800,800);
-  
+
     sprintf(name,"h_dtRechitZ_dtRechitR_%s",years[itr_year]);
     h_dtRechitZ_dtRechitR[itr_year] = new TH2D(name,"",240,-600,600,80,400,800);
 
@@ -234,7 +215,7 @@ void analyzeData_beamHalo(){
     }
 
     TTreeReader treeReader("MuonSystem",_file);
-    
+
     TTreeReaderValue<unsigned int> runNum(treeReader,"runNum");
     TTreeReaderValue<unsigned int> lumiSec(treeReader,"lumiSec");
     TTreeReaderValue<unsigned int> eventNum(treeReader,"evtNum");
@@ -312,16 +293,16 @@ void analyzeData_beamHalo(){
       nPassFullPlus = 0;
       dPhi_min = 999.;
       if(evtNum%100000==0){ cout << evtNum << " of " << treeReader.GetEntries(1) << endl; }
-      
+
       if(*MET > 200){
-	
+
 	for(Int_t itr_jet = 0; itr_jet<*nJets; itr_jet++){
 	  if(fabs(jetEta[itr_jet])<3.0 && jetPt[itr_jet]>30.0){
 	    dPhi_tmp = jetPhi[itr_jet] - *METphi;
 	    if(dPhi_tmp > TMath::Pi()){ dPhi_tmp -= 2*TMath::Pi(); }
 	    if(dPhi_tmp < -1.0*TMath::Pi()){ dPhi_tmp += 2*TMath::Pi(); }
-	    if(fabs(dPhi_tmp) < dPhi_min){ 
-	      dPhi_min = fabs(dPhi_tmp); 
+	    if(fabs(dPhi_tmp) < dPhi_min){
+	      dPhi_min = fabs(dPhi_tmp);
 	    }
 	  }
 	}
@@ -403,7 +384,7 @@ void analyzeData_beamHalo(){
 	      }
 	    }
 	  }
-	
+
 	  h_nRpcRechits_Layer1[itr_year]->Fill(rpcLayerCount[0]);
 	  h_nRpcRechits_Layer2[itr_year]->Fill(rpcLayerCount[1]);
 	  h_nRpcRechits_Layer3[itr_year]->Fill(rpcLayerCount[2]);
@@ -446,7 +427,7 @@ void analyzeData_beamHalo(){
 
 	      if(passJet && passMuon && passMB1){
 		nPassFull += 1;
-		
+
 		if(!rpcBx.empty()){
 		  if(rpcSpread==0){
 		    if(dtRechitClusterMaxStation[itr_clust]>2){
