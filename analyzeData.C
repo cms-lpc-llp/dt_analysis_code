@@ -1,8 +1,10 @@
 R__LOAD_LIBRARY(libTreePlayer)
 
+#include "datafiles.h"
 #include "helpers.h"
 
 void analyzeData(){
+
 
   const bool useHDFS(false);
   const bool useCERN(false);
@@ -1267,7 +1269,9 @@ void analyzeData(){
       _file = TFile::Open(dir+years[itr_year]+"/v4/v4/normalized/Run2_displacedJetMuonNtupler_V1p15_Data2016_Data2017_Data2018-HighMET_goodLumi.root");
     }
     else{
-      _file = TFile::Open(dir+years[itr_year]+"/v5/normalized/Run2_displacedJetMuonNtupler_V1p15_Data"+years[itr_year]+"_"+runNames[itr_year]+"-HighMET-"+dates[itr_year]+"_goodLumi.root");
+      // cout << itr_year << " " << datafiles[itr_year] << std::endl;
+      _file = TFile::Open(TString(datafiles[itr_year]));
+// dir+years[itr_year]+"/v5/normalized/Run2_displacedJetMuonNtupler_V1p15_Data"+years[itr_year]+"_"+runNames[itr_year]+"-HighMET-"+dates[itr_year]+"_goodLumi.root");
     }
 
     TTreeReader treeReader("MuonSystem",_file);
