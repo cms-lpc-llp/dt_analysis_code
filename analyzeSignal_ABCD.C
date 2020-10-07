@@ -37,12 +37,15 @@ void analyzeSignal_ABCD(){
   char name[50];
   char title[100];
   char mX[3][10] = {"15","40","55"};
-  char ctau[10] = "10000";
-  char years[3][20] = {"MC_Summer16","MC_Fall17","MC_Fall18"};
+  char ctau[10] = "1000";
+  char years[3][20] = {"MC_Fall18","MC_Fall17","MC_Summer16"};
   TString dir("/mnt/hadoop/store/group/phys_exotica/delayedjets/displacedJetMuonAnalyzer/driftTube/V1p17/");
+  //TString dir("/mnt/hadoop/store/group/phys_exotica/delayedjets/displacedJetMuonAnalyzer/driftTube/V1p15/");
   TFile *_ofile = TFile::Open("outSig_ABCD.root","RECREATE");
 
   TH1D *h_dtRechitClusterSize_signalRegion[4];
+  TH1D *h_dtRechitClusterSize_fullSelection_rpcCR[4];
+  TH1D *h_dtRechitClusterSize_fullSelection_clusterMETCR[4];
 
   TH1D *h_nRPCMatched_fullVeto_clusterMETCR[4];
   TH1D *h_rpcSpread_fullVeto_clusterMETCR[4];
@@ -121,6 +124,7 @@ void analyzeSignal_ABCD(){
   Bool_t passMuon_alt = false;
   Bool_t passMB1 = false;
   Bool_t passJet = false;
+  Double_t hoMatchedEnergy = 0.0;
   
   Bool_t passClusterCR = false;
   Bool_t passNoVeto_clusterCR = false;
@@ -129,12 +133,19 @@ void analyzeSignal_ABCD(){
   Bool_t passRPCSpread_clusterCR = false;
   Bool_t passRPCBx_clusterCR = false;
   Bool_t passMaxStation_clusterCR = false;
-  
+  Bool_t passLepton_clusterCR = false;
+  Bool_t pass50Hits_clusterCR = false;
+  Bool_t pass25Hits_clusterCR = false;
+
   Bool_t passNoVeto = false;  
   Bool_t passFullVeto_rpcCR = false;
   Bool_t passRPCCR = false;
   Bool_t passClusterMET_rpcCR = false;
   Bool_t passMaxStation_rpcCR = false;
+  Bool_t passJetMET_rpcCR = false;
+  Bool_t passLepton_rpcCR = false;
+  Bool_t pass50Hits_rpcCR = false;
+  Bool_t pass25Hits_rpcCR = false;
   Bool_t passFullPlus = false;
 
   Int_t nPassClusterCR = 0;
@@ -144,13 +155,20 @@ void analyzeSignal_ABCD(){
   Int_t nPassRPCSpread_clusterCR = 0;
   Int_t nPassRPCBx_clusterCR = 0;
   Int_t nPassMaxStation_clusterCR = 0;
-  
+  Int_t nPassLepton_clusterCR = 0;
+  Int_t nPass50Hits_clusterCR = 0;
+  Int_t nPass25Hits_clusterCR = 0;
+
   Int_t nPassNoVeto = 0;  
   Int_t nPassFullVeto_rpcCR = 0;
   Int_t nPassRPCCR = 0;
   Int_t nPassClusterMET_rpcCR = 0;
   Int_t nPassMaxStation_rpcCR = 0;
   Int_t nPassFullPlus = 0;
+  Int_t nPassJetMET_rpcCR = 0;
+  Int_t nPassLepton_rpcCR = 0;
+  Int_t nPass50Hits_rpcCR = 0;
+  Int_t nPass25Hits_rpcCR = 0;
 
   Int_t nStations1 = 0;
   Int_t nStations25 = 0;
@@ -196,6 +214,12 @@ void analyzeSignal_ABCD(){
 
     sprintf(name,"h_dtRechitClusterSize_signalRegion_%s_%s",mX[itr_mX],ctau);
     h_dtRechitClusterSize_signalRegion[itr_mX] = new TH1D(name,"",50,0,500);
+
+    sprintf(name,"h_dtRechitClusterSize_fullSelection_clusterMETCR_%s_%s",mX[itr_mX],ctau);
+    h_dtRechitClusterSize_fullSelection_clusterMETCR[itr_mX] = new TH1D(name,"",50,0,500);
+
+    sprintf(name,"h_dtRechitClusterSize_fullSelection_rpcCR_%s_%s",mX[itr_mX],ctau);
+    h_dtRechitClusterSize_fullSelection_rpcCR[itr_mX] = new TH1D(name,"",50,0,500);
 
     sprintf(name,"h_nRPCMatched_fullVeto_clusterMETCR_%s_%s",mX[itr_mX],ctau);
     h_nRPCMatched_fullVeto_clusterMETCR[itr_mX] = new TH1D(name,"",20,0,20);
@@ -363,6 +387,9 @@ void analyzeSignal_ABCD(){
     nPassRPCSpread_clusterCR = 0;
     nPassRPCBx_clusterCR = 0;
     nPassMaxStation_clusterCR = 0;
+    nPassLepton_clusterCR = 0;
+    nPass50Hits_clusterCR = 0;
+    nPass25Hits_clusterCR = 0;
   
     nPassNoVeto = 0;  
     nPassFullVeto_rpcCR = 0;
@@ -370,6 +397,10 @@ void analyzeSignal_ABCD(){
     nPassClusterMET_rpcCR = 0;
     nPassMaxStation_rpcCR = 0;
     nPassFullPlus = 0;
+    nPassJetMET_rpcCR = 0;
+    nPassLepton_rpcCR = 0;
+    nPass50Hits_rpcCR = 0;
+    nPass25Hits_rpcCR = 0;
 
     evtNum = 0;
     totalNum = 0;
@@ -380,10 +411,12 @@ void analyzeSignal_ABCD(){
       
       TFile *_file;
       if(strcmp(years[itr_year],"MC_Summer16")==0){
-	_file = TFile::Open(dir+years[itr_year]+"/v1/v3/normalized/ggH_HToSSTobbbb_MH-125_MS-"+mX[itr_mX]+"_ctau-"+ctau+"_TuneCUETP8M1_13TeV-powheg-pythia8_1pb_weighted.root");
+	//_file = TFile::Open(dir+years[itr_year]+"/v1/v3/normalized/ggH_HToSSTobbbb_MH-125_MS-"+mX[itr_mX]+"_ctau-"+ctau+"_TuneCUETP8M1_13TeV-powheg-pythia8_1pb_weighted.root");
+	_file = TFile::Open(dir+years[itr_year]+"/v3/v5/normalized/ggH_HToSSTobbbb_MH-125_MS-"+mX[itr_mX]+"_ctau-"+ctau+"_TuneCUETP8M1_13TeV-powheg-pythia8_1pb_weighted.root");
       }
       else{
-	_file = TFile::Open(dir+years[itr_year]+"/v1/v3/normalized/ggH_HToSSTobbbb_MH-125_MS-"+mX[itr_mX]+"_ctau-"+ctau+"_TuneCP5_13TeV-powheg-pythia8_1pb_weighted.root");
+	//_file = TFile::Open(dir+years[itr_year]+"/v1/v3/normalized/ggH_HToSSTobbbb_MH-125_MS-"+mX[itr_mX]+"_ctau-"+ctau+"_TuneCP5_13TeV-powheg-pythia8_1pb_weighted.root");
+	_file = TFile::Open(dir+years[itr_year]+"/v3/v5/normalized/ggH_HToSSTobbbb_MH-125_MS-"+mX[itr_mX]+"_ctau-"+ctau+"_TuneCP5_13TeV-powheg-pythia8_1pb_weighted.root");
       }
       
       TTreeReader treeReader("MuonSystem",_file);
@@ -430,13 +463,13 @@ void analyzeSignal_ABCD(){
       TTreeReaderArray<float> jetPt(treeReader,"jetPt");
       TTreeReaderArray<float> jetEta(treeReader,"jetEta");
       TTreeReaderArray<float> jetPhi(treeReader,"jetPhi");
-      TTreeReaderArray<float> jetRechitT(treeReader,"jetRechitT");
-      TTreeReaderArray<float> jetRechitT_rms(treeReader,"jetRechitT_rms");
-      TTreeReaderArray<float> jetElectronEnergyFraction(treeReader,"jetElectronEnergyFraction");
-      TTreeReaderArray<float> jetPhotonEnergyFraction(treeReader,"jetPhotonEnergyFraction");
-      TTreeReaderArray<float> jetNeutralHadronEnergyFraction(treeReader,"jetNeutralHadronEnergyFraction");
-      TTreeReaderArray<float> jetChargedHadronEnergyFraction(treeReader,"jetChargedHadronEnergyFraction");
-      TTreeReaderArray<float> jetMuonEnergyFraction(treeReader,"jetMuonEnergyFraction");
+      //TTreeReaderArray<float> jetRechitT(treeReader,"jetRechitT");
+      //TTreeReaderArray<float> jetRechitT_rms(treeReader,"jetRechitT_rms");
+      //TTreeReaderArray<float> jetElectronEnergyFraction(treeReader,"jetElectronEnergyFraction");
+      //TTreeReaderArray<float> jetPhotonEnergyFraction(treeReader,"jetPhotonEnergyFraction");
+      //TTreeReaderArray<float> jetNeutralHadronEnergyFraction(treeReader,"jetNeutralHadronEnergyFraction");
+      //TTreeReaderArray<float> jetChargedHadronEnergyFraction(treeReader,"jetChargedHadronEnergyFraction");
+      //TTreeReaderArray<float> jetMuonEnergyFraction(treeReader,"jetMuonEnergyFraction");
       
       TTreeReaderValue<int> nRPCRechits(treeReader,"nRpc");
       TTreeReaderArray<float> RPCRechitX(treeReader,"rpcX");
@@ -445,8 +478,18 @@ void analyzeSignal_ABCD(){
       TTreeReaderArray<float> RPCRechitPhi(treeReader,"rpcPhi");
       TTreeReaderArray<int> RPCRechitBx(treeReader,"rpcBx");
       
+      /*TTreeReaderValue<int> nHORechits(treeReader,"nHORechits");
+      TTreeReaderArray<float> hoRechitX(treeReader,"hoRechit_X");
+      TTreeReaderArray<float> hoRechitY(treeReader,"hoRechit_Y");
+      TTreeReaderArray<float> hoRechitZ(treeReader,"hoRechit_Z");
+      TTreeReaderArray<float> hoRechitEta(treeReader,"hoRechit_Eta");
+      TTreeReaderArray<float> hoRechitPhi(treeReader,"hoRechit_Phi");
+      TTreeReaderArray<float> hoRechitE(treeReader,"hoRechit_E");
+      TTreeReaderArray<float> hoRechitT(treeReader,"hoRechit_T");
+      */
       TTreeReaderValue<int> nLeptons(treeReader,"nLeptons");
-      
+      //TTreeReaderValue<int> nMuons(treeReader,"nMuons");
+
       _ofile->cd();
       totalNum += treeReader.GetEntries(1);
       while(treeReader.Next()){
@@ -456,10 +499,49 @@ void analyzeSignal_ABCD(){
 	passRPCSpread_clusterCR = false;
 	passRPCBx_clusterCR = false;
 	passMaxStation_clusterCR = false;
+	passLepton_clusterCR = false;
+	pass50Hits_clusterCR = false;
+	pass25Hits_clusterCR = false;
 	passFullVeto_rpcCR = false;
 	passRPCCR = false;
 	passClusterMET_rpcCR = false;
 	passMaxStation_rpcCR = false;
+	passJetMET_rpcCR = false;
+	passLepton_rpcCR = false;
+	pass50Hits_rpcCR = false;
+	pass25Hits_rpcCR = false;
+	nWheels1=0;
+	nWheels25=0;
+	nWheels50=0;
+	nStations1=0;
+	nStations25=0;
+	nStations50=0;
+	hitStation1=0;
+	hitStation2=0;
+	hitStation3=0;
+	hitStation4=0;
+	hitWheelm2=0;
+	hitWheelm1=0;
+	hitWheel0=0;
+	hitWheel1=0;
+	hitWheel2=0;
+	
+	nRPCWheels1=0;
+	nRPCWheels5=0;
+	nRPCWheels10=0;
+	nRPCStations1=0;
+	nRPCStations5=0;
+	nRPCStations10=0;
+	hitRPCStation1=0;
+	hitRPCStation2=0;
+	hitRPCStation3=0;
+	hitRPCStation4=0;
+	hitRPCWheelm2=0;
+	hitRPCWheelm1=0;
+	hitRPCWheel0=0;
+	hitRPCWheel1=0;
+	hitRPCWheel2=0;
+	
 	maxClusterSize=0;
 	
 	if(*MET > 200){
@@ -500,7 +582,8 @@ void analyzeSignal_ABCD(){
 	      dZClusterRPC = -1.;
 	      nStations25 = 0;
 	      nStations50 = 0;
-
+	      hoMatchedEnergy = 0.;
+	      
 	      dPhiClusterMET = dtRechitClusterPhi[itr_clust] - *METphi;
 	      if(dPhiClusterMET > TMath::Pi()){ dPhiClusterMET -= 2*TMath::Pi(); }
 	      if(dPhiClusterMET < -1.0*TMath::Pi()){ dPhiClusterMET += 2*TMath::Pi(); }
@@ -509,6 +592,17 @@ void analyzeSignal_ABCD(){
 	      if(dtRechitClusterMuonVetoPt[itr_clust]<10.){ passMuon = true; }
 	      if(*nLeptons==0){ passMuon_alt = true; }
 	    
+	      /*passMB1 = false;
+	      for(Int_t itr_ho = 0; itr_ho<*nHORechits; itr_ho++){
+		dPhi_tmp = hoRechitPhi[itr_ho] - dtRechitClusterPhi[itr_clust];
+		if(dPhi_tmp > TMath::Pi()){ dPhi_tmp -= 2*TMath::Pi(); }
+		if(dPhi_tmp < -1.0*TMath::Pi()){ dPhi_tmp += 2*TMath::Pi(); }
+		if(sqrt(pow(dPhi_tmp,2)+pow(hoRechitEta[itr_ho]-dtRechitClusterEta[itr_clust],2))<0.5){
+		  hoMatchedEnergy+=hoRechitE[itr_ho];
+		}
+	      }
+	      if(hoMatchedEnergy>40.0){ passMB1 = true; }
+	      */
 	      passMB1 = true;
 	      for(Int_t itr_dt = 0; itr_dt<*nDtRechits; itr_dt++){
 		if(sqrt(pow(dtRechitX[itr_dt],2)+pow(dtRechitY[itr_dt],2))>400. && sqrt(pow(dtRechitX[itr_dt],2)+pow(dtRechitY[itr_dt],2))<480.){
@@ -520,7 +614,111 @@ void analyzeSignal_ABCD(){
 		    break;
 		  }
 		}
+		/*if(itr_clust==0 && *nDtRechits<750){
+		  dtStation=getStation(dtRechitX[itr_dt],dtRechitY[itr_dt]);
+		  dtWheel=getWheel(dtRechitZ[itr_dt]);
+		  if(dtStation==1){ hitStation1+=1; }
+		  else if(dtStation==2){ hitStation2+=1; }
+		  else if(dtStation==3){ hitStation3+=1; }
+		  else if(dtStation==4){ hitStation4+=1; }
+		  if(dtWheel==-2){ hitWheelm2+=1; }
+		  else if(dtWheel==-1){ hitWheelm1+=1; }
+		  else if(dtWheel==0){ hitWheel0+=1; }
+		  else if(dtWheel==1){ hitWheel1+=1; }
+		  else if(dtWheel==2){ hitWheel2+=1; }
+		  }*/
 	      }
+	      if(itr_clust==0){
+		if(hitStation1>0){
+		  nStations1+=1;
+		  if(hitStation1>25){
+		    nStations25+=1;
+		    if(hitStation1>50){
+		      nStations50+=1;
+		    }
+		  }
+		}
+		if(hitStation2>0){
+		  nStations1+=1;
+		  if(hitStation2>25){
+		    nStations25+=1;
+		    if(hitStation2>50){
+		      nStations50+=1;
+		    }
+		  }
+		}
+		if(hitStation3>0){
+		  nStations1+=1;
+		  if(hitStation3>25){
+		    nStations25+=1;
+		    if(hitStation3>50){
+		      nStations50+=1;
+		    }
+		  }
+		}
+		if(hitStation4>0){
+		  nStations1+=1;
+		  if(hitStation4>25){
+		    nStations25+=1;
+		    if(hitStation4>50){
+		      nStations50+=1;
+		    }
+		  }
+		}
+		if(hitWheel1>0){
+		  nWheels1+=1;
+		  if(hitWheel1>25){
+		    nWheels25+=1;
+		    if(hitWheel1>50){
+		      nWheels50+=1;
+		    }
+		  }
+		}
+		if(hitWheel2>0){
+		  nWheels1+=1;
+		  if(hitWheel2>25){
+		    nWheels25+=1;
+		    if(hitWheel2>50){
+		      nWheels50+=1;
+		    }
+		  }
+		}
+		if(hitWheel0>0){
+		  nWheels1+=1;
+		  if(hitWheel0>25){
+		    nWheels25+=1;
+		    if(hitWheel0>50){
+		      nWheels50+=1;
+		    }
+		  }
+		}
+		if(hitWheelm1>0){
+		  nWheels1+=1;
+		  if(hitWheelm1>25){
+		    nWheels25+=1;
+		    if(hitWheelm1>50){
+		      nWheels50+=1;
+		    }
+		  }
+		}
+		if(hitWheelm2>0){
+		  nWheels1+=1;
+		  if(hitWheelm2>25){
+		    nWheels25+=1;
+		    if(hitWheelm2>50){
+		      nWheels50+=1;
+		    }
+		  }
+		}
+	      }
+	      /*if(*nDtRechits>=750){
+		nStations1=4;
+		nStations25=4;
+		nStations50=4;
+		nWheels1=5;
+		nWheels25=5;
+		nWheels50=5;
+		}*/
 	      if(dtRechitClusterNSegmentStation1[itr_clust]>0){ passMB1 = false; }
 	      
 	      //cout << "doing rpc" << endl;
@@ -533,12 +731,119 @@ void analyzeSignal_ABCD(){
 		if(fabs(RPCRechitZ[itr_rpc] - dtRechitClusterZ[itr_clust])<5. && fabs(dPhi_tmp)<0.4){
 		  rpcBx.push_back(RPCRechitBx[itr_rpc]);
 		}
+		/*if(itr_clust==0 && *nRPCRechits<500){
+		  rpcStation=getRPCLayer(RPCRechitX[itr_rpc],RPCRechitY[itr_rpc]);
+		  rpcWheel=getWheel(RPCRechitZ[itr_rpc]);
+		  if(abs(rpcWheel)<=2){
+		    if(rpcStation==1 || rpcStation==2){ hitRPCStation1+=1; }
+		    else if(rpcStation==3 || rpcStation==4){ hitRPCStation2+=1; }
+		    else if(rpcStation==5){ hitRPCStation3+=1; }
+		    else if(rpcStation==6){ hitRPCStation4+=1; }
+		    if(rpcWheel==-2){ hitRPCWheelm2+=1; }
+		    else if(rpcWheel==-1){ hitRPCWheelm1+=1; }
+		    else if(rpcWheel==0){ hitRPCWheel0+=1; }
+		    else if(rpcWheel==1){ hitRPCWheel1+=1; }
+		    else if(rpcWheel==2){ hitRPCWheel2+=1; }
+		  }
+		  }*/
 	      }
 	      if(!rpcBx.empty()){
 		rpcSpread = max_element(rpcBx.begin(), rpcBx.end()) - min_element(rpcBx.begin(), rpcBx.end());
 		if(rpcBx.size()%2 == 0){ rpcMedian = float(rpcBx[rpcBx.size()/2 - 1] + rpcBx[rpcBx.size()/2]) / 2.0; }
 		else{ rpcMedian = rpcBx[rpcBx.size()/2]; }
 	      }
+	      if(!rpcBx.empty() && rpcSpread>0){ passRPCCR=true; }
+	      if(itr_clust==0){
+		if(hitRPCStation1>0){
+		  nRPCStations1+=1;
+		  if(hitRPCStation1>5){
+		    nRPCStations5+=1;
+		    if(hitRPCStation1>10){
+		      nRPCStations10+=1;
+		    }
+		  }
+		}
+		if(hitRPCStation2>0){
+		  nRPCStations1+=1;
+		  if(hitRPCStation2>5){
+		    nRPCStations5+=1;
+		    if(hitRPCStation2>10){
+		      nRPCStations10+=1;
+		    }
+		  }
+		}
+		if(hitRPCStation3>0){
+		  nRPCStations1+=1;
+		  if(hitRPCStation3>5){
+		    nRPCStations5+=1;
+		    if(hitRPCStation3>10){
+		      nRPCStations10+=1;
+		    }
+		  }
+		}
+		if(hitRPCStation4>0){
+		  nRPCStations1+=1;
+		  if(hitRPCStation4>5){
+		    nRPCStations5+=1;
+		    if(hitRPCStation4>10){
+		      nRPCStations10+=1;
+		    }
+		  }
+		}
+		if(hitRPCWheel1>0){
+		  nRPCWheels1+=1;
+		  if(hitRPCWheel1>5){
+		    nRPCWheels5+=1;
+		    if(hitRPCWheel1>10){
+		      nRPCWheels10+=1;
+		    }
+		  }
+		}
+		if(hitRPCWheel2>0){
+		  nRPCWheels1+=1;
+		  if(hitRPCWheel2>5){
+		    nRPCWheels5+=1;
+		    if(hitRPCWheel2>10){
+		      nRPCWheels10+=1;
+		    }
+		  }
+		}
+		if(hitRPCWheel0>0){
+		  nRPCWheels1+=1;
+		  if(hitRPCWheel0>5){
+		    nRPCWheels5+=1;
+		    if(hitRPCWheel0>10){
+		      nRPCWheels10+=1;
+		    }
+		  }
+		}
+		if(hitRPCWheelm1>0){
+		  nRPCWheels1+=1;
+		  if(hitRPCWheelm1>5){
+		    nRPCWheels5+=1;
+		    if(hitRPCWheelm1>10){
+		      nRPCWheels10+=1;
+		    }
+		  }
+		}
+		if(hitRPCWheelm2>0){
+		  nRPCWheels1+=1;
+		  if(hitRPCWheelm2>5){
+		    nRPCWheels5+=1;
+		    if(hitRPCWheelm2>10){
+		      nRPCWheels10+=1;
+		    }
+		  }
+		}
+	      }
+	      /*if(*nRPCRechits>750){
+		nRPCStations1=4;
+		nRPCStations5=4;
+		nRPCStations10=4;
+		nRPCWheels1=5;
+		nRPCWheels5=5;
+		nRPCWheels10=5;
+		}*/
 
 	      if(passJet && passMB1){
 		
@@ -558,6 +863,15 @@ void analyzeSignal_ABCD(){
 			passRPCSpread_clusterCR=true;
 			if(rpcMedian>=0.){
 			  passRPCBx_clusterCR=true;
+			  if(*nLeptons==0){
+			    passLepton_clusterCR=true;
+			    if(nStations50<3 && nWheels50<3){
+			      pass50Hits_clusterCR=true;
+			      if(nStations25<3 && nWheels25<3){
+				pass25Hits_clusterCR=true;
+			      }
+			    }
+			  }
 			}
 		      }
 		    }
@@ -582,6 +896,18 @@ void analyzeSignal_ABCD(){
 		    h_dPhiJetMET_Nminus1_rpcCR[itr_mX]->Fill(fabs(dPhi_min));
 		    if(fabs(dPhiClusterMET)<1.0){ 
 		      passClusterMET_rpcCR=true;
+		      if(fabs(dPhi_min)>0.6){
+			passJetMET_rpcCR=true;
+			if(*nLeptons==0){
+			  passLepton_rpcCR=true;
+			  if(nStations50<3 && nWheels50<3){
+			    pass50Hits_rpcCR=true;
+			    if(nStations25<4 && nWheels25<3){
+			      pass25Hits_rpcCR=true;
+			    }
+			  }
+			}
+		      }
 		    }
 		  }
 		  if(fabs(dPhiClusterMET)<1.0){
@@ -595,7 +921,15 @@ void analyzeSignal_ABCD(){
 		      if(dtRechitClusterMaxStation[itr_clust]>2){
 			if(fabs(dPhi_min)>0.6){
 			  if(fabs(dPhiClusterMET)<1.0){
-			    h_dtRechitClusterSize_signalRegion[itr_mX]->Fill(dtRechitClusterSize[itr_clust]);
+			    if(*nLeptons==0){
+			      if(nStations50<3 && nWheels50<3){
+				if(nStations25<4 && nWheels25<3){
+				  h_dtRechitClusterSize_signalRegion[itr_mX]->Fill(dtRechitClusterSize[itr_clust]);
+				  h_dtRechitClusterSize_fullSelection_rpcCR[itr_mX]->Fill(dtRechitClusterSize[itr_clust]);
+				  h_dtRechitClusterSize_fullSelection_clusterMETCR[itr_mX]->Fill(dtRechitClusterSize[itr_clust]);
+				}
+			      }
+			    }
 			  }
 			}
 		      }
@@ -611,17 +945,71 @@ void analyzeSignal_ABCD(){
 	if(passRPCMatch_clusterCR){ nPassRPCMatch_clusterCR+=1; }
 	if(passRPCSpread_clusterCR){ nPassRPCSpread_clusterCR+=1; }
 	if(passRPCBx_clusterCR){ nPassRPCBx_clusterCR+=1; }
-	if(passMaxStation_clusterCR){ nPassMaxStation_clusterCR+=1; }
+	if(passMaxStation_clusterCR){ 
+	  nPassMaxStation_clusterCR+=1; 
+	  if(maxClusterSize>150){
+	    h_nStations1_150hits_clusterMETCR[itr_mX]->Fill(nStations1);
+	    h_nStations25_150hits_clusterMETCR[itr_mX]->Fill(nStations25);
+	    h_nStations50_150hits_clusterMETCR[itr_mX]->Fill(nStations50);
+	    h_nWheels1_150hits_clusterMETCR[itr_mX]->Fill(nWheels1);
+	    h_nWheels25_150hits_clusterMETCR[itr_mX]->Fill(nWheels25);
+	    h_nWheels50_150hits_clusterMETCR[itr_mX]->Fill(nWheels50);
+	    
+	    h_nRPCStations1_150hits_clusterMETCR[itr_mX]->Fill(nRPCStations1);
+	    h_nRPCStations5_150hits_clusterMETCR[itr_mX]->Fill(nRPCStations5);
+	    h_nRPCStations10_150hits_clusterMETCR[itr_mX]->Fill(nRPCStations10);
+	    h_nRPCWheels1_150hits_clusterMETCR[itr_mX]->Fill(nRPCWheels1);
+	    h_nRPCWheels5_150hits_clusterMETCR[itr_mX]->Fill(nRPCWheels5);
+	    h_nRPCWheels10_150hits_clusterMETCR[itr_mX]->Fill(nRPCWheels10);
+	  }
+	  else if(maxClusterSize>100){
+	    h_nStations1_100hits_clusterMETCR[itr_mX]->Fill(nStations1);
+	    h_nStations25_100hits_clusterMETCR[itr_mX]->Fill(nStations25);
+	    h_nStations50_100hits_clusterMETCR[itr_mX]->Fill(nStations50);
+	    h_nWheels1_100hits_clusterMETCR[itr_mX]->Fill(nWheels1);
+	    h_nWheels25_100hits_clusterMETCR[itr_mX]->Fill(nWheels25);
+	    h_nWheels50_100hits_clusterMETCR[itr_mX]->Fill(nWheels50);
+	    
+	    h_nRPCStations1_100hits_clusterMETCR[itr_mX]->Fill(nRPCStations1);
+	    h_nRPCStations5_100hits_clusterMETCR[itr_mX]->Fill(nRPCStations5);
+	    h_nRPCStations10_100hits_clusterMETCR[itr_mX]->Fill(nRPCStations10);
+	    h_nRPCWheels1_100hits_clusterMETCR[itr_mX]->Fill(nRPCWheels1);
+	    h_nRPCWheels5_100hits_clusterMETCR[itr_mX]->Fill(nRPCWheels5);
+	    h_nRPCWheels10_100hits_clusterMETCR[itr_mX]->Fill(nRPCWheels10);
+	  }
+	  else{
+	    h_nStations1_50hits_clusterMETCR[itr_mX]->Fill(nStations1);
+	    h_nStations25_50hits_clusterMETCR[itr_mX]->Fill(nStations25);
+	    h_nStations50_50hits_clusterMETCR[itr_mX]->Fill(nStations50);
+	    h_nWheels1_50hits_clusterMETCR[itr_mX]->Fill(nWheels1);
+	    h_nWheels25_50hits_clusterMETCR[itr_mX]->Fill(nWheels25);
+	    h_nWheels50_50hits_clusterMETCR[itr_mX]->Fill(nWheels50);
+	    
+	    h_nRPCStations1_50hits_clusterMETCR[itr_mX]->Fill(nRPCStations1);
+	    h_nRPCStations5_50hits_clusterMETCR[itr_mX]->Fill(nRPCStations5);
+	    h_nRPCStations10_50hits_clusterMETCR[itr_mX]->Fill(nRPCStations10);
+	    h_nRPCWheels1_50hits_clusterMETCR[itr_mX]->Fill(nRPCWheels1);
+	    h_nRPCWheels5_50hits_clusterMETCR[itr_mX]->Fill(nRPCWheels5);
+	    h_nRPCWheels10_50hits_clusterMETCR[itr_mX]->Fill(nRPCWheels10);
+	  }
+	}
+	if(passLepton_clusterCR){ nPassLepton_clusterCR+=1; }
+	if(pass50Hits_clusterCR){ nPass50Hits_clusterCR+=1; }
+	if(pass25Hits_clusterCR){ nPass25Hits_clusterCR+=1; }
 	
 	if(passRPCCR){ nPassRPCCR+=1; }
 	if(passFullVeto_rpcCR){ nPassFullVeto_rpcCR+=1; }
 	if(passClusterMET_rpcCR){ nPassClusterMET_rpcCR+=1; }
 	if(passMaxStation_rpcCR){ nPassMaxStation_rpcCR+=1; }
+	if(passJetMET_rpcCR){ nPassJetMET_rpcCR+=1; }
+	if(passLepton_rpcCR){ nPassLepton_rpcCR+=1; }
+	if(pass50Hits_rpcCR){ nPass50Hits_rpcCR+=1; }
+	if(pass25Hits_rpcCR){ nPass25Hits_rpcCR+=1; }
 	evtNum+=1;	
       }
     }
 
-    /*cout << "nPassNoVeto: " << nPassNoVeto << endl;
+    cout << "nPassNoVeto: " << nPassNoVeto << endl;
     cout << " " << endl;
     cout << "nPassClusterCR: " << nPassClusterCR << endl;
     cout << "nPassFullVeto_clusterCR: " << nPassFullVeto_clusterCR << endl;
@@ -629,12 +1017,19 @@ void analyzeSignal_ABCD(){
     cout << "nPassRPCMatch_clusterCR: " << nPassRPCMatch_clusterCR << endl;
     cout << "nPassRPCSpread_clusterCR: " << nPassRPCSpread_clusterCR << endl;
     cout << "nPassRPCBx_clusterCR: " << nPassRPCBx_clusterCR << endl;
+    cout << "nPassLepton_clusterCR: " << nPassLepton_clusterCR << endl;
+    cout << "nPass50Hits_clusterCR: " << nPass50Hits_clusterCR << endl;
+    cout << "nPass25Hits_clusterCR: " << nPass25Hits_clusterCR << endl;
     cout << " " << endl;
     cout << "nPassRPCCR: " << nPassRPCCR << endl;
     cout << "nPassFullVeto_rpcCR: " << nPassFullVeto_rpcCR << endl;
     cout << "nPassMaxStation_rpcCR: " << nPassMaxStation_rpcCR << endl;
     cout << "nPassClusterMET_rpcCR: " << nPassClusterMET_rpcCR << endl;
-    */
+    cout << "nPassJetMET_rpcCR: " << nPassJetMET_rpcCR << endl;
+    cout << "nPassLepton_rpcCR: " << nPassLepton_rpcCR << endl;
+    cout << "nPass50Hits_rpcCR: " << nPass50Hits_rpcCR << endl;
+    cout << "nPass25Hits_rpcCR: " << nPass25Hits_rpcCR << endl;
+
   }
 
   _ofile->Write();
