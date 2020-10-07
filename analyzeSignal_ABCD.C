@@ -1,36 +1,6 @@
 R__LOAD_LIBRARY(libTreePlayer)
 
-int getStation(float hitX, float hitY){
-  float hitR = sqrt(pow(hitX,2)+pow(hitY,2));
-  if(hitR > 400. && hitR < 480.){ return 1; }
-  else if(hitR > 485. && hitR < 560.){ return 2; }
-  else if(hitR > 590. && hitR < 650.){ return 3; }
-  else if(hitR > 690. && hitR < 800.){ return 4; }
-  else{ return -1; }
-}
-
-int getWheel(float hitZ){
-  if(hitZ > 0){
-    if(hitZ < 127.){ return 0; }
-    else if(hitZ < 395.){ return 1; }
-    else if(hitZ < 661.){ return 2; }
-    else{ return -99; }
-  }
-  else{
-    return -1*getWheel(-1.0*hitZ);
-  }
-}
-
-int getRPCLayer(float hitX, float hitY){
-  float hitR = sqrt(pow(hitX,2)+pow(hitY,2));
-  if(hitR > 410. && hitR < 440.){ return 1; }
-  else if(hitR > 445. && hitR < 475.){ return 2; }
-  else if(hitR > 490. && hitR < 520.){ return 3; }
-  else if(hitR > 525. && hitR < 555.){ return 4; }
-  else if(hitR > 600. && hitR < 630.){ return 5; }
-  else if(hitR > 700. && hitR < 770.){ return 6; }
-  else{ return -1; }
-}
+#include "helpers.h"
 
 void analyzeSignal_ABCD(){
 
@@ -121,7 +91,7 @@ void analyzeSignal_ABCD(){
   Bool_t passMuon_alt = false;
   Bool_t passMB1 = false;
   Bool_t passJet = false;
-  
+
   Bool_t passClusterCR = false;
   Bool_t passNoVeto_clusterCR = false;
   Bool_t passFullVeto_clusterCR = false;
@@ -129,8 +99,8 @@ void analyzeSignal_ABCD(){
   Bool_t passRPCSpread_clusterCR = false;
   Bool_t passRPCBx_clusterCR = false;
   Bool_t passMaxStation_clusterCR = false;
-  
-  Bool_t passNoVeto = false;  
+
+  Bool_t passNoVeto = false;
   Bool_t passFullVeto_rpcCR = false;
   Bool_t passRPCCR = false;
   Bool_t passClusterMET_rpcCR = false;
@@ -144,8 +114,8 @@ void analyzeSignal_ABCD(){
   Int_t nPassRPCSpread_clusterCR = 0;
   Int_t nPassRPCBx_clusterCR = 0;
   Int_t nPassMaxStation_clusterCR = 0;
-  
-  Int_t nPassNoVeto = 0;  
+
+  Int_t nPassNoVeto = 0;
   Int_t nPassFullVeto_rpcCR = 0;
   Int_t nPassRPCCR = 0;
   Int_t nPassClusterMET_rpcCR = 0;
@@ -226,7 +196,7 @@ void analyzeSignal_ABCD(){
 
     sprintf(name,"h_dtRechitClusterMaxStation_Nminus1_clusterMETCR_%s_%s",mX[itr_mX],ctau);
     h_dtRechitClusterMaxStation_Nminus1_clusterMETCR[itr_mX] = new TH1D(name,"",5,0,5);
-    
+
     sprintf(name,"h_dPhiClusterMET_fullVeto_rpcCR_%s_%s",mX[itr_mX],ctau);
     h_dPhiClusterMET_fullVeto_rpcCR[itr_mX] = new TH1D(name,"",35,0,3.5);
 
@@ -363,8 +333,8 @@ void analyzeSignal_ABCD(){
     nPassRPCSpread_clusterCR = 0;
     nPassRPCBx_clusterCR = 0;
     nPassMaxStation_clusterCR = 0;
-  
-    nPassNoVeto = 0;  
+
+    nPassNoVeto = 0;
     nPassFullVeto_rpcCR = 0;
     nPassRPCCR = 0;
     nPassClusterMET_rpcCR = 0;
@@ -377,7 +347,7 @@ void analyzeSignal_ABCD(){
     cout << mX[itr_mX] << "_" << ctau << endl;
     for(Int_t itr_year = 0; itr_year<3; itr_year++){
       cout << "  " << years[itr_year] << endl;
-      
+
       TFile *_file;
       if(strcmp(years[itr_year],"MC_Summer16")==0){
 	_file = TFile::Open(dir+years[itr_year]+"/v1/v3/normalized/ggH_HToSSTobbbb_MH-125_MS-"+mX[itr_mX]+"_ctau-"+ctau+"_TuneCUETP8M1_13TeV-powheg-pythia8_1pb_weighted.root");
@@ -385,15 +355,15 @@ void analyzeSignal_ABCD(){
       else{
 	_file = TFile::Open(dir+years[itr_year]+"/v1/v3/normalized/ggH_HToSSTobbbb_MH-125_MS-"+mX[itr_mX]+"_ctau-"+ctau+"_TuneCP5_13TeV-powheg-pythia8_1pb_weighted.root");
       }
-      
+
       TTreeReader treeReader("MuonSystem",_file);
-      
+
       TTreeReaderValue<unsigned int> runNum(treeReader,"runNum");
       TTreeReaderValue<unsigned int> lumiSec(treeReader,"lumiSec");
       TTreeReaderValue<unsigned int> eventNum(treeReader,"evtNum");
       TTreeReaderValue<float> MET(treeReader,"met");
       TTreeReaderValue<float> METphi(treeReader,"metPhi");
-      
+
       TTreeReaderValue<int> nDtRechitClusters(treeReader,"nDtRechitClusters");
       TTreeReaderArray<float> dtRechitClusterX(treeReader,"dtRechitClusterX");
       TTreeReaderArray<float> dtRechitClusterY(treeReader,"dtRechitClusterY");
@@ -416,7 +386,7 @@ void analyzeSignal_ABCD(){
       TTreeReaderArray<int> dtRechitClusterNStation(treeReader,"dtRechitClusterNStation");
       TTreeReaderArray<int> dtRechitClusterMaxChamber(treeReader,"dtRechitClusterMaxChamber");
       TTreeReaderArray<int> dtRechitClusterNChamber(treeReader,"dtRechitClusterNChamber");
-      
+
       TTreeReaderValue<int> nDtRechits(treeReader,"nDtRechits");
       TTreeReaderArray<float> dtRechitX(treeReader,"dtRechitX");
       TTreeReaderArray<float> dtRechitY(treeReader,"dtRechitY");
@@ -425,7 +395,7 @@ void analyzeSignal_ABCD(){
       TTreeReaderArray<float> dtRechitPhi(treeReader,"dtRechitPhi");
       TTreeReaderArray<int> dtRechitStation(treeReader,"dtRechitStation");
       TTreeReaderArray<int> dtRechitWheel(treeReader,"dtRechitWheel");
-      
+
       TTreeReaderValue<int> nJets(treeReader,"nJets");
       TTreeReaderArray<float> jetPt(treeReader,"jetPt");
       TTreeReaderArray<float> jetEta(treeReader,"jetEta");
@@ -437,16 +407,16 @@ void analyzeSignal_ABCD(){
       TTreeReaderArray<float> jetNeutralHadronEnergyFraction(treeReader,"jetNeutralHadronEnergyFraction");
       TTreeReaderArray<float> jetChargedHadronEnergyFraction(treeReader,"jetChargedHadronEnergyFraction");
       TTreeReaderArray<float> jetMuonEnergyFraction(treeReader,"jetMuonEnergyFraction");
-      
+
       TTreeReaderValue<int> nRPCRechits(treeReader,"nRpc");
       TTreeReaderArray<float> RPCRechitX(treeReader,"rpcX");
       TTreeReaderArray<float> RPCRechitY(treeReader,"rpcY");
       TTreeReaderArray<float> RPCRechitZ(treeReader,"rpcZ");
       TTreeReaderArray<float> RPCRechitPhi(treeReader,"rpcPhi");
       TTreeReaderArray<int> RPCRechitBx(treeReader,"rpcBx");
-      
+
       TTreeReaderValue<int> nLeptons(treeReader,"nLeptons");
-      
+
       _ofile->cd();
       totalNum += treeReader.GetEntries(1);
       while(treeReader.Next()){
@@ -461,7 +431,7 @@ void analyzeSignal_ABCD(){
 	passClusterMET_rpcCR = false;
 	passMaxStation_rpcCR = false;
 	maxClusterSize=0;
-	
+
 	if(*MET > 200){
 	  dPhi_min = 999.;
 	  dPhiClusterMET = 0.0;
@@ -480,16 +450,16 @@ void analyzeSignal_ABCD(){
 		dPhi_tmp = jetPhi[itr_jet] - *METphi;
 		if(dPhi_tmp > TMath::Pi()){ dPhi_tmp -= 2*TMath::Pi(); }
 		if(dPhi_tmp < -1.0*TMath::Pi()){ dPhi_tmp += 2*TMath::Pi(); }
-		if(fabs(dPhi_tmp) < dPhi_min){ 
-		  dPhi_min = fabs(dPhi_tmp); 
+		if(fabs(dPhi_tmp) < dPhi_min){
+		  dPhi_min = fabs(dPhi_tmp);
 		}
 	      }
 	    }
 	  }
 	  if(fabs(dPhiClusterMET)<1.0){ nPassClusterCR+=1; }
-	  
+
 	  for(Int_t itr_clust=0; itr_clust<*nDtRechitClusters; itr_clust++){
-	    if(dtRechitClusterSize[itr_clust]>50){  
+	    if(dtRechitClusterSize[itr_clust]>50){
 	      passMuon=false;
 	      passMuon_alt=false;
 	      passJet=false;
@@ -504,11 +474,11 @@ void analyzeSignal_ABCD(){
 	      dPhiClusterMET = dtRechitClusterPhi[itr_clust] - *METphi;
 	      if(dPhiClusterMET > TMath::Pi()){ dPhiClusterMET -= 2*TMath::Pi(); }
 	      if(dPhiClusterMET < -1.0*TMath::Pi()){ dPhiClusterMET += 2*TMath::Pi(); }
-	      
+
 	      if(dtRechitClusterJetVetoPt[itr_clust]<20.){ passJet = true; }
 	      if(dtRechitClusterMuonVetoPt[itr_clust]<10.){ passMuon = true; }
 	      if(*nLeptons==0){ passMuon_alt = true; }
-	    
+
 	      passMB1 = true;
 	      for(Int_t itr_dt = 0; itr_dt<*nDtRechits; itr_dt++){
 		if(sqrt(pow(dtRechitX[itr_dt],2)+pow(dtRechitY[itr_dt],2))>400. && sqrt(pow(dtRechitX[itr_dt],2)+pow(dtRechitY[itr_dt],2))<480.){
@@ -522,7 +492,7 @@ void analyzeSignal_ABCD(){
 		}
 	      }
 	      if(dtRechitClusterNSegmentStation1[itr_clust]>0){ passMB1 = false; }
-	      
+
 	      //cout << "doing rpc" << endl;
 	      for(Int_t itr_rpc=0; itr_rpc<*nRPCRechits; itr_rpc++){
 		dPhi_tmp = RPCRechitPhi[itr_rpc] - dtRechitClusterPhi[itr_clust];
@@ -541,7 +511,7 @@ void analyzeSignal_ABCD(){
 	      }
 
 	      if(passJet && passMB1){
-		
+
 		if(fabs(dPhiClusterMET)<1.0 && passMuon){
 		  passFullVeto_clusterCR=true;
 		  h_nRPCMatched_fullVeto_clusterMETCR[itr_mX]->Fill(rpcBx.size());
@@ -549,7 +519,7 @@ void analyzeSignal_ABCD(){
 		  h_rpcBx_fullVeto_clusterMETCR[itr_mX]->Fill(rpcMedian);
 		  h_dPhiJetMET_fullVeto_clusterMETCR[itr_mX]->Fill(fabs(dPhi_min));
 		  h_dtRechitClusterMaxStation_fullVeto_clusterMETCR[itr_mX]->Fill(dtRechitClusterMaxStation[itr_clust]);
-		  
+
 		  if(dtRechitClusterMaxStation[itr_clust]>2){
 		    passMaxStation_clusterCR=true;
 		    if(!rpcBx.empty()){
@@ -562,7 +532,7 @@ void analyzeSignal_ABCD(){
 		      }
 		    }
 		  }
-		  
+
 		  if(!rpcBx.empty() && rpcSpread==0 && rpcMedian>=0.){ h_dtRechitClusterMaxStation_Nminus1_clusterMETCR[itr_mX]->Fill(dtRechitClusterMaxStation[itr_clust]); }
 		  if(!rpcBx.empty() && rpcSpread==0 && rpcMedian>=0.){ h_dPhiJetMET_Nminus1_clusterMETCR[itr_mX]->Fill(fabs(dPhi_min)); }
 		  if(!rpcBx.empty() && rpcSpread==0 && dtRechitClusterMaxStation[itr_clust]>2){ h_rpcBx_Nminus1_clusterMETCR[itr_mX]->Fill(rpcMedian); }
@@ -575,20 +545,20 @@ void analyzeSignal_ABCD(){
 		  h_dPhiClusterMET_fullVeto_rpcCR[itr_mX]->Fill(fabs(dPhiClusterMET));
 		  h_dPhiJetMET_fullVeto_rpcCR[itr_mX]->Fill(fabs(dPhi_min));
 		  h_dtRechitClusterMaxStation_fullVeto_rpcCR[itr_mX]->Fill(dtRechitClusterMaxStation[itr_clust]);
-		  
+
 		  if(dtRechitClusterMaxStation[itr_clust]>2){
 		    passMaxStation_rpcCR=true;
 		    h_dPhiClusterMET_Nminus1_rpcCR[itr_mX]->Fill(fabs(dPhiClusterMET));
 		    h_dPhiJetMET_Nminus1_rpcCR[itr_mX]->Fill(fabs(dPhi_min));
-		    if(fabs(dPhiClusterMET)<1.0){ 
+		    if(fabs(dPhiClusterMET)<1.0){
 		      passClusterMET_rpcCR=true;
 		    }
 		  }
 		  if(fabs(dPhiClusterMET)<1.0){
-		    h_dtRechitClusterMaxStation_Nminus1_rpcCR[itr_mX]->Fill(dtRechitClusterMaxStation[itr_clust]); 
+		    h_dtRechitClusterMaxStation_Nminus1_rpcCR[itr_mX]->Fill(dtRechitClusterMaxStation[itr_clust]);
 		  }
 		}
-		
+
 		if(passMuon){
 		  if(!rpcBx.empty() && rpcSpread==0){
 		    if(rpcMedian>=0.){
@@ -612,12 +582,12 @@ void analyzeSignal_ABCD(){
 	if(passRPCSpread_clusterCR){ nPassRPCSpread_clusterCR+=1; }
 	if(passRPCBx_clusterCR){ nPassRPCBx_clusterCR+=1; }
 	if(passMaxStation_clusterCR){ nPassMaxStation_clusterCR+=1; }
-	
+
 	if(passRPCCR){ nPassRPCCR+=1; }
 	if(passFullVeto_rpcCR){ nPassFullVeto_rpcCR+=1; }
 	if(passClusterMET_rpcCR){ nPassClusterMET_rpcCR+=1; }
 	if(passMaxStation_rpcCR){ nPassMaxStation_rpcCR+=1; }
-	evtNum+=1;	
+	evtNum+=1;
       }
     }
 
@@ -641,7 +611,3 @@ void analyzeSignal_ABCD(){
   _ofile->Close();
 
 }
-    
-
-  
-  

@@ -1,45 +1,26 @@
 R__LOAD_LIBRARY(libTreePlayer)
 
-int getStation(float hitX, float hitY){
-  float hitR = sqrt(pow(hitX,2)+pow(hitY,2));
-  if(hitR > 400. && hitR < 480.){ return 1; }
-  else if(hitR > 485. && hitR < 560.){ return 2; }
-  else if(hitR > 590. && hitR < 650.){ return 3; }
-  else if(hitR > 690. && hitR < 800.){ return 4; }
-  else{ return -1; }
-}
-
-int getWheel(float hitZ){
-  if(hitZ > 0){
-    if(hitZ < 127.){ return 0; }
-    else if(hitZ < 395.){ return 1; }
-    else if(hitZ < 661.){ return 2; }
-    else{ return -99; }
-  }
-  else{
-    return -1*getWheel(-1.0*hitZ);
-  }
-}
-
-int getRPCLayer(float hitX, float hitY){
-  float hitR = sqrt(pow(hitX,2)+pow(hitY,2));
-  if(hitR > 410. && hitR < 440.){ return 1; }
-  else if(hitR > 445. && hitR < 475.){ return 2; }
-  else if(hitR > 490. && hitR < 520.){ return 3; }
-  else if(hitR > 525. && hitR < 555.){ return 4; }
-  else if(hitR > 600. && hitR < 630.){ return 5; }
-  else if(hitR > 700. && hitR < 770.){ return 6; }
-  else{ return -1; }
-}
+#include "helpers.h"
 
 void analyzeData_ABCD(){
+
+  const bool useHDFS(false);
+  const bool useCERN(false);
+  TString fsPreFix;
+  if (useHDFS) {
+    fsPreFix = "/mnt/hadoop";
+  }
+  else {
+    fsPreFix = "root://cmsxrootd.fnal.gov/";
+    if (useCERN) fsPreFix = "root://cms-xrd-global.cern.ch//";
+  }
 
   char name[50];
   char title[100];
   char years[4][10] = {"2018","2017","2016"};
   char runNames[3][20] = {"17Sept2018_Run2018","Run2017","Run2016"};
   char dates[3][20] = {"17Sep2018","17Nov2017","07Aug17"};
-  TString dir("/mnt/hadoop/store/group/phys_exotica/delayedjets/displacedJetMuonAnalyzer/driftTube/V1p17/Data");
+  TString dir(fsPreFix + "/store/group/phys_exotica/delayedjets/displacedJetMuonAnalyzer/driftTube/V1p17/Data");
   //TString dir("/storage/user/mcitron/skims/");
   TFile *_ofile = TFile::Open("outData_ABCD.root","RECREATE");
 
@@ -53,7 +34,7 @@ void analyzeData_ABCD(){
   TH1D *h_dtRechitClusterSize_dPhiClusterMETHigh_rpcSpreadCRmuonVeto[4];
   TH1D *h_dtRechitClusterSize_dPhiClusterMETLow_rpcCRnoLepton[4];
   TH1D *h_dtRechitClusterSize_dPhiClusterMETHigh_rpcCRnoLepton[4];
-  
+
   TH1D *h_dtRechitClusterSize_rpcMatch_jetMETCRmuonVeto[4];
   TH1D *h_dtRechitClusterSize_rpcNoMatch_jetMETCRmuonVeto[4];
   TH1D *h_dtRechitClusterSize_dPhiClusterMETLow_jetMETCRmuonVeto[4];
@@ -161,7 +142,7 @@ void analyzeData_ABCD(){
   Bool_t passMuon_alt = false;
   Bool_t passMB1 = false;
   Bool_t passJet = false;
-  
+
   Bool_t passClusterCR = false;
   Bool_t passNoVeto_clusterCR = false;
   Bool_t passFullVeto_clusterCR = false;
@@ -169,8 +150,8 @@ void analyzeData_ABCD(){
   Bool_t passRPCSpread_clusterCR = false;
   Bool_t passRPCBx_clusterCR = false;
   Bool_t passMaxStation_clusterCR = false;
-  
-  Bool_t passNoVeto = false;  
+
+  Bool_t passNoVeto = false;
   Bool_t passFullVeto_rpcCR = false;
   Bool_t passRPCCR = false;
   Bool_t passClusterMET_rpcCR = false;
@@ -184,8 +165,8 @@ void analyzeData_ABCD(){
   Int_t nPassRPCSpread_clusterCR = 0;
   Int_t nPassRPCBx_clusterCR = 0;
   Int_t nPassMaxStation_clusterCR = 0;
-  
-  Int_t nPassNoVeto = 0;  
+
+  Int_t nPassNoVeto = 0;
   Int_t nPassFullVeto_rpcCR = 0;
   Int_t nPassRPCCR = 0;
   Int_t nPassClusterMET_rpcCR = 0;
@@ -343,7 +324,7 @@ void analyzeData_ABCD(){
     sprintf(name,"h_dtRechitClusterSize_rpcNoMatch_clusterMETCRnoLepton_%s",years[itr_year]);
     h_dtRechitClusterSize_rpcNoMatch_clusterMETCRnoLepton[itr_year] = new TH1D(name,"",50,0,500);
 
-    
+
 
     sprintf(name,"h_dPhiClusterRPC_fullVeto_%s",years[itr_year]);
     h_dPhiClusterRPC_fullVeto[itr_year] = new TH1D(name,"",73,-0.15,3.5);
@@ -362,8 +343,8 @@ void analyzeData_ABCD(){
 
     sprintf(name,"h_rpcSpread_fullVeto_negBx_%s",years[itr_year]);
     h_rpcSpread_fullVeto_negBx[itr_year] = new TH1D(name,"",10,0,10);
-    
-    
+
+
 
     sprintf(name,"h_nRPCMatched_fullVeto_clusterMETCR_%s",years[itr_year]);
     h_nRPCMatched_fullVeto_clusterMETCR[itr_year] = new TH1D(name,"",20,0,20);
@@ -394,7 +375,7 @@ void analyzeData_ABCD(){
 
     sprintf(name,"h_dtRechitClusterMaxStation_Nminus1_clusterMETCR_%s",years[itr_year]);
     h_dtRechitClusterMaxStation_Nminus1_clusterMETCR[itr_year] = new TH1D(name,"",5,0,5);
-    
+
     sprintf(name,"h_dPhiClusterMET_fullVeto_rpcCR_%s",years[itr_year]);
     h_dPhiClusterMET_fullVeto_rpcCR[itr_year] = new TH1D(name,"",35,0,3.5);
 
@@ -535,7 +516,7 @@ void analyzeData_ABCD(){
     }
 
     TTreeReader treeReader("MuonSystem",_file);
-    
+
     TTreeReaderValue<unsigned int> runNum(treeReader,"runNum");
     TTreeReaderValue<unsigned int> lumiSec(treeReader,"lumiSec");
     TTreeReaderValue<unsigned int> eventNum(treeReader,"evtNum");
@@ -601,7 +582,7 @@ void analyzeData_ABCD(){
     event150_rpc = 0;
     event100_clusterMET = 0;
     event150_clusterMET = 0;
-    
+
     cout << "Data" << years[itr_year] << endl;
     while(treeReader.Next()){
       if(evtNum%100000==0){ cout << evtNum << " of " << treeReader.GetEntries(1) << endl; }
@@ -615,7 +596,7 @@ void analyzeData_ABCD(){
       passClusterMET_rpcCR = false;
       passMaxStation_rpcCR = false;
       maxClusterSize=0;
-    
+
       if(*MET > 200){
 	dPhi_min = 999.;
 	dPhiClusterMET = 0.0;
@@ -634,8 +615,8 @@ void analyzeData_ABCD(){
 	      dPhi_tmp = jetPhi[itr_jet] - *METphi;
 	      if(dPhi_tmp > TMath::Pi()){ dPhi_tmp -= 2*TMath::Pi(); }
 	      if(dPhi_tmp < -1.0*TMath::Pi()){ dPhi_tmp += 2*TMath::Pi(); }
-	      if(fabs(dPhi_tmp) < dPhi_min){ 
-		dPhi_min = fabs(dPhi_tmp); 
+	      if(fabs(dPhi_tmp) < dPhi_min){
+		dPhi_min = fabs(dPhi_tmp);
 	      }
 	    }
 	  }
@@ -643,7 +624,7 @@ void analyzeData_ABCD(){
 	if(fabs(dPhiClusterMET)>1.0){ nPassClusterCR+=1; }
 
 	for(Int_t itr_clust=0; itr_clust<*nDtRechitClusters; itr_clust++){
-	  
+
 	  if(dtRechitClusterSize[itr_clust]>50 && ((dtRechitClusterPhi[itr_clust]<0.4 || dtRechitClusterPhi[itr_clust]>0.6) || (*runNum<275.75e3 || *runNum>275.95e3))){
 	    passMuon=false;
 	    passMuon_alt=false;
@@ -653,15 +634,15 @@ void analyzeData_ABCD(){
 	    rpcMedian = 99;
 	    dPhiClusterRPC = -0.1;
 	    dZClusterRPC = -1.;
-	    
+
 	    dPhiClusterMET = dtRechitClusterPhi[itr_clust] - *METphi;
 	    if(dPhiClusterMET > TMath::Pi()){ dPhiClusterMET -= 2*TMath::Pi(); }
 	    if(dPhiClusterMET < -1.0*TMath::Pi()){ dPhiClusterMET += 2*TMath::Pi(); }
-	    
+
 	    if(dtRechitClusterJetVetoPt[itr_clust]<20.){ passJet = true; }
 	    if(dtRechitClusterMuonVetoPt[itr_clust]<10.){ passMuon = true; }
 	    if(*nLeptons==0){ passMuon_alt = true; }
-	    
+
 	    passMB1 = true;
 	    for(Int_t itr_dt = 0; itr_dt<*nDtRechits; itr_dt++){
 	      if(sqrt(pow(dtRechitX[itr_dt],2)+pow(dtRechitY[itr_dt],2))>400. && sqrt(pow(dtRechitX[itr_dt],2)+pow(dtRechitY[itr_dt],2))<480.){
@@ -675,7 +656,7 @@ void analyzeData_ABCD(){
 	      }
 	    }
 	    if(dtRechitClusterNSegmentStation1[itr_clust]>0){ passMB1 = false; }
-	    
+
 	    //cout << "doing rpc" << endl;
 	    for(Int_t itr_rpc=0; itr_rpc<*nRPCRechits; itr_rpc++){
 	      dPhi_tmp = RPCRechitPhi[itr_rpc] - dtRechitClusterPhi[itr_clust];
@@ -710,23 +691,23 @@ void analyzeData_ABCD(){
 		}
 	      }
 	    }
-	    
+
 	    if(passJet && passMB1){
 
-	      if(passMuon){ 
-		h_dPhiClusterRPC_fullVeto[itr_year]->Fill(dPhiClusterRPC); 
-		h_dZClusterRPC_fullVeto[itr_year]->Fill(dZClusterRPC); 
+	      if(passMuon){
+		h_dPhiClusterRPC_fullVeto[itr_year]->Fill(dPhiClusterRPC);
+		h_dZClusterRPC_fullVeto[itr_year]->Fill(dZClusterRPC);
 	      }
 
 	      //cout << "doing CRs" << endl;
 	      if(fabs(dPhi_min)<0.6 && dtRechitClusterMaxStation[itr_clust]>2){
 		if(!rpcBx.empty() && rpcSpread==0){
 		  if(fabs(dPhiClusterMET)<1.0){
-		    if(passMuon){ 
+		    if(passMuon){
 		      h_dtRechitClusterSize_dPhiClusterMETLow_jetMETCRmuonVeto[itr_year]->Fill(dtRechitClusterSize[itr_clust]);
 		      h_dtRechitClusterSize_rpcMatch_jetMETCRmuonVeto[itr_year]->Fill(dtRechitClusterSize[itr_clust]);
 		    }
-		    if(passMuon_alt){ 
+		    if(passMuon_alt){
 		      h_dtRechitClusterSize_dPhiClusterMETLow_jetMETCRnoLepton[itr_year]->Fill(dtRechitClusterSize[itr_clust]);
 		      h_dtRechitClusterSize_rpcMatch_jetMETCRnoLepton[itr_year]->Fill(dtRechitClusterSize[itr_clust]);
 		    }
@@ -748,7 +729,7 @@ void analyzeData_ABCD(){
 	      if(fabs(dPhiClusterMET)>1.0 && dtRechitClusterMaxStation[itr_clust]>2){
 		if(!rpcBx.empty() && rpcSpread==0){
 		  if(fabs(dPhi_min)>0.6){
-		    if(passMuon){ 
+		    if(passMuon){
 		      h_dtRechitClusterSize_dPhiJetMETHigh_clusterMETCRmuonVeto[itr_year]->Fill(dtRechitClusterSize[itr_clust]);
 		      h_dtRechitClusterSize_rpcGood_clusterMETCRmuonVeto[itr_year]->Fill(dtRechitClusterSize[itr_clust]);
 		      if(event100_clusterMET<4 && dtRechitClusterSize[itr_clust]>100 && dtRechitClusterSize[itr_clust]<150){
@@ -760,7 +741,7 @@ void analyzeData_ABCD(){
 			event150_clusterMET+=1;
 		      }
 		    }
-		    if(passMuon_alt){ 
+		    if(passMuon_alt){
 		      h_dtRechitClusterSize_dPhiJetMETHigh_clusterMETCRnoLepton[itr_year]->Fill(dtRechitClusterSize[itr_clust]);
 		      h_dtRechitClusterSize_rpcMatch_clusterMETCRnoLepton[itr_year]->Fill(dtRechitClusterSize[itr_clust]);
 		    }
@@ -782,7 +763,7 @@ void analyzeData_ABCD(){
 	      if(fabs(dPhiClusterMET)>1.0 && dtRechitClusterMaxStation[itr_clust]>2){
 		if(fabs(dPhi_min)>0.6){
 		  if(passMuon){
-		    if(!rpcBx.empty()){ 
+		    if(!rpcBx.empty()){
 		      h_dtRechitClusterSize_rpcMatch_clusterMETCRmuonVeto[itr_year]->Fill(dtRechitClusterSize[itr_clust]);
 		      if(rpcSpread==0){
 			h_dtRechitClusterSize_rpcNoSpread_clusterMETCRmuonVeto[itr_year]->Fill(dtRechitClusterSize[itr_clust]);
@@ -829,15 +810,15 @@ void analyzeData_ABCD(){
 		if(!rpcBx.empty() && rpcSpread==0 && dtRechitClusterMaxStation[itr_clust]>2){ h_rpcBx_Nminus1_clusterMETCR[itr_year]->Fill(rpcMedian); }
 		if(!rpcBx.empty() && rpcMedian>=0. && dtRechitClusterMaxStation[itr_clust]>2){ h_rpcSpread_Nminus1_clusterMETCR[itr_year]->Fill(rpcSpread); }
 		if(dtRechitClusterMaxStation[itr_clust]>2){ h_nRPCMatched_Nminus1_clusterMETCR[itr_year]->Fill(rpcBx.size()); }
-	      }      
-  
+	      }
+
 	      //cout << "doing rpc CRs" << endl;
 	      if((rpcBx.empty() || rpcSpread>0) && dtRechitClusterMaxStation[itr_clust]>2){
 		if(fabs(dPhi_min)>0.6){
-		  if(passMuon){ 
+		  if(passMuon){
 		    h_dtRechitClusterSize_dPhiJetMETHigh_rpcCRmuonVeto[itr_year]->Fill(dtRechitClusterSize[itr_clust]);
-		    if(fabs(dPhiClusterMET<1.0)){ 
-		      h_dtRechitClusterSize_dPhiClusterMETLow_rpcCRmuonVeto[itr_year]->Fill(dtRechitClusterSize[itr_clust]); 
+		    if(fabs(dPhiClusterMET<1.0)){
+		      h_dtRechitClusterSize_dPhiClusterMETLow_rpcCRmuonVeto[itr_year]->Fill(dtRechitClusterSize[itr_clust]);
 		      if(dtRechitClusterSize[itr_clust]>100 && dtRechitClusterSize[itr_clust]<150 && event100_rpc<5){
 			eventListRPC << *runNum << ":" << *lumiSec << ":" << *eventNum << endl;
 			event100_rpc+=1;
@@ -849,7 +830,7 @@ void analyzeData_ABCD(){
 		    }
 		    else{ h_dtRechitClusterSize_dPhiClusterMETHigh_rpcCRmuonVeto[itr_year]->Fill(dtRechitClusterSize[itr_clust]); }
 		  }
-		  if(passMuon_alt){ 
+		  if(passMuon_alt){
 		    h_dtRechitClusterSize_dPhiJetMETHigh_rpcCRnoLepton[itr_year]->Fill(dtRechitClusterSize[itr_clust]);
 		    if(fabs(dPhiClusterMET<1.0)){ h_dtRechitClusterSize_dPhiClusterMETLow_rpcCRnoLepton[itr_year]->Fill(dtRechitClusterSize[itr_clust]); }
 		    else{ h_dtRechitClusterSize_dPhiClusterMETHigh_rpcCRnoLepton[itr_year]->Fill(dtRechitClusterSize[itr_clust]); }
@@ -882,12 +863,12 @@ void analyzeData_ABCD(){
 		  passMaxStation_rpcCR=true;
 		  h_dPhiClusterMET_Nminus1_rpcCR[itr_year]->Fill(fabs(dPhiClusterMET));
 		  h_dPhiJetMET_Nminus1_rpcCR[itr_year]->Fill(fabs(dPhi_min));
-		  if(fabs(dPhiClusterMET)<1.0){ 
+		  if(fabs(dPhiClusterMET)<1.0){
 		    passClusterMET_rpcCR=true;
 		  }
 		}
-		if(fabs(dPhiClusterMET)<1.0){ 
-		  h_dtRechitClusterMaxStation_Nminus1_rpcCR[itr_year]->Fill(dtRechitClusterMaxStation[itr_clust]); 
+		if(fabs(dPhiClusterMET)<1.0){
+		  h_dtRechitClusterMaxStation_Nminus1_rpcCR[itr_year]->Fill(dtRechitClusterMaxStation[itr_clust]);
 		}
 	      }
 
@@ -928,5 +909,5 @@ void analyzeData_ABCD(){
   _ofile->Close();
   eventListRPC.close();
   eventListClusterMET.close();
-  
+
 }
