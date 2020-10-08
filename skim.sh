@@ -8,7 +8,7 @@ prefix="root://cmseos.fnal.gov/"
 signalpath="/store/user/dildick/delayedjetsanalysis/"
 alias eosls="eos root://cmseos.fnal.gov ls"
 
-output=$(eos root://cmseos.fnal.gov ls $signalpath | grep MC)
+output=$(eos root://cmseos.fnal.gov ls $signalpath | grep MC_Summer16)
 echo $output
 
 for x in $output;

@@ -31,7 +31,7 @@ void analyzeSignal_ABCD(){
   }
 
   // location of files on EOSLPC
-  fsPreFix += "/store/user/dildick/delayedjetsanalysis/"
+  fsPreFix += "/store/user/dildick/delayedjetsanalysis/";
 
   char name[50];
   char title[100];
@@ -406,8 +406,9 @@ void analyzeSignal_ABCD(){
     cout << mX[itr_mX] << "_" << ctau << endl;
     for(Int_t itr_year = 0; itr_year<3; itr_year++){
       cout << "  " << years[itr_year] << endl;
+      cout << fsPreFix + years[itr_year] + "/" + (skimsignalfiles[years[itr_year]])[itr_mX] << endl;
 
-      TFile *_file = TFile::Open(fsPreFix + TString(skimsignalfiles[itr_year]));
+      TFile *_file = TFile::Open(fsPreFix + years[itr_year] + "/" + (skimsignalfiles[years[itr_year]])[itr_mX]);
 
       TTreeReader treeReader("MuonSystem",_file);
 
