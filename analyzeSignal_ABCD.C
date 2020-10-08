@@ -30,6 +30,9 @@ void analyzeSignal_ABCD(){
     if (useCERN) fsPreFix = "root://cms-xrd-global.cern.ch//";
   }
 
+  // location of files on EOSLPC
+  fsPreFix += "/store/user/dildick/delayedjetsanalysis/"
+
   char name[50];
   char title[100];
   char mX[3][10] = {"15","40","55"};
@@ -404,19 +407,7 @@ void analyzeSignal_ABCD(){
     for(Int_t itr_year = 0; itr_year<3; itr_year++){
       cout << "  " << years[itr_year] << endl;
 
-      TFile *_file;
-      if(strcmp(years[itr_year],"MC_Summer16")==0){
-        _file = TFile::Open(dir+years[itr_year]+"/v1/v3/normalized/ggH_HToSSTobbbb_MH-125_MS-"+mX[itr_mX]+"_ctau-"+ctau+"_TuneCUETP8M1_13TeV-powheg-pythia8_1pb_weighted.root");
-        cout << dir+years[itr_year]+"/v1/v3/normalized/ggH_HToSSTobbbb_MH-125_MS-"+mX[itr_mX]+"_ctau-"+ctau+"_TuneCUETP8M1_13TeV-powheg-pythia8\
-_1pb_weighted.root" << endl;
-      }
-      else{
-        // _file = TFile::Open(dir+years[itr_year]+"/v1/v3/normalized/ggH_HToSSTobbbb_MH-125_MS-"+mX[itr_mX]+"_ctau-"+ctau+"_TuneCP5_13TeV-powheg-pythia8_1pb_weighted.root");
-        cout << dir+years[itr_year]+"/v1/v3/normalized/ggH_HToSSTobbbb_MH-125_MS-"+mX[itr_mX]+"_ctau-"+ctau+"_TuneCP5_13TeV-powheg-pythia8_1pb_weighted.root" << endl;
-        //        cout << "Opening " << TString(skimsignalfiles[itr_year]) << endl;
-        //        _file = TFile::Open(TString(skimsignalfiles[itr_year]));
-      }
-      continue;
+      TFile *_file = TFile::Open(fsPreFix + TString(skimsignalfiles[itr_year]));
 
       TTreeReader treeReader("MuonSystem",_file);
 

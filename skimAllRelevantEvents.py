@@ -9,7 +9,7 @@ def makeSkim(inputFile,outputFile,cutString,test=False):
     if inputFile == outputFile:
         print "DON'T OVERWRITE THE INPUT!"
         exit()
-    inputFile = r.TFile(inputFile)
+    inputFile = r.TFile.Open(inputFile)
     tree = inputFile.Get("MuonSystem")
     if test:
         tree.Draw(">>eList",cutString,"entryList",1000);
