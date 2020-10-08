@@ -16,13 +16,14 @@ void analyzeData_ABCD(){
     if (useCERN) fsPreFix = "root://cms-xrd-global.cern.ch//";
   }
 
+  fsPreFix += "/store/user/dildick/delayedjetsanalysis/Data/";
+
   char name[50];
   char title[100];
   char years[4][10] = {"2018","2017","2016"};
   char runNames[3][20] = {"17Sept2018_Run2018","Run2017","Run2016"};
   char dates[3][20] = {"17Sep2018","17Nov2017","07Aug17"};
   TString dir(fsPreFix + "/store/group/phys_exotica/delayedjets/displacedJetMuonAnalyzer/driftTube/V1p17/Data");
-  //TString dir("/storage/user/mcitron/skims/");
   TFile *_ofile = TFile::Open("outData_ABCD.root","RECREATE");
 
   TH1D *h_dtRechitClusterSize_dPhiJetMETLow_rpcCRmuonVeto[4];
@@ -512,9 +513,8 @@ void analyzeData_ABCD(){
       _file = TFile::Open(dir+years[itr_year]+"/v4/v4/normalized/Run2_displacedJetMuonNtupler_V1p15_Data2016_Data2017_Data2018-HighMET_goodLumi.root");
     }
     else{
-      _file = TFile::Open(TString(datafiles[itr_year]));
-      // _file = TFile::Open(dir+years[itr_year]+"/v1/v3/normalized/Run2_displacedJetMuonNtupler_V1p17_Data"+years[itr_year]+"_"+runNames[itr_year]+"-HighMET-"+dates[itr_year]+"_goodLumi.root");
-      //_file = TFile::Open(dir+"Run2_displacedJetMuonNtupler_V1p17_Data"+years[itr_year]+"_"+runNames[itr_year]+"-HighMET-"+dates[itr_year]+"_goodLumi.root");
+      cout << "Opening " << fsPreFix + TString(datafiles[itr_year]) << endl;
+      _file = TFile::Open(fsPreFix + TString(datafiles[itr_year]));
     }
 
     TTreeReader treeReader("MuonSystem",_file);
