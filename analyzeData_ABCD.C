@@ -1439,16 +1439,6 @@ void analyzeData_ABCD(){
 	    if(fabs(jetEta[itr_jet])<3.0 && jetPt[itr_jet]>30.0){
 	      passOneJet = true;
 	      goodInvertedJet = true;
-	      dPhi_tmp = jetPhi[itr_jet] - *METphi;
-	      if(dPhi_tmp > TMath::Pi()){ dPhi_tmp -= 2*TMath::Pi(); }
-	      if(dPhi_tmp < -1.0*TMath::Pi()){ dPhi_tmp += 2*TMath::Pi(); }
-	      if(fabs(dPhi_tmp) < dPhi_min){ 
-		dPhi_min = fabs(dPhi_tmp); 
-	      }
-	    }
-	  }
-	  for(Int_t itr_jet = 0; itr_jet<*nJets; itr_jet++){
-	    if(fabs(jetEta[itr_jet]) && jetPt[itr_jet]>20.0){
 	      for(Int_t itr_clust=0; itr_clust<*nDtRechitClusters; itr_clust++){
 		dPhi_tmp = jetPhi[itr_jet] - dtRechitClusterPhi[itr_clust];
 		if(dPhi_tmp > TMath::Pi()){ dPhi_tmp -= 2*TMath::Pi(); }
@@ -1457,11 +1447,18 @@ void analyzeData_ABCD(){
 		  goodInvertedJet = false;
 		}
 	      }
-	      if(goodInvertedJet && (fabs(dPhi_min) < dPhi_min_invertedJet)){
-		dPhi_min_invertedJet = fabs(dPhi_min);
+	      dPhi_tmp = jetPhi[itr_jet] - *METphi;
+	      if(dPhi_tmp > TMath::Pi()){ dPhi_tmp -= 2*TMath::Pi(); }
+	      if(dPhi_tmp < -1.0*TMath::Pi()){ dPhi_tmp += 2*TMath::Pi(); }
+	      if(fabs(dPhi_tmp) < dPhi_min){ 
+		dPhi_min = fabs(dPhi_tmp); 
+	      }
+	      if(goodInvertedJet && (fabs(dPhi_tmp) < dPhi_min_invertedJet)){
+		dPhi_min_invertedJet = fabs(dPhi_tmp);
 	      }
 	    }
 	  }
+	
 	  for(Int_t itr_dt = 0; itr_dt<*nDtRechits; itr_dt++){
 	    dtR = sqrt(pow(dtRechitX[itr_dt],2)+pow(dtRechitY[itr_dt],2));
 	    if(dtR>400. && dtR<480.){ hitStation1+=1; }
