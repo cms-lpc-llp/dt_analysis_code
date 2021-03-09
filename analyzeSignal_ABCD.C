@@ -46,7 +46,7 @@ void analyzeSignal_ABCD(){
   //char mX[2][10] = {"450"};
   //char ctau[2][20] = {"1m","10m"};
   //char ctau[6][20] = {"1","10","100","1000","10000","100000"};
-  char ctau[2][20] = {"1000","10000"};
+  char ctau[4][20] = {"100","1000","10000","100000"};
   //char ctau[4][20] = {"500mm_xi_1","1000mm_xi_1","5000mm_xi_1","10000mm_xi_1"};
   //char ctau[8][25] = {"500mm_xi_1","1000mm_xi_1","5000mm_xi_1","10000mm_xi_1","500mm_xi_2p5","1000mm_xi_2p5","5000mm_xi_2p5","10000mm_xi_2p5"};
   //char ctau[4][20] = {"500_xi_1","500_xi_2p5","1000_xi_1","1000_xi_2p5"};
@@ -175,7 +175,25 @@ void analyzeSignal_ABCD(){
   TH1D *h_nMB1MatchAdjacent_MB1Veto_dPhiClusterMET[5][6];
   TH1D *h_nMB1MatchAdjacentPi2_dPhiClusterMET[5][6];
   TH1D *h_nMB1MatchAdjacentPi2_MB1Veto_dPhiClusterMET[5][6];
+  TH1D *h_nMB1MatchAdjacent0p8_dPhiClusterMET[5][6];
+  TH1D *h_nMB1MatchAdjacent0p8_MB1Veto_dPhiClusterMET[5][6];
+  TH1D *h_nMB1MatchAdjacent0p8Pi2_dPhiClusterMET[5][6];
+  TH1D *h_nMB1MatchAdjacent0p8Pi2_MB1Veto_dPhiClusterMET[5][6];
   
+  TH1D *h_jetChargedHadronicEnergyFraction_SR[5][6];
+  TH1D *h_jetNeutralHadronicEnergyFraction_SR[5][6];
+  TH1D *h_jetNeutralEMEnergyFraction_SR[5][6];
+  TH1D *h_jetChargedEMEnergyFraction_SR[5][6];
+  TH1D *h_leadingJetChargedHadronicEnergyFraction_SR[5][6];
+  TH1D *h_leadingJetNeutralHadronicEnergyFraction_SR[5][6];
+  TH1D *h_leadingJetNeutralEMEnergyFraction_SR[5][6];
+  TH1D *h_leadingJetChargedEMEnergyFraction_SR[5][6];
+  
+  Double_t chargedHadFraction_mindPhi = 0.0;
+  Double_t chargedEMFraction_mindPhi = 0.0;
+  Double_t neutralHadFraction_mindPhi = 0.0;
+  Double_t neutralEMFraction_mindPhi = 0.0;
+
   Double_t dPhi_tmp = 0.0;
   Double_t dPhi_min = 0.0;
   Double_t dPhiClusterRPC = 0.0;
@@ -226,6 +244,7 @@ void analyzeSignal_ABCD(){
 
   Bool_t passMET = false;
   Bool_t passOneJet = false;
+  Bool_t passNHFJet = false;
   Bool_t passJetMET = false;
   Bool_t passStations25 = false;
   Bool_t passWheels25 = false;
@@ -240,6 +259,8 @@ void analyzeSignal_ABCD(){
   Bool_t passNoVetoCluster = false;
   Bool_t passClusterSize = false;
   Bool_t passAdjacentMB1 = false;
+  Bool_t passAdjacent0p8MB1 = false;
+  Bool_t passOtherStations = false;
 
   Bool_t passMB1CR = false;
   Bool_t passJetVetoMB1CR = false;
@@ -250,7 +271,15 @@ void analyzeSignal_ABCD(){
   Bool_t passClusterSizeMB1CR = false;
 
   Bool_t passMB2CR = false;
+  Bool_t passMB2CRwithAdjacent = false;
+  Bool_t passMB2CRwithAdjacent0p8 = false;
+  Bool_t passMB2CRwithOther = false;
+  Bool_t passMB2CRwithNHF = false;
   Double_t nPassMB2CR = 0;
+  Double_t nPassMB2CRwithAdjacent = 0;
+  Double_t nPassMB2CRwithAdjacent0p8 = 0;
+  Double_t nPassMB2CRwithOther = 0;
+  Double_t nPassMB2CRwithNHF = 0;
 
   Bool_t passSignalRegion = false;
   Double_t nPassSignalRegion = 0;
@@ -323,13 +352,21 @@ void analyzeSignal_ABCD(){
   Int_t nMB1MatchClusterAdjacentMinus = 0;
   Int_t nMB1MatchPi2AdjacentPlus = 0;
   Int_t nMB1MatchPi2AdjacentMinus = 0;
+  Int_t nMB1MatchClusterAdjacent0p8Plus = 0;
+  Int_t nMB1MatchClusterAdjacent0p8Minus = 0;
+  Int_t nMB1MatchPi2Adjacent0p8Plus = 0;
+  Int_t nMB1MatchPi2Adjacent0p8Minus = 0;
   Int_t nRB1MatchCluster = 0;
+
+  Int_t nMB2MatchCluster = 0;
+  Int_t nMB3MatchCluster = 0;
+  Int_t nMB4MatchCluster = 0;
 
   TRandom3 *rand = new TRandom3();
   Int_t pmRand = 0;
 
   for(Int_t itr_mX=0; itr_mX<3; itr_mX++){
-    for(Int_t itr_ctau=0; itr_ctau<2; itr_ctau++){
+    for(Int_t itr_ctau=0; itr_ctau<4; itr_ctau++){
       sprintf(name,"h_nDtRechitClusters_dPhiJetMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
       h_nDtRechitClusters_dPhiJetMET[itr_mX][itr_ctau] = new TH1D(name,"",5,0,5);
       
@@ -447,6 +484,18 @@ void analyzeSignal_ABCD(){
       
       sprintf(name,"h_nMB1MatchAdjacentPi2_MB1Veto_dPhiClusterMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
       h_nMB1MatchAdjacentPi2_MB1Veto_dPhiClusterMET[itr_mX][itr_ctau] = new TH1D(name,"",30,0,30);
+
+      sprintf(name,"h_nMB1MatchAdjacent0p8_dPhiClusterMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      h_nMB1MatchAdjacent0p8_dPhiClusterMET[itr_mX][itr_ctau] = new TH1D(name,"",50,0,50);
+      
+      sprintf(name,"h_nMB1MatchAdjacent0p8_MB1Veto_dPhiClusterMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      h_nMB1MatchAdjacent0p8_MB1Veto_dPhiClusterMET[itr_mX][itr_ctau] = new TH1D(name,"",30,0,30);
+
+      sprintf(name,"h_nMB1MatchAdjacent0p8Pi2_dPhiClusterMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      h_nMB1MatchAdjacent0p8Pi2_dPhiClusterMET[itr_mX][itr_ctau] = new TH1D(name,"",50,0,50);
+      
+      sprintf(name,"h_nMB1MatchAdjacent0p8Pi2_MB1Veto_dPhiClusterMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      h_nMB1MatchAdjacent0p8Pi2_MB1Veto_dPhiClusterMET[itr_mX][itr_ctau] = new TH1D(name,"",30,0,30);
 
 
     sprintf(name,"h_dtRechitClusterSize_fullSelection_rpcCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
@@ -622,6 +671,31 @@ void analyzeSignal_ABCD(){
     h_dtRechitClusterMB1Veto[itr_mX][itr_ctau] = new TH1D(name,"",60,0,60);
 
 
+    sprintf(name,"h_jetNeutralEMEnergyFraction_SR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    h_jetNeutralEMEnergyFraction_SR[itr_mX][itr_ctau] = new TH1D(name,"",50,0,1);
+
+    sprintf(name,"h_jetChargedEMEnergyFraction_SR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    h_jetChargedEMEnergyFraction_SR[itr_mX][itr_ctau] = new TH1D(name,"",50,0,1);
+
+    sprintf(name,"h_jetNeutralHadronicEnergyFraction_SR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    h_jetNeutralHadronicEnergyFraction_SR[itr_mX][itr_ctau] = new TH1D(name,"",50,0,1);
+
+    sprintf(name,"h_jetChargedHadronicEnergyFraction_SR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    h_jetChargedHadronicEnergyFraction_SR[itr_mX][itr_ctau] = new TH1D(name,"",50,0,1);
+
+    sprintf(name,"h_leadingJetNeutralEMEnergyFraction_SR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    h_leadingJetNeutralEMEnergyFraction_SR[itr_mX][itr_ctau] = new TH1D(name,"",50,0,1);
+
+    sprintf(name,"h_leadingJetChargedEMEnergyFraction_SR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    h_leadingJetChargedEMEnergyFraction_SR[itr_mX][itr_ctau] = new TH1D(name,"",50,0,1);
+
+    sprintf(name,"h_leadingJetNeutralHadronicEnergyFraction_SR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    h_leadingJetNeutralHadronicEnergyFraction_SR[itr_mX][itr_ctau] = new TH1D(name,"",50,0,1);
+
+    sprintf(name,"h_leadingJetChargedHadronicEnergyFraction_SR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    h_leadingJetChargedHadronicEnergyFraction_SR[itr_mX][itr_ctau] = new TH1D(name,"",50,0,1);
+
+
     sprintf(name,"h_efficiency_%s_%s",mX[itr_mX],ctau[itr_ctau]);
     h_efficiency[itr_mX][itr_ctau] = new TH1D(name,"",20,0,20);
 
@@ -651,6 +725,10 @@ void analyzeSignal_ABCD(){
     nPass25Hits_rpcCR = 0;
    
     nPassMB2CR = 0;
+    nPassMB2CRwithAdjacent = 0;
+    nPassMB2CRwithAdjacent0p8 = 0;
+    nPassMB2CRwithOther = 0;
+    nPassMB2CRwithNHF = 0;
     nPassSignalRegion = 0;
 
     evtNum = 0;
@@ -740,10 +818,10 @@ void analyzeSignal_ABCD(){
       TTreeReaderArray<float> jetPhi(treeReader,"jetPhi");
       //TTreeReaderArray<float> jetRechitT(treeReader,"jetRechitT");
       //TTreeReaderArray<float> jetRechitT_rms(treeReader,"jetRechitT_rms");
-      //TTreeReaderArray<float> jetElectronEnergyFraction(treeReader,"jetElectronEnergyFraction");
-      //TTreeReaderArray<float> jetPhotonEnergyFraction(treeReader,"jetPhotonEnergyFraction");
-      //TTreeReaderArray<float> jetNeutralHadronEnergyFraction(treeReader,"jetNeutralHadronEnergyFraction");
-      //TTreeReaderArray<float> jetChargedHadronEnergyFraction(treeReader,"jetChargedHadronEnergyFraction");
+      TTreeReaderArray<float> jetElectronEnergyFraction(treeReader,"jetElectronEnergyFraction");
+      TTreeReaderArray<float> jetPhotonEnergyFraction(treeReader,"jetPhotonEnergyFraction");
+      TTreeReaderArray<float> jetNeutralHadronEnergyFraction(treeReader,"jetNeutralHadronEnergyFraction");
+      TTreeReaderArray<float> jetChargedHadronEnergyFraction(treeReader,"jetChargedHadronEnergyFraction");
       //TTreeReaderArray<float> jetMuonEnergyFraction(treeReader,"jetMuonEnergyFraction");
       
       TTreeReaderValue<int> nRPCRechits(treeReader,"nRpc");
@@ -805,6 +883,10 @@ void analyzeSignal_ABCD(){
 	pass25Hits_rpcCR = false;
 	passSignalRegion = false;
 	passMB2CR = false;
+	passMB2CRwithAdjacent = false;
+	passMB2CRwithAdjacent0p8 = false;
+	passMB2CRwithOther = false;
+	passMB2CRwithNHF = false;
 	nWheels1=0;
 	nWheels25=0;
 	nWheels50=0;
@@ -842,6 +924,7 @@ void analyzeSignal_ABCD(){
 
 	passMET = false;
 	passOneJet = false;
+	passNHFJet = true;
 	passJetMET = false;
 	passStations25 = false;
 	passWheels25 = false;
@@ -856,6 +939,8 @@ void analyzeSignal_ABCD(){
 	passNoVetoCluster = false;
 	passClusterSize = false;
 	passAdjacentMB1 = false;
+	passAdjacent0p8MB1 = false;
+	passOtherStations = false;
 
 	passMB1CR = false;
 	passJetVetoMB1CR = false;
@@ -875,6 +960,10 @@ void analyzeSignal_ABCD(){
 	nMB1MatchClusterAdjacentMinus = 0;
 	nMB1MatchPi2AdjacentPlus = 0;
 	nMB1MatchPi2AdjacentMinus = 0;
+	nMB1MatchClusterAdjacent0p8Plus = 0;
+	nMB1MatchClusterAdjacent0p8Minus = 0;
+	nMB1MatchPi2Adjacent0p8Plus = 0;
+	nMB1MatchPi2Adjacent0p8Minus = 0;
 	nRB1MatchCluster = 0;
 	
 	if(rand->Uniform()<0.5){ pmRand = -1; }
@@ -885,6 +974,10 @@ void analyzeSignal_ABCD(){
 	  dPhi_min = 999.;
 	  dPhiClusterMET = 0.0;
 	  dPhiClusterMET_max = 0.0;
+	  chargedHadFraction_mindPhi = -1.0;
+	  chargedEMFraction_mindPhi = -1.0;
+	  neutralHadFraction_mindPhi = -1.0;
+	  neutralEMFraction_mindPhi = -1.0;
 	  if(*nDtRechitClusters>0){
 	    nPassNoVeto+=1;
 	    for(Int_t itr_clust = 0; itr_clust<*nDtRechitClusters; itr_clust++){
@@ -900,11 +993,16 @@ void analyzeSignal_ABCD(){
 	  for(Int_t itr_jet = 0; itr_jet<*nJets; itr_jet++){
 	    if(fabs(jetEta[itr_jet])<3.0 && jetPt[itr_jet]>30.0){
 	      passOneJet = true;
+	      if(jetNeutralHadronEnergyFraction[itr_jet]>=0.9 && fabs(jetEta[itr_jet])<2.4 && jetPt[itr_jet]>50.0){ passNHFJet = false; }
 	      dPhi_tmp = jetPhi[itr_jet] - *METphi;
 	      if(dPhi_tmp > TMath::Pi()){ dPhi_tmp -= 2*TMath::Pi(); }
 	      if(dPhi_tmp < -1.0*TMath::Pi()){ dPhi_tmp += 2*TMath::Pi(); }
 	      if(fabs(dPhi_tmp) < dPhi_min){ 
 		dPhi_min = fabs(dPhi_tmp); 
+		chargedHadFraction_mindPhi = jetChargedHadronEnergyFraction[itr_jet];
+		chargedEMFraction_mindPhi = jetElectronEnergyFraction[itr_jet];
+		neutralHadFraction_mindPhi = jetNeutralHadronEnergyFraction[itr_jet];
+		neutralEMFraction_mindPhi = jetPhotonEnergyFraction[itr_jet];
 	      }
 	    }
 	  }
@@ -1027,16 +1125,20 @@ void analyzeSignal_ABCD(){
 		else{ rpcMedian = rpcBx[rpcBx.size()/2]; }
 	      }
 
+	      nMB2MatchCluster=0;
+	      nMB3MatchCluster=0;
+	      nMB4MatchCluster=0;
 	      passMB1 = true;
 	      for(Int_t itr_dt = 0; itr_dt<*nDtRechits; itr_dt++){
-		if(sqrt(pow(dtRechitX[itr_dt],2)+pow(dtRechitY[itr_dt],2))>400. && sqrt(pow(dtRechitX[itr_dt],2)+pow(dtRechitY[itr_dt],2))<480.){
-		  dPhi_tmp = dtRechitPhi[itr_dt] - dtRechitClusterPhi[itr_clust];
-		  if(dPhi_tmp > TMath::Pi()){ dPhi_tmp -= 2*TMath::Pi(); }
-		  if(dPhi_tmp < -1.0*TMath::Pi()){ dPhi_tmp += 2*TMath::Pi(); }
-		  if(sqrt(pow(dPhi_tmp,2)+pow(dtRechitEta[itr_dt]-dtRechitClusterEta[itr_clust],2))<0.4){
-		    hitsMB1+=1;
+		dPhi_tmp = dtRechitPhi[itr_dt] - dtRechitClusterPhi[itr_clust];
+		if(dPhi_tmp > TMath::Pi()){ dPhi_tmp -= 2*TMath::Pi(); }
+		if(dPhi_tmp < -1.0*TMath::Pi()){ dPhi_tmp += 2*TMath::Pi(); }
+		if(sqrt(pow(dPhi_tmp,2)+pow(dtRechitEta[itr_dt]-dtRechitClusterEta[itr_clust],2))<0.4){
+		  if(dtRechitStation[itr_dt]==1){ hitsMB1+=1; }
+		  if(dtRechitStation[itr_dt]==2){ nMB2MatchCluster+=1; }
+		  if(dtRechitStation[itr_dt]==3){ nMB3MatchCluster+=1; }
+		  if(dtRechitStation[itr_dt]==4){ nMB4MatchCluster+=1; }
 		    //break;
-		  }
 		}
 		/*if(itr_clust==0 && *nDtRechits<750){
 		  dtStation=getStation(dtRechitX[itr_dt],dtRechitY[itr_dt]);
@@ -1146,7 +1248,7 @@ void analyzeSignal_ABCD(){
 	      if(hitsMB1>1 || dtRechitClusterNSegmentStation1[itr_clust]>0){ passMB1 = false; } 
 	      h_dtRechitClusterMB1Veto[itr_mX][itr_ctau]->Fill(hitsMB1,weight);
 	      
-
+	      
 	      if(fabs(dPhi_min)>0.6 && dtRechitClusterJetVetoPt[itr_clust]<20.0 && dtRechitClusterMuonVetoPt[itr_clust]<10.0){
 		nClustersVeto_dPhiJetMET+=1;
 		h_dtRechitClusterNSegmentStation2_dPhiJetMET[itr_mX][itr_ctau]->Fill(dtRechitClusterNSegmentStation2[itr_clust],weight);
@@ -1325,6 +1427,10 @@ void analyzeSignal_ABCD(){
 		    nMB1MatchClusterAdjacentMinus = 0;
 		    nMB1MatchPi2AdjacentPlus = 0;
 		    nMB1MatchPi2AdjacentMinus = 0;
+		    nMB1MatchClusterAdjacent0p8Plus = 0;
+		    nMB1MatchClusterAdjacent0p8Minus = 0;
+		    nMB1MatchPi2Adjacent0p8Plus = 0;
+		    nMB1MatchPi2Adjacent0p8Minus = 0;
 		    for(Int_t itr_dt=0; itr_dt<*nDtRechits; itr_dt++){
 		      if(dtRechitStation[itr_dt]==1){
 			dPhi_tmp = dtRechitClusterPhi[itr_clust] - dtRechitPhi[itr_dt];
@@ -1334,6 +1440,10 @@ void analyzeSignal_ABCD(){
 			  if(dtRechitWheel[itr_dt]==dtRechitClusterMaxChamber[itr_clust]+1){ nMB1MatchClusterAdjacentPlus+=1; }
 			  if(dtRechitWheel[itr_dt]==dtRechitClusterMaxChamber[itr_clust]-1){ nMB1MatchClusterAdjacentMinus+=1; }
 			}
+			if(fabs(dPhi_tmp)<TMath::Pi()/4.0){
+			  if(dtRechitWheel[itr_dt]==dtRechitClusterMaxChamber[itr_clust]+1){ nMB1MatchClusterAdjacent0p8Plus+=1; }
+			  if(dtRechitWheel[itr_dt]==dtRechitClusterMaxChamber[itr_clust]-1){ nMB1MatchClusterAdjacent0p8Minus+=1; }
+			}
 			dPhi_tmp = dtRechitClusterPhi[itr_clust] - dtRechitPhi[itr_dt] + pmRand*TMath::Pi()/2.0;
 			if(dPhi_tmp > TMath::Pi()){ dPhi_tmp -= 2*TMath::Pi(); }
 			if(dPhi_tmp < -1.0*TMath::Pi()){ dPhi_tmp += 2*TMath::Pi(); }
@@ -1341,21 +1451,33 @@ void analyzeSignal_ABCD(){
 			  if(dtRechitWheel[itr_dt]==dtRechitClusterMaxChamber[itr_clust]+1){ nMB1MatchPi2AdjacentPlus+=1; }
 			  if(dtRechitWheel[itr_dt]==dtRechitClusterMaxChamber[itr_clust]-1){ nMB1MatchPi2AdjacentMinus+=1; }
 			}
+			if(fabs(dPhi_tmp)<TMath::Pi()/4.0){
+			  if(dtRechitWheel[itr_dt]==dtRechitClusterMaxChamber[itr_clust]+1){ nMB1MatchPi2Adjacent0p8Plus+=1; }
+			  if(dtRechitWheel[itr_dt]==dtRechitClusterMaxChamber[itr_clust]-1){ nMB1MatchPi2Adjacent0p8Minus+=1; }
+			}
 		      }
 		    }
 		    if(dtRechitClusterMaxChamber[itr_clust]==-2){ 
 		      h_nMB1MatchAdjacent_dPhiClusterMET[itr_mX][itr_ctau]->Fill(nMB1MatchClusterAdjacentPlus); 
 		      h_nMB1MatchAdjacentPi2_dPhiClusterMET[itr_mX][itr_ctau]->Fill(nMB1MatchPi2AdjacentPlus); 
+		      h_nMB1MatchAdjacent0p8_dPhiClusterMET[itr_mX][itr_ctau]->Fill(nMB1MatchClusterAdjacent0p8Plus); 
+		      h_nMB1MatchAdjacent0p8Pi2_dPhiClusterMET[itr_mX][itr_ctau]->Fill(nMB1MatchPi2Adjacent0p8Plus); 
 		    }
 		    else if(dtRechitClusterMaxChamber[itr_clust]==2){ 
 		      h_nMB1MatchAdjacent_dPhiClusterMET[itr_mX][itr_ctau]->Fill(nMB1MatchClusterAdjacentMinus); 
 		      h_nMB1MatchAdjacentPi2_dPhiClusterMET[itr_mX][itr_ctau]->Fill(nMB1MatchPi2AdjacentMinus); 
+		      h_nMB1MatchAdjacent0p8_dPhiClusterMET[itr_mX][itr_ctau]->Fill(nMB1MatchClusterAdjacent0p8Minus); 
+		      h_nMB1MatchAdjacent0p8Pi2_dPhiClusterMET[itr_mX][itr_ctau]->Fill(nMB1MatchPi2Adjacent0p8Minus); 
 		    }
 		    else{
 		      h_nMB1MatchAdjacent_dPhiClusterMET[itr_mX][itr_ctau]->Fill(nMB1MatchClusterAdjacentPlus);
 		      h_nMB1MatchAdjacent_dPhiClusterMET[itr_mX][itr_ctau]->Fill(nMB1MatchClusterAdjacentMinus); 
 		      h_nMB1MatchAdjacentPi2_dPhiClusterMET[itr_mX][itr_ctau]->Fill(nMB1MatchPi2AdjacentPlus);
 		      h_nMB1MatchAdjacentPi2_dPhiClusterMET[itr_mX][itr_ctau]->Fill(nMB1MatchPi2AdjacentMinus); 
+		      h_nMB1MatchAdjacent0p8_dPhiClusterMET[itr_mX][itr_ctau]->Fill(nMB1MatchClusterAdjacent0p8Plus);
+		      h_nMB1MatchAdjacent0p8_dPhiClusterMET[itr_mX][itr_ctau]->Fill(nMB1MatchClusterAdjacent0p8Minus); 
+		      h_nMB1MatchAdjacent0p8Pi2_dPhiClusterMET[itr_mX][itr_ctau]->Fill(nMB1MatchPi2Adjacent0p8Plus);
+		      h_nMB1MatchAdjacent0p8Pi2_dPhiClusterMET[itr_mX][itr_ctau]->Fill(nMB1MatchPi2Adjacent0p8Minus); 
 		    }
 		  }
 		  
@@ -1452,6 +1574,37 @@ void analyzeSignal_ABCD(){
 			  if(dtRechitClusterSize[itr_clust]>=100){
 			    if(fabs(dPhiClusterMET)<1.0){
 			      passMB2CR = true;
+			      nMB1MatchClusterAdjacentPlus = 0;
+			      nMB1MatchClusterAdjacentMinus = 0;
+			      nMB1MatchClusterAdjacent0p8Plus = 0;
+			      nMB1MatchClusterAdjacent0p8Minus = 0;
+			      for(Int_t itr_dt=0; itr_dt<*nDtRechits; itr_dt++){
+				if(dtRechitStation[itr_dt]==1){
+				  dPhi_tmp = dtRechitClusterPhi[itr_clust] - dtRechitPhi[itr_dt];
+				  if(dPhi_tmp > TMath::Pi()){ dPhi_tmp -= 2*TMath::Pi(); }
+				  if(dPhi_tmp < -1.0*TMath::Pi()){ dPhi_tmp += 2*TMath::Pi(); }
+				  if(fabs(dPhi_tmp)<0.4){
+				    if(dtRechitWheel[itr_dt]==dtRechitClusterMaxChamber[itr_clust]+1){ nMB1MatchClusterAdjacentPlus+=1; }
+				    if(dtRechitWheel[itr_dt]==dtRechitClusterMaxChamber[itr_clust]-1){ nMB1MatchClusterAdjacentMinus+=1; }
+				  }
+				  if(fabs(dPhi_tmp)<TMath::Pi()/4.0){
+				    if(dtRechitWheel[itr_dt]==dtRechitClusterMaxChamber[itr_clust]+1){ nMB1MatchClusterAdjacent0p8Plus+=1; }
+				    if(dtRechitWheel[itr_dt]==dtRechitClusterMaxChamber[itr_clust]-1){ nMB1MatchClusterAdjacent0p8Minus+=1; }
+				  }
+				}
+			      }
+			      if(nMB1MatchClusterAdjacentPlus<5 && nMB1MatchClusterAdjacentMinus<5){
+				passMB2CRwithAdjacent = true;
+			      }
+			      if(nMB1MatchClusterAdjacent0p8Plus<8 && nMB1MatchClusterAdjacent0p8Minus<8){
+				passMB2CRwithAdjacent0p8 = true;
+			      }
+			      if(nMB3MatchCluster<5 && nMB4MatchCluster<5){
+				passMB2CRwithOther = true;
+			      }
+			      if(passNHFJet){
+				passMB2CRwithNHF = true;
+			      }
 			    }
 			  }
 			}
@@ -1480,8 +1633,19 @@ void analyzeSignal_ABCD(){
 			      passClusterMET = true;
 			      if(dtRechitClusterSize[itr_clust]>=100){
 				passClusterSize = true;
+				
+				h_jetChargedHadronicEnergyFraction_SR[itr_mX][itr_ctau]->Fill(chargedHadFraction_mindPhi);
+				h_jetChargedEMEnergyFraction_SR[itr_mX][itr_ctau]->Fill(chargedEMFraction_mindPhi);
+				h_jetNeutralHadronicEnergyFraction_SR[itr_mX][itr_ctau]->Fill(neutralHadFraction_mindPhi);
+				h_jetNeutralEMEnergyFraction_SR[itr_mX][itr_ctau]->Fill(neutralEMFraction_mindPhi);
+				h_leadingJetChargedHadronicEnergyFraction_SR[itr_mX][itr_ctau]->Fill(jetChargedHadronEnergyFraction[0]);
+				h_leadingJetChargedEMEnergyFraction_SR[itr_mX][itr_ctau]->Fill(jetElectronEnergyFraction[0]);
+				h_leadingJetNeutralHadronicEnergyFraction_SR[itr_mX][itr_ctau]->Fill(jetNeutralHadronEnergyFraction[0]);
+				h_leadingJetNeutralEMEnergyFraction_SR[itr_mX][itr_ctau]->Fill(jetPhotonEnergyFraction[0]);
 				nMB1MatchClusterAdjacentPlus = 0;
 				nMB1MatchClusterAdjacentMinus = 0;
+				nMB1MatchClusterAdjacent0p8Plus = 0;
+				nMB1MatchClusterAdjacent0p8Minus = 0;
 				for(Int_t itr_dt=0; itr_dt<*nDtRechits; itr_dt++){
 				  if(dtRechitStation[itr_dt]==1){
 				    dPhi_tmp = dtRechitClusterPhi[itr_clust] - dtRechitPhi[itr_dt];
@@ -1491,10 +1655,20 @@ void analyzeSignal_ABCD(){
 				      if(dtRechitWheel[itr_dt]==dtRechitClusterMaxChamber[itr_clust]+1){ nMB1MatchClusterAdjacentPlus+=1; }
 				      if(dtRechitWheel[itr_dt]==dtRechitClusterMaxChamber[itr_clust]-1){ nMB1MatchClusterAdjacentMinus+=1; }
 				    }
+				    if(fabs(dPhi_tmp)<TMath::Pi()/4.0){
+				      if(dtRechitWheel[itr_dt]==dtRechitClusterMaxChamber[itr_clust]+1){ nMB1MatchClusterAdjacent0p8Plus+=1; }
+				      if(dtRechitWheel[itr_dt]==dtRechitClusterMaxChamber[itr_clust]-1){ nMB1MatchClusterAdjacent0p8Minus+=1; }
+				    }
 				  }
 				}
-				if(nMB1MatchClusterAdjacentPlus<4 && nMB1MatchClusterAdjacentMinus<4){
+				if(nMB1MatchClusterAdjacentPlus<5 && nMB1MatchClusterAdjacentMinus<5){
 				  passAdjacentMB1 = true;
+				}
+				if(nMB1MatchClusterAdjacent0p8Plus<8 && nMB1MatchClusterAdjacent0p8Minus<8){
+				  passAdjacent0p8MB1 = true;
+				}
+				if((dtRechitClusterMaxStation[itr_clust]==3 && nMB2MatchCluster<5 && nMB4MatchCluster<5) || (dtRechitClusterMaxStation[itr_clust]==4 && nMB2MatchCluster<5 && nMB3MatchCluster<5)){
+				  passOtherStations = true;
 				}
 			      }
 			    }
@@ -1601,6 +1775,10 @@ void analyzeSignal_ABCD(){
 	if(pass25Hits_rpcCR){ nPass25Hits_rpcCR+=weight; }
 	if(passSignalRegion){ nPassSignalRegion+=weight; }
 	if(passMB2CR){ nPassMB2CR+=weight; }
+	if(passMB2CRwithAdjacent){ nPassMB2CRwithAdjacent+=weight; }
+	if(passMB2CRwithAdjacent0p8){ nPassMB2CRwithAdjacent0p8+=weight; }
+	if(passMB2CRwithOther){ nPassMB2CRwithOther+=weight; }
+	if(passMB2CRwithNHF){ nPassMB2CRwithNHF+=weight; }
 
 	h_nDtRechitClustersVeto_dPhiJetMET[itr_mX][itr_ctau]->Fill(nClustersVeto_dPhiJetMET,weight);
 	if(clusterPhi.size()>1){
@@ -1653,6 +1831,11 @@ void analyzeSignal_ABCD(){
 	if(passClusterMET){ h_efficiency[itr_mX][itr_ctau]->Fill(13,weight); }
 	if(passClusterSize){ h_efficiency[itr_mX][itr_ctau]->Fill(14,weight); }
 	if(passAdjacentMB1){ h_efficiency[itr_mX][itr_ctau]->Fill(15,weight); }
+	if(passAdjacent0p8MB1){
+	  h_efficiency[itr_mX][itr_ctau]->Fill(17,weight); 
+	  if(passNHFJet){ h_efficiency[itr_mX][itr_ctau]->Fill(18,weight); }
+	}
+	if(passOtherStations){ h_efficiency[itr_mX][itr_ctau]->Fill(16,weight); }
 
 	if(passMB1CR){ h_efficiency_MB1CR[itr_mX][itr_ctau]->Fill(6,weight); }
 	if(passJetVetoMB1CR){ h_efficiency_MB1CR[itr_mX][itr_ctau]->Fill(7,weight); }
@@ -1669,7 +1852,7 @@ void analyzeSignal_ABCD(){
 	evtNum+=1;	
       }
     }
-    for(int i=1; i<18; i++){
+    for(int i=1; i<20; i++){
       if(i > 1){
 	if(h_efficiency[itr_mX][itr_ctau]->GetBinContent(i-1)>0){
 	  cout << h_efficiency[itr_mX][itr_ctau]->GetBinContent(i) << " (" << h_efficiency[itr_mX][itr_ctau]->GetBinContent(i) / h_efficiency[itr_mX][itr_ctau]->GetBinContent(i-1) << ")" << endl;
@@ -1684,6 +1867,10 @@ void analyzeSignal_ABCD(){
     }
     cout << " " << endl;
     cout << "nPassMB2CR: " << nPassMB2CR << endl;
+    cout << "nPassMB2CRwithAdjacent: " << nPassMB2CRwithAdjacent << endl;
+    cout << "nPassMB2CRwithAdjacent0p8: " << nPassMB2CRwithAdjacent0p8 << endl;
+    cout << "nPassMB2CRwithOther: " << nPassMB2CRwithOther << endl;
+    cout << "nPassMB2CRwithNHF: " << nPassMB2CRwithNHF << endl;
     cout << " " << endl;
     /*cout << "nPassNoVeto: " << nPassNoVeto << endl;
     cout << " " << endl;
