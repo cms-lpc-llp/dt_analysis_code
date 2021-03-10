@@ -188,6 +188,16 @@ void analyzeSignal_ABCD(){
   TH1D *h_leadingJetNeutralHadronicEnergyFraction_SR[5][6];
   TH1D *h_leadingJetNeutralEMEnergyFraction_SR[5][6];
   TH1D *h_leadingJetChargedEMEnergyFraction_SR[5][6];
+
+  TH1D *h_decayVertexRadius_noVeto[5][6];
+  TH1D *h_decayVertexRadius_clusterReco[5][6];
+  TH1D *h_decayVertexRadius_clusterReco_signalRegionEq2[5][6];
+  TH1D *h_decayVertexRadius_clusterReco_signalRegionGt2[5][6];
+
+  TH1D *h_decayVertexZ_noVeto[5][6];
+  TH1D *h_decayVertexZ_clusterReco[5][6];
+  TH1D *h_decayVertexZ_clusterReco_signalRegionEq2[5][6];
+  TH1D *h_decayVertexZ_clusterReco_signalRegionGt2[5][6];
   
   Double_t chargedHadFraction_mindPhi = 0.0;
   Double_t chargedEMFraction_mindPhi = 0.0;
@@ -702,6 +712,45 @@ void analyzeSignal_ABCD(){
     sprintf(name,"h_efficiency_MB1CR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
     h_efficiency_MB1CR[itr_mX][itr_ctau] = new TH1D(name,"",20,0,20);
 
+    sprintf(name,"h_decayVertexRadius_noVeto_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    h_decayVertexRadius_noVeto[itr_mX][itr_ctau] = new TH1D(name,"",80,0,800);
+
+    sprintf(name,"h_decayVertexRadius_clusterReco_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    h_decayVertexRadius_clusterReco[itr_mX][itr_ctau] = new TH1D(name,"",80,0,800);
+
+    sprintf(name,"h_decayVertexRadius_clusterReco_signalRegionGt2_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    h_decayVertexRadius_clusterReco_signalRegionGt2[itr_mX][itr_ctau] = new TH1D(name,"",80,0,800);
+
+    sprintf(name,"h_decayVertexRadius_clusterReco_signalRegionEq2_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    h_decayVertexRadius_clusterReco_signalRegionEq2[itr_mX][itr_ctau] = new TH1D(name,"",80,0,800);
+
+    // sprintf(name,"h_decayVertexRadius_clusterReco_noMax_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    // h_decayVertexRadius_clusterReco_noMax[itr_mX][itr_ctau] = new TH1D(name,"",80,0,800);
+    //
+    // sprintf(name,"h_decayVertexRadius_clusterReco_noMB1_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    // h_decayVertexRadius_clusterReco_noMB1[itr_mX][itr_ctau] = new TH1D(name,"",80,0,800);
+    //
+    // sprintf(name,"h_decayVertexRadius_clusterReco_noMB1_noMax_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    // h_decayVertexRadius_clusterReco_noMB1_noMax[itr_mX][itr_ctau] = new TH1D(name,"",80,0,800);
+
+    sprintf(name,"h_decayVertexZ_noVeto_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    h_decayVertexZ_noVeto[itr_mX][itr_ctau] = new TH1D(name,"",80,0,800);
+
+    sprintf(name,"h_decayVertexZ_clusterReco_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    h_decayVertexZ_clusterReco[itr_mX][itr_ctau] = new TH1D(name,"",80,0,800);
+
+    sprintf(name,"h_decayVertexZ_clusterReco_signalRegionGt2_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    h_decayVertexZ_clusterReco_signalRegionGt2[itr_mX][itr_ctau] = new TH1D(name,"",80,0,800);
+
+    sprintf(name,"h_decayVertexZ_clusterReco_signalRegionEq2_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    h_decayVertexZ_clusterReco_signalRegionEq2[itr_mX][itr_ctau] = new TH1D(name,"",80,0,800);
+
+    // sprintf(name,"h_decayVertexZ_clusterReco_noMax_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    // h_decayVertexZ_clusterReco_noMax[itr_mX][itr_ctau] = new TH1D(name,"",80,0,800);
+    //
+    // sprintf(name,"h_decayVertexZ_clusterReco_noMB1_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    // h_decayVertexZ_clusterReco_noMB1[itr_mX][itr_ctau] = new TH1D(name,"",80,0,800);
+
     nPassClusterCR = 0;
     nPassNoVeto_clusterCR = 0;
     nPassFullVeto_clusterCR = 0;
@@ -850,6 +899,9 @@ void analyzeSignal_ABCD(){
 
       _ofile->cd();
       totalNum += treeReader.GetEntries(1);
+      std::vector<bool> gLLP_plotted; 
+      std::vector<bool> gLLP_plotted_id_sr1; 
+      std::vector<bool> gLLP_plotted_id_sr2; 
       weight = 48.58*1000*0.01*lumi[itr_year]/treeReader.GetEntries(1);
       //weight = 48.58*1000*0.01*lumi[itr_year]/1E6;
       //weight = 48.58*1000*0.01*137/500000;
@@ -864,6 +916,9 @@ void analyzeSignal_ABCD(){
 	ctau[itr_ctau]1 = decay2 / (gLLP_beta[1]*(1.0/sqrt(1-gLLP_beta[1]*gLLP_beta[1])));
 	weight = weight*exp((ctau[itr_ctau]1+ctau[itr_ctau]2)*(10./lifetime[itr_mX] - 100./(3*lifetime[itr_mX])));
 	*/
+	gLLP_plotted_id_sr1.clear();
+	gLLP_plotted_id_sr2.clear();
+	gLLP_plotted.clear();
 	if(evtNum%100000==0){ cout << evtNum << " of " << treeReader.GetEntries(1) << endl; }
 	passFullVeto_clusterCR = false;
 	passRPCMatch_clusterCR = false;
@@ -971,6 +1026,22 @@ void analyzeSignal_ABCD(){
 	
 	if(*MET > 200){
 	  passMET = true;
+	  for(Int_t itr_llp=0; itr_llp<2; itr_llp++){
+	      float decayR = sqrt(pow(gLLP_decay_vertex_x[itr_llp],2)+pow(gLLP_decay_vertex_y[itr_llp],2));
+	      if(decayR > 300 && decayR < 800 && gLLP_decay_vertex_z[itr_llp] < 650.){
+		  h_decayVertexRadius_noVeto[itr_mX][itr_ctau]->Fill(sqrt(pow(gLLP_decay_vertex_x[itr_llp],2)+pow(gLLP_decay_vertex_y[itr_llp],2)));
+		  h_decayVertexZ_noVeto[itr_mX][itr_ctau]->Fill(fabs(gLLP_decay_vertex_z[itr_llp]));
+	      }
+	      // float phi = TMath::ATan2(gLLP_decay_vertex_y[itr_llp],gLLP_decay_vertex_x[itr_llp]);
+	      // float theta = TMath::ACos(gLLP_decay_vertex_z[itr_llp]/TMath::Sqrt(gLLP_decay_vertex_x[itr_llp]*gLLP_decay_vertex_x[itr_llp]+gLLP_decay_vertex_y[itr_llp]*gLLP_decay_vertex_y[itr_llp]+gLLP_decay_vertex_z[itr_llp]*gLLP_decay_vertex_z[itr_llp]));
+	      // float eta = -TMath::Log(TMath::Tan(theta/2.));
+	      gLLP_plotted.push_back(false); 
+	      gLLP_plotted_id_sr1.push_back(false); 
+	      gLLP_plotted_id_sr2.push_back(false); 
+	      // gLLP_plotted_id_noMax.push_back(false); 
+	      // gLLP_plotted_id_noMB1.push_back(false); 
+	      // gLLP_plotted_id_noMB1_noMax.push_back(false); 
+	  }
 	  dPhi_min = 999.;
 	  dPhiClusterMET = 0.0;
 	  dPhiClusterMET_max = 0.0;
@@ -1041,6 +1112,20 @@ void analyzeSignal_ABCD(){
 
 	  for(Int_t itr_clust=0; itr_clust<*nDtRechitClusters; itr_clust++){
 	    if(dtRechitClusterSize[itr_clust]>50){  
+		TVector3 dtRechitClusterVec = TVector3();
+		dtRechitClusterVec.SetPtEtaPhi(1,dtRechitClusterEta[itr_clust],dtRechitClusterPhi[itr_clust]);
+		for(Int_t itr_llp=0; itr_llp<2; itr_llp++){
+		    float decayR = sqrt(pow(gLLP_decay_vertex_x[itr_llp],2)+pow(gLLP_decay_vertex_y[itr_llp],2));
+		    if(decayR > 300 && decayR < 800 && fabs(gLLP_decay_vertex_z[itr_llp]) < 650. && !gLLP_plotted[itr_llp]){
+			TVector3 llpDecay = TVector3(gLLP_decay_vertex_x[itr_llp],gLLP_decay_vertex_y[itr_llp],gLLP_decay_vertex_z[itr_llp]);
+			// if (llpDecay.DeltaR(dtRechitClusterVec) < 0.5)
+			{
+			    h_decayVertexRadius_clusterReco[itr_mX][itr_ctau]->Fill(sqrt(pow(gLLP_decay_vertex_x[itr_llp],2)+pow(gLLP_decay_vertex_y[itr_llp],2)));
+			    h_decayVertexZ_clusterReco[itr_mX][itr_ctau]->Fill(fabs(gLLP_decay_vertex_z[itr_llp]));
+			    gLLP_plotted[itr_llp] = true;
+			}
+		    }
+		}
 	      passMuon=false;
 	      passMuonLoose=false;
 	      passMuon_alt=false;
@@ -1598,6 +1683,21 @@ void analyzeSignal_ABCD(){
 			      }
 			      if(nMB1MatchClusterAdjacent0p8Plus<8 && nMB1MatchClusterAdjacent0p8Minus<8){
 				passMB2CRwithAdjacent0p8 = true;
+				if (passNHFJet){
+				    for(Int_t itr_llp=0; itr_llp<2; itr_llp++){
+					float decayR = sqrt(pow(gLLP_decay_vertex_x[itr_llp],2)+pow(gLLP_decay_vertex_y[itr_llp],2));
+					dtRechitClusterVec.SetPtEtaPhi(1,dtRechitClusterEta[itr_clust],dtRechitClusterPhi[itr_clust]);
+					if(decayR > 300 && decayR < 800 && fabs(gLLP_decay_vertex_z[itr_llp]) < 650. && !gLLP_plotted_id_sr2[itr_llp] && dtRechitClusterSize[itr_clust] > 100){
+					    TVector3 llpDecay = TVector3(gLLP_decay_vertex_x[itr_llp],gLLP_decay_vertex_y[itr_llp],gLLP_decay_vertex_z[itr_llp]);
+					    if (llpDecay.DeltaR(dtRechitClusterVec) < 0.5)
+					    {
+						h_decayVertexRadius_clusterReco_signalRegionEq2[itr_mX][itr_ctau]->Fill(sqrt(pow(gLLP_decay_vertex_x[itr_llp],2)+pow(gLLP_decay_vertex_y[itr_llp],2)));
+						h_decayVertexZ_clusterReco_signalRegionEq2[itr_mX][itr_ctau]->Fill(fabs(gLLP_decay_vertex_z[itr_llp]));
+						gLLP_plotted_id_sr2[itr_llp] = true;
+					    }
+					}
+				    }
+				}
 			      }
 			      if(nMB3MatchCluster<5 && nMB4MatchCluster<5){
 				passMB2CRwithOther = true;
@@ -1666,6 +1766,21 @@ void analyzeSignal_ABCD(){
 				}
 				if(nMB1MatchClusterAdjacent0p8Plus<8 && nMB1MatchClusterAdjacent0p8Minus<8){
 				  passAdjacent0p8MB1 = true;
+				  if (passNHFJet){
+				    for(Int_t itr_llp=0; itr_llp<2; itr_llp++){
+					    float decayR = sqrt(pow(gLLP_decay_vertex_x[itr_llp],2)+pow(gLLP_decay_vertex_y[itr_llp],2));
+					    dtRechitClusterVec.SetPtEtaPhi(1,dtRechitClusterEta[itr_clust],dtRechitClusterPhi[itr_clust]);
+					    if(decayR > 300 && decayR < 800 && fabs(gLLP_decay_vertex_z[itr_llp]) < 650. && !gLLP_plotted_id_sr1[itr_llp] && dtRechitClusterSize[itr_clust] > 100){
+						TVector3 llpDecay = TVector3(gLLP_decay_vertex_x[itr_llp],gLLP_decay_vertex_y[itr_llp],gLLP_decay_vertex_z[itr_llp]);
+						if (llpDecay.DeltaR(dtRechitClusterVec) < 0.5)
+						{
+						    h_decayVertexRadius_clusterReco_signalRegionGt2[itr_mX][itr_ctau]->Fill(sqrt(pow(gLLP_decay_vertex_x[itr_llp],2)+pow(gLLP_decay_vertex_y[itr_llp],2)));
+						    h_decayVertexZ_clusterReco_signalRegionGt2[itr_mX][itr_ctau]->Fill(fabs(gLLP_decay_vertex_z[itr_llp]));
+						    gLLP_plotted_id_sr1[itr_llp] = true;
+						}
+					    }
+					}
+				    }
 				}
 				if((dtRechitClusterMaxStation[itr_clust]==3 && nMB2MatchCluster<5 && nMB4MatchCluster<5) || (dtRechitClusterMaxStation[itr_clust]==4 && nMB2MatchCluster<5 && nMB3MatchCluster<5)){
 				  passOtherStations = true;
