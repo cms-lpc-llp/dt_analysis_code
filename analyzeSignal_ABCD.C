@@ -37,8 +37,8 @@ void analyzeSignal_ABCD(){
   char name[50];
   char title[100];
   //char mX[1][20] = {"photon_m_10"};
-  char mX[3][10] = {"15","40","55"};
-  //char mX[5][20] = {"vector_m_2","vector_m_5","vector_m_10","vector_m_15","vector_m_20"};
+  //char mX[3][10] = {"15","40","55"};
+  char mX[5][20] = {"vector_m_2","vector_m_5","vector_m_10","vector_m_15","vector_m_20"};
   //char mX[4][20] = {"photon_m_7","photon_m_10","photon_m_15","photon_m_20"};
   //char mX[5][20] = {"higgs_m_4","higgs_m_5","higgs_m_10","higgs_m_15","higgs_m_20"};
   //char mX[4][20] = {"gluon_m_6","gluon_m_10","gluon_m_15","gluon_m_20"};
@@ -46,14 +46,14 @@ void analyzeSignal_ABCD(){
   //char mX[2][10] = {"450"};
   //char ctau[2][20] = {"1m","10m"};
   //char ctau[6][20] = {"1","10","100","1000","10000","100000"};
-  char ctau[4][20] = {"100","1000","10000","100000"};
-  //char ctau[4][20] = {"500mm_xi_1","1000mm_xi_1","5000mm_xi_1","10000mm_xi_1"};
+  //char ctau[4][20] = {"100","1000","10000","100000"};
+  char ctau[4][20] = {"500mm_xi_1","1000mm_xi_1","5000mm_xi_1","10000mm_xi_1"};
   //char ctau[8][25] = {"500mm_xi_1","1000mm_xi_1","5000mm_xi_1","10000mm_xi_1","500mm_xi_2p5","1000mm_xi_2p5","5000mm_xi_2p5","10000mm_xi_2p5"};
   //char ctau[4][20] = {"500_xi_1","500_xi_2p5","1000_xi_1","1000_xi_2p5"};
   Float_t lifetime = 10000;
   //Float_t lifetime[2] = {1000,10000};
-  char years[3][20] = {"MC_Fall18","MC_Fall17","MC_Summer16"};
-  //char years[3][20] = {"2016","2017","2018"};
+  //char years[3][20] = {"MC_Fall18","MC_Fall17","MC_Summer16"};
+  char years[3][20] = {"2018","2017","2016"};
   Float_t lumi[3] = {59.74,41.53,35.92};
   Double_t weight = 1.0;
   Float_t decay1 = 0.0;
@@ -61,143 +61,143 @@ void analyzeSignal_ABCD(){
   Float_t ctau1 = 0.0;
   Float_t ctau2 = 0.0;
 
-  TString dir("/mnt/hadoop/store/group/phys_exotica/delayedjets/displacedJetMuonAnalyzer/driftTube/V1p17/");
+  //TString dir("/mnt/hadoop/store/group/phys_exotica/delayedjets/displacedJetMuonAnalyzer/driftTube/V1p17/");
   //TString dir("/mnt/hadoop/store/group/phys_exotica/delayedjets/displacedJetMuonAnalyzer/driftTube/V1p15/");
-  //TString dir("/storage/user/mcitron/hvHaddedFiles/");
-  TFile *_ofile = TFile::Open("outSig_ABCD_new.root","RECREATE");
+  TString dir("/storage/user/mcitron/hvHaddedFiles/");
+  TFile *_ofile = TFile::Open("outSig_ABCD_HV.root","RECREATE");
 
-  TH1D *h_dtRechitClusterSize_signalRegion[5][6];
-  TH1D *h_dtRechitClusterSize_signalRegionNew[5][6];
-  TH1D *h_dtRechitClusterSizeTotal_signalRegionNew[5][6];
-  TH1D *h_dtRechitClusterSize_fullSelection_rpcCR[5][6];
-  TH1D *h_dtRechitClusterSize_fullSelection_clusterMETCR[5][6];
+  TH1D *h_dtRechitClusterSize_signalRegion[5][8];
+  TH1D *h_dtRechitClusterSize_signalRegionNew[5][8];
+  TH1D *h_dtRechitClusterSizeTotal_signalRegionNew[5][8];
+  TH1D *h_dtRechitClusterSize_fullSelection_rpcCR[5][8];
+  TH1D *h_dtRechitClusterSize_fullSelection_clusterMETCR[5][8];
 
-  TH1D *h_nRPCMatched_fullVeto_clusterMETCR[5][6];
-  TH1D *h_rpcSpread_fullVeto_clusterMETCR[5][6];
-  TH1D *h_rpcBx_fullVeto_clusterMETCR[5][6];
-  TH1D *h_dPhiJetMET_fullVeto_clusterMETCR[5][6];
-  TH1D *h_dtRechitClusterMaxStation_fullVeto_clusterMETCR[5][6];
+  TH1D *h_nRPCMatched_fullVeto_clusterMETCR[5][8];
+  TH1D *h_rpcSpread_fullVeto_clusterMETCR[5][8];
+  TH1D *h_rpcBx_fullVeto_clusterMETCR[5][8];
+  TH1D *h_dPhiJetMET_fullVeto_clusterMETCR[5][8];
+  TH1D *h_dtRechitClusterMaxStation_fullVeto_clusterMETCR[5][8];
 
-  TH1D *h_nRPCMatched_Nminus1_clusterMETCR[5][6];
-  TH1D *h_rpcSpread_Nminus1_clusterMETCR[5][6];
-  TH1D *h_rpcBx_Nminus1_clusterMETCR[5][6];
-  TH1D *h_dPhiJetMET_Nminus1_clusterMETCR[5][6];
-  TH1D *h_dtRechitClusterMaxStation_Nminus1_clusterMETCR[5][6];
+  TH1D *h_nRPCMatched_Nminus1_clusterMETCR[5][8];
+  TH1D *h_rpcSpread_Nminus1_clusterMETCR[5][8];
+  TH1D *h_rpcBx_Nminus1_clusterMETCR[5][8];
+  TH1D *h_dPhiJetMET_Nminus1_clusterMETCR[5][8];
+  TH1D *h_dtRechitClusterMaxStation_Nminus1_clusterMETCR[5][8];
 
-  TH1D *h_dPhiClusterMET_fullVeto_rpcCR[5][6];
-  TH1D *h_dPhiJetMET_fullVeto_rpcCR[5][6];
-  TH1D *h_dtRechitClusterMaxStation_fullVeto_rpcCR[5][6];
+  TH1D *h_dPhiClusterMET_fullVeto_rpcCR[5][8];
+  TH1D *h_dPhiJetMET_fullVeto_rpcCR[5][8];
+  TH1D *h_dtRechitClusterMaxStation_fullVeto_rpcCR[5][8];
 
-  TH1D *h_dPhiClusterMET_Nminus1_rpcCR[5][6];
-  TH1D *h_dPhiJetMET_Nminus1_rpcCR[5][6];
-  TH1D *h_dtRechitClusterMaxStation_Nminus1_rpcCR[5][6];
+  TH1D *h_dPhiClusterMET_Nminus1_rpcCR[5][8];
+  TH1D *h_dPhiJetMET_Nminus1_rpcCR[5][8];
+  TH1D *h_dtRechitClusterMaxStation_Nminus1_rpcCR[5][8];
 
-  TH1D *h_nStations1_50hits_clusterMETCR[5][6];
-  TH1D *h_nStations1_100hits_clusterMETCR[5][6];
-  TH1D *h_nStations1_150hits_clusterMETCR[5][6];
-  TH1D *h_nStations25_50hits_clusterMETCR[5][6];
-  TH1D *h_nStations25_100hits_clusterMETCR[5][6];
-  TH1D *h_nStations25_150hits_clusterMETCR[5][6];
-  TH1D *h_nStations50_50hits_clusterMETCR[5][6];
-  TH1D *h_nStations50_100hits_clusterMETCR[5][6];
-  TH1D *h_nStations50_150hits_clusterMETCR[5][6];
+  TH1D *h_nStations1_50hits_clusterMETCR[5][8];
+  TH1D *h_nStations1_100hits_clusterMETCR[5][8];
+  TH1D *h_nStations1_150hits_clusterMETCR[5][8];
+  TH1D *h_nStations25_50hits_clusterMETCR[5][8];
+  TH1D *h_nStations25_100hits_clusterMETCR[5][8];
+  TH1D *h_nStations25_150hits_clusterMETCR[5][8];
+  TH1D *h_nStations50_50hits_clusterMETCR[5][8];
+  TH1D *h_nStations50_100hits_clusterMETCR[5][8];
+  TH1D *h_nStations50_150hits_clusterMETCR[5][8];
 
-  TH1D *h_nWheels1_50hits_clusterMETCR[5][6];
-  TH1D *h_nWheels25_50hits_clusterMETCR[5][6];
-  TH1D *h_nWheels50_50hits_clusterMETCR[5][6];
-  TH1D *h_nWheels1_100hits_clusterMETCR[5][6];
-  TH1D *h_nWheels25_100hits_clusterMETCR[5][6];
-  TH1D *h_nWheels50_100hits_clusterMETCR[5][6];
-  TH1D *h_nWheels1_150hits_clusterMETCR[5][6];
-  TH1D *h_nWheels25_150hits_clusterMETCR[5][6];
-  TH1D *h_nWheels50_150hits_clusterMETCR[5][6];
+  TH1D *h_nWheels1_50hits_clusterMETCR[5][8];
+  TH1D *h_nWheels25_50hits_clusterMETCR[5][8];
+  TH1D *h_nWheels50_50hits_clusterMETCR[5][8];
+  TH1D *h_nWheels1_100hits_clusterMETCR[5][8];
+  TH1D *h_nWheels25_100hits_clusterMETCR[5][8];
+  TH1D *h_nWheels50_100hits_clusterMETCR[5][8];
+  TH1D *h_nWheels1_150hits_clusterMETCR[5][8];
+  TH1D *h_nWheels25_150hits_clusterMETCR[5][8];
+  TH1D *h_nWheels50_150hits_clusterMETCR[5][8];
 
-  TH1D *h_nRPCStations1_50hits_clusterMETCR[5][6];
-  TH1D *h_nRPCStations5_50hits_clusterMETCR[5][6];
-  TH1D *h_nRPCStations10_50hits_clusterMETCR[5][6];
-  TH1D *h_nRPCStations1_100hits_clusterMETCR[5][6];
-  TH1D *h_nRPCStations5_100hits_clusterMETCR[5][6];
-  TH1D *h_nRPCStations10_100hits_clusterMETCR[5][6];
-  TH1D *h_nRPCStations1_150hits_clusterMETCR[5][6];
-  TH1D *h_nRPCStations5_150hits_clusterMETCR[5][6];
-  TH1D *h_nRPCStations10_150hits_clusterMETCR[5][6];
+  TH1D *h_nRPCStations1_50hits_clusterMETCR[5][8];
+  TH1D *h_nRPCStations5_50hits_clusterMETCR[5][8];
+  TH1D *h_nRPCStations10_50hits_clusterMETCR[5][8];
+  TH1D *h_nRPCStations1_100hits_clusterMETCR[5][8];
+  TH1D *h_nRPCStations5_100hits_clusterMETCR[5][8];
+  TH1D *h_nRPCStations10_100hits_clusterMETCR[5][8];
+  TH1D *h_nRPCStations1_150hits_clusterMETCR[5][8];
+  TH1D *h_nRPCStations5_150hits_clusterMETCR[5][8];
+  TH1D *h_nRPCStations10_150hits_clusterMETCR[5][8];
 
-  TH1D *h_nRPCWheels1_50hits_clusterMETCR[5][6];
-  TH1D *h_nRPCWheels5_50hits_clusterMETCR[5][6];
-  TH1D *h_nRPCWheels10_50hits_clusterMETCR[5][6];
-  TH1D *h_nRPCWheels1_100hits_clusterMETCR[5][6];
-  TH1D *h_nRPCWheels5_100hits_clusterMETCR[5][6];
-  TH1D *h_nRPCWheels10_100hits_clusterMETCR[5][6];
-  TH1D *h_nRPCWheels1_150hits_clusterMETCR[5][6];
-  TH1D *h_nRPCWheels5_150hits_clusterMETCR[5][6];
-  TH1D *h_nRPCWheels10_150hits_clusterMETCR[5][6];
+  TH1D *h_nRPCWheels1_50hits_clusterMETCR[5][8];
+  TH1D *h_nRPCWheels5_50hits_clusterMETCR[5][8];
+  TH1D *h_nRPCWheels10_50hits_clusterMETCR[5][8];
+  TH1D *h_nRPCWheels1_100hits_clusterMETCR[5][8];
+  TH1D *h_nRPCWheels5_100hits_clusterMETCR[5][8];
+  TH1D *h_nRPCWheels10_100hits_clusterMETCR[5][8];
+  TH1D *h_nRPCWheels1_150hits_clusterMETCR[5][8];
+  TH1D *h_nRPCWheels5_150hits_clusterMETCR[5][8];
+  TH1D *h_nRPCWheels10_150hits_clusterMETCR[5][8];
 
-  TH1D *h_dtRechitClusterJetVetoPt[5][6];
-  TH1D *h_dtRechitClusterMuonVetoPt[5][6];
-  TH1D *h_dtRechitClusterMB1Veto[5][6];
+  TH1D *h_dtRechitClusterJetVetoPt[5][8];
+  TH1D *h_dtRechitClusterMuonVetoPt[5][8];
+  TH1D *h_dtRechitClusterMB1Veto[5][8];
 
-  TH1D *h_efficiency[5][6];
-  TH1D *h_efficiency_MB1CR[5][6];
+  TH1D *h_efficiency[5][8];
+  TH1D *h_efficiency_MB1CR[5][8];
   
-  TH1D *h_nDtRechitClusters_dPhiJetMET[5][6];
-  TH1D *h_nDtRechitClustersVeto_dPhiJetMET[5][6];
-  TH1D *h_dtRechitClustersDR_dPhiJetMET[5][6];
-  TH1D *h_dtRechitClustersVetoDR_dPhiJetMET[5][6];
-  TH1D *h_dtRechitClusterNSegmentStation2_dPhiJetMET[5][6];
-  TH1D *h_dtRechitClusterNSegmentStation3_dPhiJetMET[5][6];
-  TH1D *h_dtRechitClusterNSegmentStation4_dPhiJetMET[5][6];
-  TH1D *h_dtRechitClusterMaxStationRatio_dPhiJetMET[5][6];
-  TH1D *h_dtRechitClusterNStation_dPhiJetMET[5][6];
-  TH1D *h_dtRechitClusterMaxStation_dPhiJetMET[5][6];
-  TH1D *h_dtRechitClusterMaxChamberRatio_dPhiJetMET[5][6];
-  TH1D *h_dtRechitClusterNChamber_dPhiJetMET[5][6];
-  TH1D *h_dtRechitClusterMaxChamber_dPhiJetMET[5][6];
-  TH1D *h_dtRechitClusterX_dPhiJetMET[5][6];
-  TH1D *h_dtRechitClusterY_dPhiJetMET[5][6];
-  TH1D *h_dtRechitClusterZ_dPhiJetMET[5][6];
-  TH1D *h_dtRechitClusterEta_dPhiJetMET[5][6];
-  TH1D *h_dtRechitClusterPhi_dPhiJetMET[5][6];
-  TH1D *h_dtRechitClusterTime_dPhiJetMET[5][6];
-  TH1D *h_dtRechitClusterXSpread_dPhiJetMET[5][6];
-  TH1D *h_dtRechitClusterYSpread_dPhiJetMET[5][6];
-  TH1D *h_dtRechitClusterZSpread_dPhiJetMET[5][6];
-  TH1D *h_dtRechitClusterEtaSpread_dPhiJetMET[5][6];
-  TH1D *h_dtRechitClusterPhiSpread_dPhiJetMET[5][6];
-  TH1D *h_dtRechitClusterTimeSpread_dPhiJetMET[5][6];
-  TH1D *h_dtRechitClusterMajorAxis_dPhiJetMET[5][6];
-  TH1D *h_dtRechitClusterMinorAxis_dPhiJetMET[5][6];
+  TH1D *h_nDtRechitClusters_dPhiJetMET[5][8];
+  TH1D *h_nDtRechitClustersVeto_dPhiJetMET[5][8];
+  TH1D *h_dtRechitClustersDR_dPhiJetMET[5][8];
+  TH1D *h_dtRechitClustersVetoDR_dPhiJetMET[5][8];
+  TH1D *h_dtRechitClusterNSegmentStation2_dPhiJetMET[5][8];
+  TH1D *h_dtRechitClusterNSegmentStation3_dPhiJetMET[5][8];
+  TH1D *h_dtRechitClusterNSegmentStation4_dPhiJetMET[5][8];
+  TH1D *h_dtRechitClusterMaxStationRatio_dPhiJetMET[5][8];
+  TH1D *h_dtRechitClusterNStation_dPhiJetMET[5][8];
+  TH1D *h_dtRechitClusterMaxStation_dPhiJetMET[5][8];
+  TH1D *h_dtRechitClusterMaxChamberRatio_dPhiJetMET[5][8];
+  TH1D *h_dtRechitClusterNChamber_dPhiJetMET[5][8];
+  TH1D *h_dtRechitClusterMaxChamber_dPhiJetMET[5][8];
+  TH1D *h_dtRechitClusterX_dPhiJetMET[5][8];
+  TH1D *h_dtRechitClusterY_dPhiJetMET[5][8];
+  TH1D *h_dtRechitClusterZ_dPhiJetMET[5][8];
+  TH1D *h_dtRechitClusterEta_dPhiJetMET[5][8];
+  TH1D *h_dtRechitClusterPhi_dPhiJetMET[5][8];
+  TH1D *h_dtRechitClusterTime_dPhiJetMET[5][8];
+  TH1D *h_dtRechitClusterXSpread_dPhiJetMET[5][8];
+  TH1D *h_dtRechitClusterYSpread_dPhiJetMET[5][8];
+  TH1D *h_dtRechitClusterZSpread_dPhiJetMET[5][8];
+  TH1D *h_dtRechitClusterEtaSpread_dPhiJetMET[5][8];
+  TH1D *h_dtRechitClusterPhiSpread_dPhiJetMET[5][8];
+  TH1D *h_dtRechitClusterTimeSpread_dPhiJetMET[5][8];
+  TH1D *h_dtRechitClusterMajorAxis_dPhiJetMET[5][8];
+  TH1D *h_dtRechitClusterMinorAxis_dPhiJetMET[5][8];
   
-  TH1D *h_nRB1Match_dPhiJetMET[5][6];
-  TH1D *h_nRB1Match_MB1Veto_dPhiJetMET[5][6];
-  TH1D *h_nMB1MatchAdjacent_dPhiJetMET[5][6];
-  TH1D *h_nMB1MatchAdjacent_MB1Veto_dPhiJetMET[5][6];
-  TH1D *h_nMB1MatchAdjacent_dPhiClusterMET[5][6];
-  TH1D *h_nMB1MatchAdjacent_MB1Veto_dPhiClusterMET[5][6];
-  TH1D *h_nMB1MatchAdjacentPi2_dPhiClusterMET[5][6];
-  TH1D *h_nMB1MatchAdjacentPi2_MB1Veto_dPhiClusterMET[5][6];
-  TH1D *h_nMB1MatchAdjacent0p8_dPhiClusterMET[5][6];
-  TH1D *h_nMB1MatchAdjacent0p8_MB1Veto_dPhiClusterMET[5][6];
-  TH1D *h_nMB1MatchAdjacent0p8Pi2_dPhiClusterMET[5][6];
-  TH1D *h_nMB1MatchAdjacent0p8Pi2_MB1Veto_dPhiClusterMET[5][6];
+  TH1D *h_nRB1Match_dPhiJetMET[5][8];
+  TH1D *h_nRB1Match_MB1Veto_dPhiJetMET[5][8];
+  TH1D *h_nMB1MatchAdjacent_dPhiJetMET[5][8];
+  TH1D *h_nMB1MatchAdjacent_MB1Veto_dPhiJetMET[5][8];
+  TH1D *h_nMB1MatchAdjacent_dPhiClusterMET[5][8];
+  TH1D *h_nMB1MatchAdjacent_MB1Veto_dPhiClusterMET[5][8];
+  TH1D *h_nMB1MatchAdjacentPi2_dPhiClusterMET[5][8];
+  TH1D *h_nMB1MatchAdjacentPi2_MB1Veto_dPhiClusterMET[5][8];
+  TH1D *h_nMB1MatchAdjacent0p8_dPhiClusterMET[5][8];
+  TH1D *h_nMB1MatchAdjacent0p8_MB1Veto_dPhiClusterMET[5][8];
+  TH1D *h_nMB1MatchAdjacent0p8Pi2_dPhiClusterMET[5][8];
+  TH1D *h_nMB1MatchAdjacent0p8Pi2_MB1Veto_dPhiClusterMET[5][8];
   
-  TH1D *h_jetChargedHadronicEnergyFraction_SR[5][6];
-  TH1D *h_jetNeutralHadronicEnergyFraction_SR[5][6];
-  TH1D *h_jetNeutralEMEnergyFraction_SR[5][6];
-  TH1D *h_jetChargedEMEnergyFraction_SR[5][6];
-  TH1D *h_leadingJetChargedHadronicEnergyFraction_SR[5][6];
-  TH1D *h_leadingJetNeutralHadronicEnergyFraction_SR[5][6];
-  TH1D *h_leadingJetNeutralEMEnergyFraction_SR[5][6];
-  TH1D *h_leadingJetChargedEMEnergyFraction_SR[5][6];
+  TH1D *h_jetChargedHadronicEnergyFraction_SR[5][8];
+  TH1D *h_jetNeutralHadronicEnergyFraction_SR[5][8];
+  TH1D *h_jetNeutralEMEnergyFraction_SR[5][8];
+  TH1D *h_jetChargedEMEnergyFraction_SR[5][8];
+  TH1D *h_leadingJetChargedHadronicEnergyFraction_SR[5][8];
+  TH1D *h_leadingJetNeutralHadronicEnergyFraction_SR[5][8];
+  TH1D *h_leadingJetNeutralEMEnergyFraction_SR[5][8];
+  TH1D *h_leadingJetChargedEMEnergyFraction_SR[5][8];
 
-  TH1D *h_decayVertexRadius_noVeto[5][6];
-  TH1D *h_decayVertexRadius_clusterReco[5][6];
-  TH1D *h_decayVertexRadius_clusterReco_signalRegionEq2[5][6];
-  TH1D *h_decayVertexRadius_clusterReco_signalRegionGt2[5][6];
+  TH1D *h_decayVertexRadius_noVeto[5][8];
+  TH1D *h_decayVertexRadius_clusterReco[5][8];
+  TH1D *h_decayVertexRadius_clusterReco_signalRegionEq2[5][8];
+  TH1D *h_decayVertexRadius_clusterReco_signalRegionGt2[5][8];
 
-  TH1D *h_decayVertexZ_noVeto[5][6];
-  TH1D *h_decayVertexZ_clusterReco[5][6];
-  TH1D *h_decayVertexZ_clusterReco_signalRegionEq2[5][6];
-  TH1D *h_decayVertexZ_clusterReco_signalRegionGt2[5][6];
+  TH1D *h_decayVertexZ_noVeto[5][8];
+  TH1D *h_decayVertexZ_clusterReco[5][8];
+  TH1D *h_decayVertexZ_clusterReco_signalRegionEq2[5][8];
+  TH1D *h_decayVertexZ_clusterReco_signalRegionGt2[5][8];
   
   Double_t chargedHadFraction_mindPhi = 0.0;
   Double_t chargedEMFraction_mindPhi = 0.0;
@@ -375,7 +375,7 @@ void analyzeSignal_ABCD(){
   TRandom3 *rand = new TRandom3();
   Int_t pmRand = 0;
 
-  for(Int_t itr_mX=0; itr_mX<3; itr_mX++){
+  for(Int_t itr_mX=0; itr_mX<5; itr_mX++){
     for(Int_t itr_ctau=0; itr_ctau<4; itr_ctau++){
       sprintf(name,"h_nDtRechitClusters_dPhiJetMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
       h_nDtRechitClusters_dPhiJetMET[itr_mX][itr_ctau] = new TH1D(name,"",5,0,5);
@@ -796,26 +796,26 @@ void analyzeSignal_ABCD(){
 	//_file = TFile::Open(dir+years[itr_year]+"/v3/v5/normalized/ggH_HToSSTobbbb_MH-125_MS-"+mX[itr_mX]+"_ctau-"+ctau[itr_ctau]+"_TuneCUETP8M1_13TeV-powheg-pythia8_1pb_weighted.root");
       }
       else{
-	_file = TFile::Open(dir+years[itr_year]+"/v1/v3/normalized/ggH_HToSSTobbbb_MH-125_MS-"+mX[itr_mX]+"_ctau-"+ctau[itr_ctau]+"_TuneCP5_13TeV-powheg-pythia8_1pb_weighted.root");
+	//_file = TFile::Open(dir+years[itr_year]+"/v1/v3/normalized/ggH_HToSSTobbbb_MH-125_MS-"+mX[itr_mX]+"_ctau-"+ctau[itr_ctau]+"_TuneCP5_13TeV-powheg-pythia8_1pb_weighted.root");
 	//_file = TFile::Open(dir+years[itr_year]+"/v3/v5/normalized/ggH_HToSSTobbbb_MH-125_MS-"+mX[itr_mX]+"_ctau-"+ctau[itr_ctau]+"_TuneCP5_13TeV-powheg-pythia8_1pb_weighted.root");
+	_file = TFile::Open(dir+years[itr_year]+"/HV_params_"+mX[itr_mX]+"_ctau_"+ctau[itr_ctau]+"_LLPNTUPLE_v0_filter.root");
       }
       
       //_file = TFile::Open(dir+"signalPointsGGHWithRPCWithFlags/signal_1000_"+mX[itr_mX]+"_"+ctau[itr_ctau]+".root");
       //_file = TFile::Open(dir+"signalPointsGenFilter/HiddenValleyGenFilter_"+mX[itr_mX]+"_ctau_"+ctau[itr_ctau]+".py_privateMC_102X_LLPNTUPLE_v2_generationGenFilter_forHV_2018_MS.root");
-      //_file = TFile::Open(dir+years[itr_year]+"/HV_params_"+mX[itr_mX]+"_ctau_"+ctau[itr_ctau]+"_LLPNTUPLE_v0_filter.root");
-
-      TTreeReader treeReader("MuonSystem",_file);
-      //TTreeReader treeReader("ntuples/llp",_file);
+      
+      //TTreeReader treeReader("MuonSystem",_file);
+      TTreeReader treeReader("ntuples/llp",_file);
 
       TTreeReaderValue<unsigned int> runNum(treeReader,"runNum");
       //TTreeReaderValue<unsigned int> lumiSec(treeReader,"lumiSec");
       //TTreeReaderValue<unsigned int> eventNum(treeReader,"evtNum");
       
-      TTreeReaderValue<float> MET(treeReader,"met");
-      TTreeReaderValue<float> METphi(treeReader,"metPhi");
+      //TTreeReaderValue<float> MET(treeReader,"met");
+      //TTreeReaderValue<float> METphi(treeReader,"metPhi");
      
-      //TTreeReaderValue<float> MET(treeReader,"metType1Pt");
-      //TTreeReaderValue<float> METphi(treeReader,"metType1Phi");
+      TTreeReaderValue<float> MET(treeReader,"metType1Pt");
+      TTreeReaderValue<float> METphi(treeReader,"metType1Phi");
  
       //TTreeReaderArray<float> gLLP_ctau(treeReader,"gLLP_ctau");
       TTreeReaderArray<float> gLLP_beta(treeReader,"gLLP_beta");
@@ -890,20 +890,20 @@ void analyzeSignal_ABCD(){
       TTreeReaderArray<float> hoRechitE(treeReader,"hoRechit_E");
       TTreeReaderArray<float> hoRechitT(treeReader,"hoRechit_T");
       */
-      TTreeReaderValue<int> nLeptons(treeReader,"nLeptons");
+      //TTreeReaderValue<int> nLeptons(treeReader,"nLeptons");
       TTreeReaderValue<int> nMuons(treeReader,"nMuons");
-      TTreeReaderArray<int> lepPdgId(treeReader,"lepPdgId");
-      TTreeReaderArray<float> lepPhi(treeReader,"lepPhi");
-      TTreeReaderArray<float> lepEta(treeReader,"lepEta");
-      TTreeReaderArray<float> lepPt(treeReader,"lepPt");
+      //TTreeReaderArray<int> lepPdgId(treeReader,"lepPdgId");
+      //TTreeReaderArray<float> lepPhi(treeReader,"lepPhi");
+      //TTreeReaderArray<float> lepEta(treeReader,"lepEta");
+      //TTreeReaderArray<float> lepPt(treeReader,"lepPt");
 
       _ofile->cd();
       totalNum += treeReader.GetEntries(1);
       std::vector<bool> gLLP_plotted; 
       std::vector<bool> gLLP_plotted_id_sr1; 
       std::vector<bool> gLLP_plotted_id_sr2; 
-      weight = 48.58*1000*0.01*lumi[itr_year]/treeReader.GetEntries(1);
-      //weight = 48.58*1000*0.01*lumi[itr_year]/1E6;
+      //weight = 48.58*1000*0.01*lumi[itr_year]/treeReader.GetEntries(1);
+      weight = 48.58*1000*0.01*lumi[itr_year]/1E6;
       //weight = 48.58*1000*0.01*137/500000;
       //weight = 0.1845*1000*1.00*137/treeReader.GetEntries(1);
       while(treeReader.Next()){
@@ -1150,7 +1150,7 @@ void analyzeSignal_ABCD(){
 	      if(dtRechitClusterMuonVetoPt[itr_clust]<10.){ passMuon = true; } 
 	      
 	      passMuonLoose=true;
-	      for(Int_t itr_lep=0; itr_lep<*nLeptons; itr_lep++){
+	      /*for(Int_t itr_lep=0; itr_lep<*nLeptons; itr_lep++){
 		if(abs(lepPdgId[itr_lep])==13){
 		  dPhi_tmp = lepPhi[itr_lep] - dtRechitClusterPhi[itr_clust];
 		  if(dPhi_tmp > TMath::Pi()){ dPhi_tmp -= 2*TMath::Pi(); }
@@ -1162,7 +1162,7 @@ void analyzeSignal_ABCD(){
 		    }
 		  }
 		}
-	      }
+		}*/
 
 	      //if(*nLeptons==0){ passMuon_alt = true; }
 	    
@@ -1684,26 +1684,26 @@ void analyzeSignal_ABCD(){
 			      if(nMB1MatchClusterAdjacent0p8Plus<8 && nMB1MatchClusterAdjacent0p8Minus<8){
 				passMB2CRwithAdjacent0p8 = true;
 				if (passNHFJet){
-				    for(Int_t itr_llp=0; itr_llp<2; itr_llp++){
-					float decayR = sqrt(pow(gLLP_decay_vertex_x[itr_llp],2)+pow(gLLP_decay_vertex_y[itr_llp],2));
-					dtRechitClusterVec.SetPtEtaPhi(1,dtRechitClusterEta[itr_clust],dtRechitClusterPhi[itr_clust]);
-					if(decayR > 300 && decayR < 800 && fabs(gLLP_decay_vertex_z[itr_llp]) < 650. && !gLLP_plotted_id_sr2[itr_llp] && dtRechitClusterSize[itr_clust] > 100){
-					    TVector3 llpDecay = TVector3(gLLP_decay_vertex_x[itr_llp],gLLP_decay_vertex_y[itr_llp],gLLP_decay_vertex_z[itr_llp]);
-					    if (llpDecay.DeltaR(dtRechitClusterVec) < 0.5)
-					    {
-						h_decayVertexRadius_clusterReco_signalRegionEq2[itr_mX][itr_ctau]->Fill(sqrt(pow(gLLP_decay_vertex_x[itr_llp],2)+pow(gLLP_decay_vertex_y[itr_llp],2)));
-						h_decayVertexZ_clusterReco_signalRegionEq2[itr_mX][itr_ctau]->Fill(fabs(gLLP_decay_vertex_z[itr_llp]));
-						gLLP_plotted_id_sr2[itr_llp] = true;
-					    }
+				  
+				  passMB2CRwithNHF = true;
+				  
+				  for(Int_t itr_llp=0; itr_llp<2; itr_llp++){
+				    float decayR = sqrt(pow(gLLP_decay_vertex_x[itr_llp],2)+pow(gLLP_decay_vertex_y[itr_llp],2));
+				    dtRechitClusterVec.SetPtEtaPhi(1,dtRechitClusterEta[itr_clust],dtRechitClusterPhi[itr_clust]);
+				    if(decayR > 300 && decayR < 800 && fabs(gLLP_decay_vertex_z[itr_llp]) < 650. && !gLLP_plotted_id_sr2[itr_llp] && dtRechitClusterSize[itr_clust] > 100){
+				      TVector3 llpDecay = TVector3(gLLP_decay_vertex_x[itr_llp],gLLP_decay_vertex_y[itr_llp],gLLP_decay_vertex_z[itr_llp]);
+				      if (llpDecay.DeltaR(dtRechitClusterVec) < 0.5)
+					{
+					  h_decayVertexRadius_clusterReco_signalRegionEq2[itr_mX][itr_ctau]->Fill(sqrt(pow(gLLP_decay_vertex_x[itr_llp],2)+pow(gLLP_decay_vertex_y[itr_llp],2)));
+					  h_decayVertexZ_clusterReco_signalRegionEq2[itr_mX][itr_ctau]->Fill(fabs(gLLP_decay_vertex_z[itr_llp]));
+					  gLLP_plotted_id_sr2[itr_llp] = true;
 					}
 				    }
+				  }
 				}
 			      }
 			      if(nMB3MatchCluster<5 && nMB4MatchCluster<5){
 				passMB2CRwithOther = true;
-			      }
-			      if(passNHFJet){
-				passMB2CRwithNHF = true;
 			      }
 			    }
 			  }
@@ -1768,7 +1768,7 @@ void analyzeSignal_ABCD(){
 				  passAdjacent0p8MB1 = true;
 				  if (passNHFJet){
 				    for(Int_t itr_llp=0; itr_llp<2; itr_llp++){
-					    float decayR = sqrt(pow(gLLP_decay_vertex_x[itr_llp],2)+pow(gLLP_decay_vertex_y[itr_llp],2));
+				            float decayR = sqrt(pow(gLLP_decay_vertex_x[itr_llp],2)+pow(gLLP_decay_vertex_y[itr_llp],2));
 					    dtRechitClusterVec.SetPtEtaPhi(1,dtRechitClusterEta[itr_clust],dtRechitClusterPhi[itr_clust]);
 					    if(decayR > 300 && decayR < 800 && fabs(gLLP_decay_vertex_z[itr_llp]) < 650. && !gLLP_plotted_id_sr1[itr_llp] && dtRechitClusterSize[itr_clust] > 100){
 						TVector3 llpDecay = TVector3(gLLP_decay_vertex_x[itr_llp],gLLP_decay_vertex_y[itr_llp],gLLP_decay_vertex_z[itr_llp]);
