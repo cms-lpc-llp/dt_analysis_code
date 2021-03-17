@@ -1,3 +1,16 @@
+#include "TFile.h"
+#include "TH1.h"
+#include "TH2.h"
+#include "TMath.h"
+#include "TRandom3.h"
+#include <TTreeReader.h>
+#include <TTreeReaderValue.h>
+#include <TTreeReaderArray.h>
+#include <vector> 
+#include <map> 
+#include <fstream>      // std::ofstream
+
+
 R__LOAD_LIBRARY(libTreePlayer)
 
 int getStation(float hitX, float hitY){
@@ -34,11 +47,10 @@ int getRPCLayer(float hitX, float hitY){
 
 void analyzeData_ABCD(){
 
-  char name[50];
-  char title[100];
-  char years[4][10] = {"2018","2017","2016"};
-  char runNames[3][20] = {"17Sept2018_Run2018","Run2017","Run2016"};
-  char dates[3][20] = {"17Sep2018","17Nov2017","07Aug17"};
+  TString name;
+  TString years[3] = {"2018","2017","2016"};
+  TString runNames[3] = {"17Sept2018_Run2018","Run2017","Run2016"};
+  TString dates[20] = {"17Sep2018","17Nov2017","07Aug17"};
   //TString dir("/mnt/hadoop/store/group/phys_exotica/delayedjets/displacedJetMuonAnalyzer/driftTube/V1p17/Data");
   TString dir("/storage/user/mcitron/skims/v3/");
   TFile *_ofile = TFile::Open("outData_ABCD_new.root","RECREATE");
@@ -385,13 +397,19 @@ void analyzeData_ABCD(){
   TH1D *h_MET_MB1HitsCRlowNHF[4];
   TH1D *h_dPhiClusterMET_MB1HitsCRlowNHF[4];
 
+  std::vector<TString> selsStrings = {"oneCluster_lowNHF","oneVetoCluster_lowNHF","oneCluster_highNHF","oneVetoCluster_highNHF"};
+  std::map<const TString, TH1D*> runNumHists;
+  std::map<const TString, TH1D*> etaClusterHists;
+  std::map<const TString, TH1D*> phiClusterHists;
+  std::map<const TString, TH2D*> etaPhiClusterHists;
+      
+
   TH1D *h_MET_highNHF[4];
   TH1D *h_MET_oneCluster_highNHF[4];
   TH1D *h_MET_oneVetoCluster_highNHF[4];
   TH1D *h_MET_lowNHF[4];
   TH1D *h_MET_oneCluster_lowNHF[4];
   TH1D *h_MET_oneVetoCluster_lowNHF[4];
-
   TH1D *h_rpcBxMedian_MB1CR[4];
   TH1D *h_rpcBxMedian_MB2CR[4];
   TH1D *h_rpcBxMedian_MB2withMB1CR[4];
@@ -782,1092 +800,1098 @@ void analyzeData_ABCD(){
   Int_t pmRand = 0;
 
   for(Int_t itr_year=0; itr_year<3; itr_year++){
+    TString year = years[itr_year];
 
-    sprintf(name,"h_dtRechitClusterNSegmentStation2_dPhiJetMET_%s",years[itr_year]);
+    name = "h_dtRechitClusterNSegmentStation2_dPhiJetMET_"+year;
     h_dtRechitClusterNSegmentStation2_dPhiJetMET[itr_year] = new TH1D(name,"",50,0,500);
     
-    sprintf(name,"h_dtRechitClusterNSegmentStation3_dPhiJetMET_%s",years[itr_year]);
+    name = "h_dtRechitClusterNSegmentStation3_dPhiJetMET_"+year;
     h_dtRechitClusterNSegmentStation3_dPhiJetMET[itr_year] = new TH1D(name,"",50,0,500);
     
-    sprintf(name,"h_dtRechitClusterNSegmentStation4_dPhiJetMET_%s",years[itr_year]);
+    name = "h_dtRechitClusterNSegmentStation4_dPhiJetMET_"+year;
     h_dtRechitClusterNSegmentStation4_dPhiJetMET[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterMaxStation_dPhiJetMET_%s",years[itr_year]);
+    name = "h_dtRechitClusterMaxStation_dPhiJetMET_"+year;
     h_dtRechitClusterMaxStation_dPhiJetMET[itr_year] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_dtRechitClusterNStation_dPhiJetMET_%s",years[itr_year]);
+    name = "h_dtRechitClusterNStation_dPhiJetMET_"+year;
     h_dtRechitClusterNStation_dPhiJetMET[itr_year] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_nDtRechitClusters_dPhiJetMET_%s",years[itr_year]);
+    name = "h_nDtRechitClusters_dPhiJetMET_"+year;
     h_nDtRechitClusters_dPhiJetMET[itr_year] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_nDtRechitClustersVeto_dPhiJetMET_%s",years[itr_year]);
+    name = "h_nDtRechitClustersVeto_dPhiJetMET_"+year;
     h_nDtRechitClustersVeto_dPhiJetMET[itr_year] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_dtRechitClustersDR_dPhiJetMET_%s",years[itr_year]);
+    name = "h_dtRechitClustersDR_dPhiJetMET_"+year;
     h_dtRechitClustersDR_dPhiJetMET[itr_year] = new TH1D(name,"",50,0,2);
 
-    sprintf(name,"h_dtRechitClustersVetoDR_dPhiJetMET_%s",years[itr_year]);
+    name = "h_dtRechitClustersVetoDR_dPhiJetMET_"+year;
     h_dtRechitClustersVetoDR_dPhiJetMET[itr_year] = new TH1D(name,"",50,0,2);
 
-    sprintf(name,"h_dtRechitClusterMaxStationRatio_dPhiJetMET_%s",years[itr_year]);
+    name = "h_dtRechitClusterMaxStationRatio_dPhiJetMET_"+year;
     h_dtRechitClusterMaxStationRatio_dPhiJetMET[itr_year] = new TH1D(name,"",50,0,1);
     
-    sprintf(name,"h_dtRechitClusterMaxChamberRatio_dPhiJetMET_%s",years[itr_year]);
+    name = "h_dtRechitClusterMaxChamberRatio_dPhiJetMET_"+year;
     h_dtRechitClusterMaxChamberRatio_dPhiJetMET[itr_year] = new TH1D(name,"",50,0,1);
     
-    sprintf(name,"h_dtRechitClusterNChamber_dPhiJetMET_%s",years[itr_year]);
+    name = "h_dtRechitClusterNChamber_dPhiJetMET_"+year;
     h_dtRechitClusterNChamber_dPhiJetMET[itr_year] = new TH1D(name,"",6,0,6);
     
-    sprintf(name,"h_dtRechitClusterMaxChamber_dPhiJetMET_%s",years[itr_year]);
+    name = "h_dtRechitClusterMaxChamber_dPhiJetMET_"+year;
     h_dtRechitClusterMaxChamber_dPhiJetMET[itr_year] = new TH1D(name,"",6,0,6);
     
-    sprintf(name,"h_dtRechitClusterX_dPhiJetMET_%s",years[itr_year]);
+    name = "h_dtRechitClusterX_dPhiJetMET_"+year;
     h_dtRechitClusterX_dPhiJetMET[itr_year] = new TH1D(name,"",100,-800,800);
     
-    sprintf(name,"h_dtRechitClusterY_dPhiJetMET_%s",years[itr_year]);
+    name = "h_dtRechitClusterY_dPhiJetMET_"+year;
     h_dtRechitClusterY_dPhiJetMET[itr_year] = new TH1D(name,"",100,-800,800);
     
-    sprintf(name,"h_dtRechitClusterZ_dPhiJetMET_%s",years[itr_year]);
+    name = "h_dtRechitClusterZ_dPhiJetMET_"+year;
     h_dtRechitClusterZ_dPhiJetMET[itr_year] = new TH1D(name,"",100,-600,600);
     
-    sprintf(name,"h_dtRechitClusterEta_dPhiJetMET_%s",years[itr_year]);
+    name = "h_dtRechitClusterEta_dPhiJetMET_"+year;
     h_dtRechitClusterEta_dPhiJetMET[itr_year] = new TH1D(name,"",50,-1.5,1.5);
     
-    sprintf(name,"h_dtRechitClusterPhi_dPhiJetMET_%s",years[itr_year]);
+    name = "h_dtRechitClusterPhi_dPhiJetMET_"+year;
     h_dtRechitClusterPhi_dPhiJetMET[itr_year] = new TH1D(name,"",100,-3.5,3.5);
     
-    sprintf(name,"h_dtRechitClusterTime_dPhiJetMET_%s",years[itr_year]);
+    name = "h_dtRechitClusterTime_dPhiJetMET_"+year;
     h_dtRechitClusterTime_dPhiJetMET[itr_year] = new TH1D(name,"",50,300,800);
     
-    sprintf(name,"h_dtRechitClusterXSpread_dPhiJetMET_%s",years[itr_year]);
+    name = "h_dtRechitClusterXSpread_dPhiJetMET_"+year;
     h_dtRechitClusterXSpread_dPhiJetMET[itr_year] = new TH1D(name,"",100,0,500);
     
-    sprintf(name,"h_dtRechitClusterYSpread_dPhiJetMET_%s",years[itr_year]);
+    name = "h_dtRechitClusterYSpread_dPhiJetMET_"+year;
     h_dtRechitClusterYSpread_dPhiJetMET[itr_year] = new TH1D(name,"",100,0,500);
     
-    sprintf(name,"h_dtRechitClusterZSpread_dPhiJetMET_%s",years[itr_year]);
+    name = "h_dtRechitClusterZSpread_dPhiJetMET_"+year;
     h_dtRechitClusterZSpread_dPhiJetMET[itr_year] = new TH1D(name,"",100,0,140);
     
-    sprintf(name,"h_dtRechitClusterEtaSpread_dPhiJetMET_%s",years[itr_year]);
+    name = "h_dtRechitClusterEtaSpread_dPhiJetMET_"+year;
     h_dtRechitClusterEtaSpread_dPhiJetMET[itr_year] = new TH1D(name,"",50,0,0.5);
     
-    sprintf(name,"h_dtRechitClusterPhiSpread_dPhiJetMET_%s",years[itr_year]);
+    name = "h_dtRechitClusterPhiSpread_dPhiJetMET_"+year;
     h_dtRechitClusterPhiSpread_dPhiJetMET[itr_year] = new TH1D(name,"",50,0,1);
     
-    sprintf(name,"h_dtRechitClusterTimeSpread_dPhiJetMET_%s",years[itr_year]);
+    name = "h_dtRechitClusterTimeSpread_dPhiJetMET_"+year;
     h_dtRechitClusterTimeSpread_dPhiJetMET[itr_year] = new TH1D(name,"",100,0,150);
     
-    sprintf(name,"h_dtRechitClusterMajorAxis_dPhiJetMET_%s",years[itr_year]);
+    name = "h_dtRechitClusterMajorAxis_dPhiJetMET_"+year;
     h_dtRechitClusterMajorAxis_dPhiJetMET[itr_year] = new TH1D(name,"",50,0,1);
     
-    sprintf(name,"h_dtRechitClusterMinorAxis_dPhiJetMET_%s",years[itr_year]);
+    name = "h_dtRechitClusterMinorAxis_dPhiJetMET_"+year;
     h_dtRechitClusterMinorAxis_dPhiJetMET[itr_year] = new TH1D(name,"",50,0,1);
     
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiJetMETLow_rpcCRmuonVeto_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiJetMETLow_rpcCRmuonVeto_"+year;
     h_dtRechitClusterSize_dPhiJetMETLow_rpcCRmuonVeto[itr_year] = new TH1D(name,"",50,0,500);
     
-    sprintf(name,"h_dtRechitClusterSize_dPhiJetMETHigh_rpcCRmuonVeto_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiJetMETHigh_rpcCRmuonVeto_"+year;
     h_dtRechitClusterSize_dPhiJetMETHigh_rpcCRmuonVeto[itr_year] = new TH1D(name,"",50,0,500);
     
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMETLow_rpcCRmuonVeto_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMETLow_rpcCRmuonVeto_"+year;
     h_dtRechitClusterSize_dPhiClusterMETLow_rpcCRmuonVeto[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMETHigh_rpcCRmuonVeto_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMETHigh_rpcCRmuonVeto_"+year;
     h_dtRechitClusterSize_dPhiClusterMETHigh_rpcCRmuonVeto[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMETLow_rpcSpreadCRmuonVeto_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMETLow_rpcSpreadCRmuonVeto_"+year;
     h_dtRechitClusterSize_dPhiClusterMETLow_rpcSpreadCRmuonVeto[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMETHigh_rpcSpreadCRmuonVeto_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMETHigh_rpcSpreadCRmuonVeto_"+year;
     h_dtRechitClusterSize_dPhiClusterMETHigh_rpcSpreadCRmuonVeto[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiJetMETLow_rpcCRnoLepton_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiJetMETLow_rpcCRnoLepton_"+year;
     h_dtRechitClusterSize_dPhiJetMETLow_rpcCRnoLepton[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiJetMETHigh_rpcCRnoLepton_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiJetMETHigh_rpcCRnoLepton_"+year;
     h_dtRechitClusterSize_dPhiJetMETHigh_rpcCRnoLepton[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMETLow_rpcCRnoLepton_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMETLow_rpcCRnoLepton_"+year;
     h_dtRechitClusterSize_dPhiClusterMETLow_rpcCRnoLepton[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMETHigh_rpcCRnoLepton_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMETHigh_rpcCRnoLepton_"+year;
     h_dtRechitClusterSize_dPhiClusterMETHigh_rpcCRnoLepton[itr_year] = new TH1D(name,"",50,0,500);
 
 
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMETLow_jetMETCRmuonVeto_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMETLow_jetMETCRmuonVeto_"+year;
     h_dtRechitClusterSize_dPhiClusterMETLow_jetMETCRmuonVeto[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMETHigh_jetMETCRmuonVeto_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMETHigh_jetMETCRmuonVeto_"+year;
     h_dtRechitClusterSize_dPhiClusterMETHigh_jetMETCRmuonVeto[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSize_rpcMatch_jetMETCRmuonVeto_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_rpcMatch_jetMETCRmuonVeto_"+year;
     h_dtRechitClusterSize_rpcMatch_jetMETCRmuonVeto[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSize_rpcNoMatch_jetMETCRmuonVeto_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_rpcNoMatch_jetMETCRmuonVeto_"+year;
     h_dtRechitClusterSize_rpcNoMatch_jetMETCRmuonVeto[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMETLow_jetMETCRnoLepton_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMETLow_jetMETCRnoLepton_"+year;
     h_dtRechitClusterSize_dPhiClusterMETLow_jetMETCRnoLepton[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMETHigh_jetMETCRnoLepton_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMETHigh_jetMETCRnoLepton_"+year;
     h_dtRechitClusterSize_dPhiClusterMETHigh_jetMETCRnoLepton[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSize_rpcMatch_jetMETCRnoLepton_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_rpcMatch_jetMETCRnoLepton_"+year;
     h_dtRechitClusterSize_rpcMatch_jetMETCRnoLepton[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSize_rpcNoMatch_jetMETCRnoLepton_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_rpcNoMatch_jetMETCRnoLepton_"+year;
     h_dtRechitClusterSize_rpcNoMatch_jetMETCRnoLepton[itr_year] = new TH1D(name,"",50,0,500);
 
 
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiJetMETLow_clusterMETCRmuonVeto_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiJetMETLow_clusterMETCRmuonVeto_"+year;
     h_dtRechitClusterSize_dPhiJetMETLow_clusterMETCRmuonVeto[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiJetMETHigh_clusterMETCRmuonVeto_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiJetMETHigh_clusterMETCRmuonVeto_"+year;
     h_dtRechitClusterSize_dPhiJetMETHigh_clusterMETCRmuonVeto[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSize_rpcGood_clusterMETCRmuonVeto_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_rpcGood_clusterMETCRmuonVeto_"+year;
     h_dtRechitClusterSize_rpcGood_clusterMETCRmuonVeto[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSize_rpcBad_clusterMETCRmuonVeto_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_rpcBad_clusterMETCRmuonVeto_"+year;
     h_dtRechitClusterSize_rpcBad_clusterMETCRmuonVeto[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSize_rpcMatch_clusterMETCRmuonVeto_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_rpcMatch_clusterMETCRmuonVeto_"+year;
     h_dtRechitClusterSize_rpcMatch_clusterMETCRmuonVeto[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSize_rpcNoMatch_clusterMETCRmuonVeto_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_rpcNoMatch_clusterMETCRmuonVeto_"+year;
     h_dtRechitClusterSize_rpcNoMatch_clusterMETCRmuonVeto[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSize_rpcSpread_clusterMETCRmuonVeto_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_rpcSpread_clusterMETCRmuonVeto_"+year;
     h_dtRechitClusterSize_rpcSpread_clusterMETCRmuonVeto[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSize_rpcNoSpread_clusterMETCRmuonVeto_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_rpcNoSpread_clusterMETCRmuonVeto_"+year;
     h_dtRechitClusterSize_rpcNoSpread_clusterMETCRmuonVeto[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSize_rpcNegativeSpread_clusterMETCRmuonVeto_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_rpcNegativeSpread_clusterMETCRmuonVeto_"+year;
     h_dtRechitClusterSize_rpcNegativeSpread_clusterMETCRmuonVeto[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSize_rpcNegativeNoSpread_clusterMETCRmuonVeto_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_rpcNegativeNoSpread_clusterMETCRmuonVeto_"+year;
     h_dtRechitClusterSize_rpcNegativeNoSpread_clusterMETCRmuonVeto[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiJetMETLow_clusterMETCRnoLepton_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiJetMETLow_clusterMETCRnoLepton_"+year;
     h_dtRechitClusterSize_dPhiJetMETLow_clusterMETCRnoLepton[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiJetMETHigh_clusterMETCRnoLepton_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiJetMETHigh_clusterMETCRnoLepton_"+year;
     h_dtRechitClusterSize_dPhiJetMETHigh_clusterMETCRnoLepton[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSize_rpcMatch_clusterMETCRnoLepton_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_rpcMatch_clusterMETCRnoLepton_"+year;
     h_dtRechitClusterSize_rpcMatch_clusterMETCRnoLepton[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSize_rpcNoMatch_clusterMETCRnoLepton_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_rpcNoMatch_clusterMETCRnoLepton_"+year;
     h_dtRechitClusterSize_rpcNoMatch_clusterMETCRnoLepton[itr_year] = new TH1D(name,"",50,0,500);
 
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelection_rpcCR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelection_rpcCR_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelection_rpcCR[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
 
 
-    sprintf(name,"h_dtRechitClusterSize_fullSelection_rpcCR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_fullSelection_rpcCR_"+year;
     h_dtRechitClusterSize_fullSelection_rpcCR[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSize_lowClusterMET_fullSelection_rpcCR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_lowClusterMET_fullSelection_rpcCR_"+year;
     h_dtRechitClusterSize_lowClusterMET_fullSelection_rpcCR[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSize_highClusterMET_fullSelection_rpcCR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_highClusterMET_fullSelection_rpcCR_"+year;
     h_dtRechitClusterSize_highClusterMET_fullSelection_rpcCR[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSize_fullSelection_clusterMETCR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_fullSelection_clusterMETCR_"+year;
     h_dtRechitClusterSize_fullSelection_clusterMETCR[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSize_goodRPC_fullSelection_clusterMETCR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_goodRPC_fullSelection_clusterMETCR_"+year;
     h_dtRechitClusterSize_goodRPC_fullSelection_clusterMETCR[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSize_badRPC_fullSelection_clusterMETCR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_badRPC_fullSelection_clusterMETCR_"+year;
     h_dtRechitClusterSize_badRPC_fullSelection_clusterMETCR[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSize_lowClusterMET_lowClusterSize_SR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_lowClusterMET_lowClusterSize_SR_"+year;
     h_dtRechitClusterSize_lowClusterMET_lowClusterSize_SR[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSize_highClusterMET_lowClusterSize_SR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_highClusterMET_lowClusterSize_SR_"+year;
     h_dtRechitClusterSize_highClusterMET_lowClusterSize_SR[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSize_highClusterMET_highClusterSize_SR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_highClusterMET_highClusterSize_SR_"+year;
     h_dtRechitClusterSize_highClusterMET_highClusterSize_SR[itr_year] = new TH1D(name,"",50,0,500);
 
 
 
-    sprintf(name,"h_dPhiClusterRPC_fullVeto_%s",years[itr_year]);
+    name = "h_dPhiClusterRPC_fullVeto_"+year;
     h_dPhiClusterRPC_fullVeto[itr_year] = new TH1D(name,"",73,-0.15,3.5);
 
-    sprintf(name,"h_dZClusterRPC_fullVeto_%s",years[itr_year]);
+    name = "h_dZClusterRPC_fullVeto_"+year;
     h_dZClusterRPC_fullVeto[itr_year] = new TH1D(name,"",101,-5,500);
 
-    sprintf(name,"h_rpcSpread_invertedJetVeto_%s",years[itr_year]);
+    name = "h_rpcSpread_invertedJetVeto_"+year;
     h_rpcSpread_invertedJetVeto[itr_year] = new TH1D(name,"",10,0,10);
 
-    sprintf(name,"h_rpcSpread_invertedJetVeto_muonVeto_%s",years[itr_year]);
+    name = "h_rpcSpread_invertedJetVeto_muonVeto_"+year;
     h_rpcSpread_invertedJetVeto_muonVeto[itr_year] = new TH1D(name,"",10,0,10);
 
-    sprintf(name,"h_rpcSpread_fullVeto_%s",years[itr_year]);
+    name = "h_rpcSpread_fullVeto_"+year;
     h_rpcSpread_fullVeto[itr_year] = new TH1D(name,"",10,0,10);
 
-    sprintf(name,"h_rpcSpread_fullVeto_negBx_%s",years[itr_year]);
+    name = "h_rpcSpread_fullVeto_negBx_"+year;
     h_rpcSpread_fullVeto_negBx[itr_year] = new TH1D(name,"",10,0,10);
     
     
 
-    sprintf(name,"h_nRPCMatched_fullVeto_clusterMETCR_%s",years[itr_year]);
+    name = "h_nRPCMatched_fullVeto_clusterMETCR_"+year;
     h_nRPCMatched_fullVeto_clusterMETCR[itr_year] = new TH1D(name,"",20,0,20);
 
-    sprintf(name,"h_rpcSpread_fullVeto_clusterMETCR_%s",years[itr_year]);
+    name = "h_rpcSpread_fullVeto_clusterMETCR_"+year;
     h_rpcSpread_fullVeto_clusterMETCR[itr_year] = new TH1D(name,"",10,0,10);
 
-    sprintf(name,"h_rpcBx_fullVeto_clusterMETCR_%s",years[itr_year]);
+    name = "h_rpcBx_fullVeto_clusterMETCR_"+year;
     h_rpcBx_fullVeto_clusterMETCR[itr_year] = new TH1D(name,"",10,-4.5,5.5);
 
-    sprintf(name,"h_dPhiJetMET_fullVeto_clusterMETCR_%s",years[itr_year]);
+    name = "h_dPhiJetMET_fullVeto_clusterMETCR_"+year;
     h_dPhiJetMET_fullVeto_clusterMETCR[itr_year] = new TH1D(name,"",35,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterMaxStation_fullVeto_clusterMETCR_%s",years[itr_year]);
+    name = "h_dtRechitClusterMaxStation_fullVeto_clusterMETCR_"+year;
     h_dtRechitClusterMaxStation_fullVeto_clusterMETCR[itr_year] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_nRPCMatched_Nminus1_clusterMETCR_%s",years[itr_year]);
+    name = "h_nRPCMatched_Nminus1_clusterMETCR_"+year;
     h_nRPCMatched_Nminus1_clusterMETCR[itr_year] = new TH1D(name,"",20,0,20);
 
-    sprintf(name,"h_rpcSpread_Nminus1_clusterMETCR_%s",years[itr_year]);
+    name = "h_rpcSpread_Nminus1_clusterMETCR_"+year;
     h_rpcSpread_Nminus1_clusterMETCR[itr_year] = new TH1D(name,"",10,0,10);
 
-    sprintf(name,"h_rpcBx_Nminus1_clusterMETCR_%s",years[itr_year]);
+    name = "h_rpcBx_Nminus1_clusterMETCR_"+year;
     h_rpcBx_Nminus1_clusterMETCR[itr_year] = new TH1D(name,"",10,-4.5,5.5);
 
-    sprintf(name,"h_dPhiJetMET_Nminus1_clusterMETCR_%s",years[itr_year]);
+    name = "h_dPhiJetMET_Nminus1_clusterMETCR_"+year;
     h_dPhiJetMET_Nminus1_clusterMETCR[itr_year] = new TH1D(name,"",35,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterMaxStation_Nminus1_clusterMETCR_%s",years[itr_year]);
+    name = "h_dtRechitClusterMaxStation_Nminus1_clusterMETCR_"+year;
     h_dtRechitClusterMaxStation_Nminus1_clusterMETCR[itr_year] = new TH1D(name,"",5,0,5);
     
-    sprintf(name,"h_dPhiClusterMET_fullVeto_rpcCR_%s",years[itr_year]);
+    name = "h_dPhiClusterMET_fullVeto_rpcCR_"+year;
     h_dPhiClusterMET_fullVeto_rpcCR[itr_year] = new TH1D(name,"",35,0,3.5);
 
-    sprintf(name,"h_dPhiJetMET_fullVeto_rpcCR_%s",years[itr_year]);
+    name = "h_dPhiJetMET_fullVeto_rpcCR_"+year;
     h_dPhiJetMET_fullVeto_rpcCR[itr_year] = new TH1D(name,"",35,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterMaxStation_fullVeto_rpcCR_%s",years[itr_year]);
+    name = "h_dtRechitClusterMaxStation_fullVeto_rpcCR_"+year;
     h_dtRechitClusterMaxStation_fullVeto_rpcCR[itr_year] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_dPhiClusterMET_Nminus1_rpcCR_%s",years[itr_year]);
+    name = "h_dPhiClusterMET_Nminus1_rpcCR_"+year;
     h_dPhiClusterMET_Nminus1_rpcCR[itr_year] = new TH1D(name,"",35,0,3.5);
 
-    sprintf(name,"h_dPhiJetMET_Nminus1_rpcCR_%s",years[itr_year]);
+    name = "h_dPhiJetMET_Nminus1_rpcCR_"+year;
     h_dPhiJetMET_Nminus1_rpcCR[itr_year] = new TH1D(name,"",35,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterMaxStation_Nminus1_rpcCR_%s",years[itr_year]);
+    name = "h_dtRechitClusterMaxStation_Nminus1_rpcCR_"+year;
     h_dtRechitClusterMaxStation_Nminus1_rpcCR[itr_year] = new TH1D(name,"",5,0,5);
 
 
 
-    sprintf(name,"h_nStations1_50hits_clusterMETCR_%s",years[itr_year]);
+    name = "h_nStations1_50hits_clusterMETCR_"+year;
     h_nStations1_50hits_clusterMETCR[itr_year] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_nStations1_100hits_clusterMETCR_%s",years[itr_year]);
+    name = "h_nStations1_100hits_clusterMETCR_"+year;
     h_nStations1_100hits_clusterMETCR[itr_year] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_nStations1_150hits_clusterMETCR_%s",years[itr_year]);
+    name = "h_nStations1_150hits_clusterMETCR_"+year;
     h_nStations1_150hits_clusterMETCR[itr_year] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_nStations25_50hits_clusterMETCR_%s",years[itr_year]);
+    name = "h_nStations25_50hits_clusterMETCR_"+year;
     h_nStations25_50hits_clusterMETCR[itr_year] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_nStations25_100hits_clusterMETCR_%s",years[itr_year]);
+    name = "h_nStations25_100hits_clusterMETCR_"+year;
     h_nStations25_100hits_clusterMETCR[itr_year] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_nStations25_150hits_clusterMETCR_%s",years[itr_year]);
+    name = "h_nStations25_150hits_clusterMETCR_"+year;
     h_nStations25_150hits_clusterMETCR[itr_year] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_nStations50_50hits_clusterMETCR_%s",years[itr_year]);
+    name = "h_nStations50_50hits_clusterMETCR_"+year;
     h_nStations50_50hits_clusterMETCR[itr_year] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_nStations50_100hits_clusterMETCR_%s",years[itr_year]);
+    name = "h_nStations50_100hits_clusterMETCR_"+year;
     h_nStations50_100hits_clusterMETCR[itr_year] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_nStations50_150hits_clusterMETCR_%s",years[itr_year]);
+    name = "h_nStations50_150hits_clusterMETCR_"+year;
     h_nStations50_150hits_clusterMETCR[itr_year] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_nWheels1_50hits_clusterMETCR_%s",years[itr_year]);
+    name = "h_nWheels1_50hits_clusterMETCR_"+year;
     h_nWheels1_50hits_clusterMETCR[itr_year] = new TH1D(name,"",6,0,6);
 
-    sprintf(name,"h_nWheels1_100hits_clusterMETCR_%s",years[itr_year]);
+    name = "h_nWheels1_100hits_clusterMETCR_"+year;
     h_nWheels1_100hits_clusterMETCR[itr_year] = new TH1D(name,"",6,0,6);
 
-    sprintf(name,"h_nWheels1_150hits_clusterMETCR_%s",years[itr_year]);
+    name = "h_nWheels1_150hits_clusterMETCR_"+year;
     h_nWheels1_150hits_clusterMETCR[itr_year] = new TH1D(name,"",6,0,6);
 
-    sprintf(name,"h_nWheels25_50hits_clusterMETCR_%s",years[itr_year]);
+    name = "h_nWheels25_50hits_clusterMETCR_"+year;
     h_nWheels25_50hits_clusterMETCR[itr_year] = new TH1D(name,"",6,0,6);
 
-    sprintf(name,"h_nWheels25_100hits_clusterMETCR_%s",years[itr_year]);
+    name = "h_nWheels25_100hits_clusterMETCR_"+year;
     h_nWheels25_100hits_clusterMETCR[itr_year] = new TH1D(name,"",6,0,6);
 
-    sprintf(name,"h_nWheels25_150hits_clusterMETCR_%s",years[itr_year]);
+    name = "h_nWheels25_150hits_clusterMETCR_"+year;
     h_nWheels25_150hits_clusterMETCR[itr_year] = new TH1D(name,"",6,0,6);
 
-    sprintf(name,"h_nWheels50_50hits_clusterMETCR_%s",years[itr_year]);
+    name = "h_nWheels50_50hits_clusterMETCR_"+year;
     h_nWheels50_50hits_clusterMETCR[itr_year] = new TH1D(name,"",6,0,6);
 
-    sprintf(name,"h_nWheels50_100hits_clusterMETCR_%s",years[itr_year]);
+    name = "h_nWheels50_100hits_clusterMETCR_"+year;
     h_nWheels50_100hits_clusterMETCR[itr_year] = new TH1D(name,"",6,0,6);
 
-    sprintf(name,"h_nWheels50_150hits_clusterMETCR_%s",years[itr_year]);
+    name = "h_nWheels50_150hits_clusterMETCR_"+year;
     h_nWheels50_150hits_clusterMETCR[itr_year] = new TH1D(name,"",6,0,6);
 
 
-    sprintf(name,"h_nRPCStations1_50hits_clusterMETCR_%s",years[itr_year]);
+    name = "h_nRPCStations1_50hits_clusterMETCR_"+year;
     h_nRPCStations1_50hits_clusterMETCR[itr_year] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_nRPCStations1_100hits_clusterMETCR_%s",years[itr_year]);
+    name = "h_nRPCStations1_100hits_clusterMETCR_"+year;
     h_nRPCStations1_100hits_clusterMETCR[itr_year] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_nRPCStations1_150hits_clusterMETCR_%s",years[itr_year]);
+    name = "h_nRPCStations1_150hits_clusterMETCR_"+year;
     h_nRPCStations1_150hits_clusterMETCR[itr_year] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_nRPCStations5_50hits_clusterMETCR_%s",years[itr_year]);
+    name = "h_nRPCStations5_50hits_clusterMETCR_"+year;
     h_nRPCStations5_50hits_clusterMETCR[itr_year] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_nRPCStations5_100hits_clusterMETCR_%s",years[itr_year]);
+    name = "h_nRPCStations5_100hits_clusterMETCR_"+year;
     h_nRPCStations5_100hits_clusterMETCR[itr_year] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_nRPCStations5_150hits_clusterMETCR_%s",years[itr_year]);
+    name = "h_nRPCStations5_150hits_clusterMETCR_"+year;
     h_nRPCStations5_150hits_clusterMETCR[itr_year] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_nRPCStations10_50hits_clusterMETCR_%s",years[itr_year]);
+    name = "h_nRPCStations10_50hits_clusterMETCR_"+year;
     h_nRPCStations10_50hits_clusterMETCR[itr_year] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_nRPCStations10_100hits_clusterMETCR_%s",years[itr_year]);
+    name = "h_nRPCStations10_100hits_clusterMETCR_"+year;
     h_nRPCStations10_100hits_clusterMETCR[itr_year] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_nRPCStations10_150hits_clusterMETCR_%s",years[itr_year]);
+    name = "h_nRPCStations10_150hits_clusterMETCR_"+year;
     h_nRPCStations10_150hits_clusterMETCR[itr_year] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_nRPCWheels1_50hits_clusterMETCR_%s",years[itr_year]);
+    name = "h_nRPCWheels1_50hits_clusterMETCR_"+year;
     h_nRPCWheels1_50hits_clusterMETCR[itr_year] = new TH1D(name,"",6,0,6);
 
-    sprintf(name,"h_nRPCWheels1_100hits_clusterMETCR_%s",years[itr_year]);
+    name = "h_nRPCWheels1_100hits_clusterMETCR_"+year;
     h_nRPCWheels1_100hits_clusterMETCR[itr_year] = new TH1D(name,"",6,0,6);
 
-    sprintf(name,"h_nRPCWheels1_150hits_clusterMETCR_%s",years[itr_year]);
+    name = "h_nRPCWheels1_150hits_clusterMETCR_"+year;
     h_nRPCWheels1_150hits_clusterMETCR[itr_year] = new TH1D(name,"",6,0,6);
 
-    sprintf(name,"h_nRPCWheels5_50hits_clusterMETCR_%s",years[itr_year]);
+    name = "h_nRPCWheels5_50hits_clusterMETCR_"+year;
     h_nRPCWheels5_50hits_clusterMETCR[itr_year] = new TH1D(name,"",6,0,6);
 
-    sprintf(name,"h_nRPCWheels5_100hits_clusterMETCR_%s",years[itr_year]);
+    name = "h_nRPCWheels5_100hits_clusterMETCR_"+year;
     h_nRPCWheels5_100hits_clusterMETCR[itr_year] = new TH1D(name,"",6,0,6);
 
-    sprintf(name,"h_nRPCWheels5_150hits_clusterMETCR_%s",years[itr_year]);
+    name = "h_nRPCWheels5_150hits_clusterMETCR_"+year;
     h_nRPCWheels5_150hits_clusterMETCR[itr_year] = new TH1D(name,"",6,0,6);
 
-    sprintf(name,"h_nRPCWheels10_50hits_clusterMETCR_%s",years[itr_year]);
+    name = "h_nRPCWheels10_50hits_clusterMETCR_"+year;
     h_nRPCWheels10_50hits_clusterMETCR[itr_year] = new TH1D(name,"",6,0,6);
 
-    sprintf(name,"h_nRPCWheels10_100hits_clusterMETCR_%s",years[itr_year]);
+    name = "h_nRPCWheels10_100hits_clusterMETCR_"+year;
     h_nRPCWheels10_100hits_clusterMETCR[itr_year] = new TH1D(name,"",6,0,6);
 
-    sprintf(name,"h_nRPCWheels10_150hits_clusterMETCR_%s",years[itr_year]);
+    name = "h_nRPCWheels10_150hits_clusterMETCR_"+year;
     h_nRPCWheels10_150hits_clusterMETCR[itr_year] = new TH1D(name,"",6,0,6);
 
 
-    sprintf(name,"h_matchedRPCStation_MB3Cluster_clusterMETCR_%s",years[itr_year]);
+    name = "h_matchedRPCStation_MB3Cluster_clusterMETCR_"+year;
     h_matchedRPCStation_MB3Cluster_clusterMETCR[itr_year] = new TH1D(name,"",7,0,7);
 
-    sprintf(name,"h_matchedRPCStation_MB4Cluster_clusterMETCR_%s",years[itr_year]);
+    name = "h_matchedRPCStation_MB4Cluster_clusterMETCR_"+year;
     h_matchedRPCStation_MB4Cluster_clusterMETCR[itr_year] = new TH1D(name,"",7,0,7);
 
-    sprintf(name,"h_matchedRPCStation_MB3Cluster_spreadRPC_clusterMETCR_%s",years[itr_year]);
+    name = "h_matchedRPCStation_MB3Cluster_spreadRPC_clusterMETCR_"+year;
     h_matchedRPCStation_MB3Cluster_spreadRPC_clusterMETCR[itr_year] = new TH1D(name,"",7,0,7);
 
-    sprintf(name,"h_matchedRPCStation_MB4Cluster_spreadRPC_clusterMETCR_%s",years[itr_year]);
+    name = "h_matchedRPCStation_MB4Cluster_spreadRPC_clusterMETCR_"+year;
     h_matchedRPCStation_MB4Cluster_spreadRPC_clusterMETCR[itr_year] = new TH1D(name,"",7,0,7);
 
 
-    sprintf(name,"h_dPhiClusterMET_lowClusterSize_fullSelection_rpcCR_%s",years[itr_year]);
+    name = "h_dPhiClusterMET_lowClusterSize_fullSelection_rpcCR_"+year;
     h_dPhiClusterMET_lowClusterSize_fullSelection_rpcCR[itr_year] = new TH1D(name,"",70,0,3.5);
 
-    sprintf(name,"h_dPhiClusterMET_highClusterSize_fullSelection_rpcCR_%s",years[itr_year]);
+    name = "h_dPhiClusterMET_highClusterSize_fullSelection_rpcCR_"+year;
     h_dPhiClusterMET_highClusterSize_fullSelection_rpcCR[itr_year] = new TH1D(name,"",70,0,3.5);
 
     
-    sprintf(name,"h_dtRechitClusterJetVetoPt_%s",years[itr_year]);
+    name = "h_dtRechitClusterJetVetoPt_"+year;
     h_dtRechitClusterJetVetoPt[itr_year] = new TH1D(name,"",20,0,200);
 
-    sprintf(name,"h_dtRechitClusterMuonVetoPt_%s",years[itr_year]);
+    name = "h_dtRechitClusterMuonVetoPt_"+year;
     h_dtRechitClusterMuonVetoPt[itr_year] = new TH1D(name,"",20,0,200);
 
-    sprintf(name,"h_dtRechitClusterMB1Veto_%s",years[itr_year]);
+    name = "h_dtRechitClusterMB1Veto_"+year;
     h_dtRechitClusterMB1Veto[itr_year] = new TH1D(name,"",60,0,60);
     
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelection_MB1HitsCR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelection_MB1HitsCR_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelection_MB1HitsCR[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithAdjacentMB1Cut_MB1HitsCR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithAdjacentMB1Cut_MB1HitsCR_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithAdjacentMB1Cut_MB1HitsCR[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithNHF50Cut_MB1HitsCR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithNHF50Cut_MB1HitsCR_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithNHF50Cut_MB1HitsCR[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelectionInvertedNHF50Cut_MB1HitsCR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelectionInvertedNHF50Cut_MB1HitsCR_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelectionInvertedNHF50Cut_MB1HitsCR[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithNHFLeadCut_MB1HitsCR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithNHFLeadCut_MB1HitsCR_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithNHFLeadCut_MB1HitsCR[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithInvertedNHFLeadCut_MB1HitsCR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithInvertedNHFLeadCut_MB1HitsCR_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithInvertedNHFLeadCut_MB1HitsCR[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_lowdPhiClusterMET_fullSelection_MB1HitsCR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_lowdPhiClusterMET_fullSelection_MB1HitsCR_"+year;
     h_dtRechitClusterSize_lowdPhiClusterMET_fullSelection_MB1HitsCR[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSizeTotal_lowdPhiClusterMET_fullSelection_MB1HitsCR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSizeTotal_lowdPhiClusterMET_fullSelection_MB1HitsCR_"+year;
     h_dtRechitClusterSizeTotal_lowdPhiClusterMET_fullSelection_MB1HitsCR[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSize_highdPhiClusterMET_fullSelection_MB1HitsCR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_highdPhiClusterMET_fullSelection_MB1HitsCR_"+year;
     h_dtRechitClusterSize_highdPhiClusterMET_fullSelection_MB1HitsCR[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dPhiClusterMET_lowClusterSize_fullSelection_MB1HitsCR_%s",years[itr_year]);
+    name = "h_dPhiClusterMET_lowClusterSize_fullSelection_MB1HitsCR_"+year;
     h_dPhiClusterMET_lowClusterSize_fullSelection_MB1HitsCR[itr_year] = new TH1D(name,"",70,0,3.5);
 
-    sprintf(name,"h_dPhiClusterMET_highClusterSize_fullSelection_MB1HitsCR_%s",years[itr_year]);
+    name = "h_dPhiClusterMET_highClusterSize_fullSelection_MB1HitsCR_"+year;
     h_dPhiClusterMET_highClusterSize_fullSelection_MB1HitsCR[itr_year] = new TH1D(name,"",70,0,3.5);
 
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelection_MB1Hits30CR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelection_MB1Hits30CR_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelection_MB1Hits30CR[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelection_MB1Hits30MaxMB2CR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelection_MB1Hits30MaxMB2CR_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelection_MB1Hits30MaxMB2CR[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelection_MB1Hits30MaxMB3CR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelection_MB1Hits30MaxMB3CR_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelection_MB1Hits30MaxMB3CR[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelection_MB1Hits30MaxMB4CR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelection_MB1Hits30MaxMB4CR_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelection_MB1Hits30MaxMB4CR[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_lowdPhiClusterMET_fullSelection_MB1Hits30CR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_lowdPhiClusterMET_fullSelection_MB1Hits30CR_"+year;
     h_dtRechitClusterSize_lowdPhiClusterMET_fullSelection_MB1Hits30CR[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSizeTotal_lowdPhiClusterMET_fullSelection_MB1Hits30CR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSizeTotal_lowdPhiClusterMET_fullSelection_MB1Hits30CR_"+year;
     h_dtRechitClusterSizeTotal_lowdPhiClusterMET_fullSelection_MB1Hits30CR[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSize_highdPhiClusterMET_fullSelection_MB1Hits30CR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_highdPhiClusterMET_fullSelection_MB1Hits30CR_"+year;
     h_dtRechitClusterSize_highdPhiClusterMET_fullSelection_MB1Hits30CR[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dPhiClusterMET_lowClusterSize_fullSelection_MB1Hits30CR_%s",years[itr_year]);
+    name = "h_dPhiClusterMET_lowClusterSize_fullSelection_MB1Hits30CR_"+year;
     h_dPhiClusterMET_lowClusterSize_fullSelection_MB1Hits30CR[itr_year] = new TH1D(name,"",70,0,3.5);
 
-    sprintf(name,"h_dPhiClusterMET_highClusterSize_fullSelection_MB1Hits30CR_%s",years[itr_year]);
+    name = "h_dPhiClusterMET_highClusterSize_fullSelection_MB1Hits30CR_"+year;
     h_dPhiClusterMET_highClusterSize_fullSelection_MB1Hits30CR[itr_year] = new TH1D(name,"",70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelection_MB1HitsNoMB1ClusterCR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelection_MB1HitsNoMB1ClusterCR_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelection_MB1HitsNoMB1ClusterCR[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_lowdPhiClusterMET_fullSelection_MB1HitsNoMB1ClusterCR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_lowdPhiClusterMET_fullSelection_MB1HitsNoMB1ClusterCR_"+year;
     h_dtRechitClusterSize_lowdPhiClusterMET_fullSelection_MB1HitsNoMB1ClusterCR[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSizeTotal_lowdPhiClusterMET_fullSelection_MB1HitsNoMB1ClusterCR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSizeTotal_lowdPhiClusterMET_fullSelection_MB1HitsNoMB1ClusterCR_"+year;
     h_dtRechitClusterSizeTotal_lowdPhiClusterMET_fullSelection_MB1HitsNoMB1ClusterCR[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSize_highdPhiClusterMET_fullSelection_MB1HitsNoMB1ClusterCR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_highdPhiClusterMET_fullSelection_MB1HitsNoMB1ClusterCR_"+year;
     h_dtRechitClusterSize_highdPhiClusterMET_fullSelection_MB1HitsNoMB1ClusterCR[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dPhiClusterMET_lowClusterSize_fullSelection_MB1HitsNoMB1ClusterCR_%s",years[itr_year]);
+    name = "h_dPhiClusterMET_lowClusterSize_fullSelection_MB1HitsNoMB1ClusterCR_"+year;
     h_dPhiClusterMET_lowClusterSize_fullSelection_MB1HitsNoMB1ClusterCR[itr_year] = new TH1D(name,"",70,0,3.5);
 
-    sprintf(name,"h_dPhiClusterMET_highClusterSize_fullSelection_MB1HitsNoMB1ClusterCR_%s",years[itr_year]);
+    name = "h_dPhiClusterMET_highClusterSize_fullSelection_MB1HitsNoMB1ClusterCR_"+year;
     h_dPhiClusterMET_highClusterSize_fullSelection_MB1HitsNoMB1ClusterCR[itr_year] = new TH1D(name,"",70,0,3.5);
 
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelection_MB1CR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelection_MB1CR_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelection_MB1CR[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithNHFLeadCut_MB1CR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithNHFLeadCut_MB1CR_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithNHFLeadCut_MB1CR[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_lowdPhiClusterMET_fullSelection_MB1CR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_lowdPhiClusterMET_fullSelection_MB1CR_"+year;
     h_dtRechitClusterSize_lowdPhiClusterMET_fullSelection_MB1CR[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSizeTotal_lowdPhiClusterMET_fullSelection_MB1CR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSizeTotal_lowdPhiClusterMET_fullSelection_MB1CR_"+year;
     h_dtRechitClusterSizeTotal_lowdPhiClusterMET_fullSelection_MB1CR[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSize_highdPhiClusterMET_fullSelection_MB1CR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_highdPhiClusterMET_fullSelection_MB1CR_"+year;
     h_dtRechitClusterSize_highdPhiClusterMET_fullSelection_MB1CR[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dPhiClusterMET_lowClusterSize_fullSelection_MB1CR_%s",years[itr_year]);
+    name = "h_dPhiClusterMET_lowClusterSize_fullSelection_MB1CR_"+year;
     h_dPhiClusterMET_lowClusterSize_fullSelection_MB1CR[itr_year] = new TH1D(name,"",70,0,3.5);
 
-    sprintf(name,"h_dPhiClusterMET_highClusterSize_fullSelection_MB1CR_%s",years[itr_year]);
+    name = "h_dPhiClusterMET_highClusterSize_fullSelection_MB1CR_"+year;
     h_dPhiClusterMET_highClusterSize_fullSelection_MB1CR[itr_year] = new TH1D(name,"",70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelection_MB2CR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelection_MB2CR_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelection_MB2CR[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithAdjacentMB1Cut_MB2CR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithAdjacentMB1Cut_MB2CR_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithAdjacentMB1Cut_MB2CR[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithAdjacent0p8MB1Cut_MB2CR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithAdjacent0p8MB1Cut_MB2CR_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithAdjacent0p8MB1Cut_MB2CR[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithOtherStationsCut_MB2CR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithOtherStationsCut_MB2CR_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithOtherStationsCut_MB2CR[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithNHF50Cut_MB2CR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithNHF50Cut_MB2CR_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithNHF50Cut_MB2CR[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelectionInvertedNHF50Cut_MB2CR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelectionInvertedNHF50Cut_MB2CR_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelectionInvertedNHF50Cut_MB2CR[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithNHFLeadCut_MB2CR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithNHFLeadCut_MB2CR_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithNHFLeadCut_MB2CR[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithInvertedNHFLeadCut_MB2CR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithInvertedNHFLeadCut_MB2CR_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithInvertedNHFLeadCut_MB2CR[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_lowdPhiClusterMET_fullSelection_MB2CR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_lowdPhiClusterMET_fullSelection_MB2CR_"+year;
     h_dtRechitClusterSize_lowdPhiClusterMET_fullSelection_MB2CR[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSize_highdPhiClusterMET_fullSelection_MB2CR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_highdPhiClusterMET_fullSelection_MB2CR_"+year;
     h_dtRechitClusterSize_highdPhiClusterMET_fullSelection_MB2CR[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dPhiClusterMET_lowClusterSize_fullSelection_MB2CR_%s",years[itr_year]);
+    name = "h_dPhiClusterMET_lowClusterSize_fullSelection_MB2CR_"+year;
     h_dPhiClusterMET_lowClusterSize_fullSelection_MB2CR[itr_year] = new TH1D(name,"",70,0,3.5);
 
-    sprintf(name,"h_dPhiClusterMET_highClusterSize_fullSelection_MB2CR_%s",years[itr_year]);
+    name = "h_dPhiClusterMET_highClusterSize_fullSelection_MB2CR_"+year;
     h_dPhiClusterMET_highClusterSize_fullSelection_MB2CR[itr_year] = new TH1D(name,"",70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelection_MB2withMB1CR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelection_MB2withMB1CR_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelection_MB2withMB1CR[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithAdjacentMB1Cut_MB2withMB1CR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithAdjacentMB1Cut_MB2withMB1CR_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithAdjacentMB1Cut_MB2withMB1CR[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithNHF50Cut_MB2withMB1CR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithNHF50Cut_MB2withMB1CR_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithNHF50Cut_MB2withMB1CR[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelectionInvertedNHF50Cut_MB2withMB1CR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelectionInvertedNHF50Cut_MB2withMB1CR_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelectionInvertedNHF50Cut_MB2withMB1CR[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithNHFLeadCut_MB2withMB1CR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithNHFLeadCut_MB2withMB1CR_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithNHFLeadCut_MB2withMB1CR[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithInvertedNHFLeadCut_MB2withMB1CR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithInvertedNHFLeadCut_MB2withMB1CR_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithInvertedNHFLeadCut_MB2withMB1CR[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_lowdPhiClusterMET_fullSelection_MB2withMB1CR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_lowdPhiClusterMET_fullSelection_MB2withMB1CR_"+year;
     h_dtRechitClusterSize_lowdPhiClusterMET_fullSelection_MB2withMB1CR[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSize_highdPhiClusterMET_fullSelection_MB2withMB1CR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_highdPhiClusterMET_fullSelection_MB2withMB1CR_"+year;
     h_dtRechitClusterSize_highdPhiClusterMET_fullSelection_MB2withMB1CR[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dPhiClusterMET_lowClusterSize_fullSelection_MB2withMB1CR_%s",years[itr_year]);
+    name = "h_dPhiClusterMET_lowClusterSize_fullSelection_MB2withMB1CR_"+year;
     h_dPhiClusterMET_lowClusterSize_fullSelection_MB2withMB1CR[itr_year] = new TH1D(name,"",70,0,3.5);
 
-    sprintf(name,"h_dPhiClusterMET_highClusterSize_fullSelection_MB2withMB1CR_%s",years[itr_year]);
+    name = "h_dPhiClusterMET_highClusterSize_fullSelection_MB2withMB1CR_"+year;
     h_dPhiClusterMET_highClusterSize_fullSelection_MB2withMB1CR[itr_year] = new TH1D(name,"",70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelection_MB1or2CR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelection_MB1or2CR_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelection_MB1or2CR[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_lowdPhiClusterMET_fullSelection_MB1or2CR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_lowdPhiClusterMET_fullSelection_MB1or2CR_"+year;
     h_dtRechitClusterSize_lowdPhiClusterMET_fullSelection_MB1or2CR[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dtRechitClusterSize_highdPhiClusterMET_fullSelection_MB1or2CR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_highdPhiClusterMET_fullSelection_MB1or2CR_"+year;
     h_dtRechitClusterSize_highdPhiClusterMET_fullSelection_MB1or2CR[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_dPhiClusterMET_lowClusterSize_fullSelection_MB1or2CR_%s",years[itr_year]);
+    name = "h_dPhiClusterMET_lowClusterSize_fullSelection_MB1or2CR_"+year;
     h_dPhiClusterMET_lowClusterSize_fullSelection_MB1or2CR[itr_year] = new TH1D(name,"",70,0,3.5);
 
-    sprintf(name,"h_dPhiClusterMET_highClusterSize_fullSelection_MB1or2CR_%s",years[itr_year]);
+    name = "h_dPhiClusterMET_highClusterSize_fullSelection_MB1or2CR_"+year;
     h_dPhiClusterMET_highClusterSize_fullSelection_MB1or2CR[itr_year] = new TH1D(name,"",70,0,3.5);
 
 
-    sprintf(name,"h_nMatchedHitsMB2_fullSelection_SRMB3_%s",years[itr_year]);
+    name = "h_nMatchedHitsMB2_fullSelection_SRMB3_"+year;
     h_nMatchedHitsMB2_fullSelection_SRMB3[itr_year] = new TH1D(name,"",50,0,50);
 
-    sprintf(name,"h_nMatchedHitsMB4_fullSelection_SRMB3_%s",years[itr_year]);
+    name = "h_nMatchedHitsMB4_fullSelection_SRMB3_"+year;
     h_nMatchedHitsMB4_fullSelection_SRMB3[itr_year] = new TH1D(name,"",50,0,50);
 
-    sprintf(name,"h_nMatchedHitsMB2and4_lowClusterSize_fullSelection_SRMB3_%s",years[itr_year]);
+    name = "h_nMatchedHitsMB2and4_lowClusterSize_fullSelection_SRMB3_"+year;
     h_nMatchedHitsMB2and4_lowClusterSize_fullSelection_SRMB3[itr_year] = new TH1D(name,"",50,0,50);
 
-    sprintf(name,"h_nMatchedHitsMB2and4_highClusterSize_fullSelection_SRMB3_%s",years[itr_year]);
+    name = "h_nMatchedHitsMB2and4_highClusterSize_fullSelection_SRMB3_"+year;
     h_nMatchedHitsMB2and4_highClusterSize_fullSelection_SRMB3[itr_year] = new TH1D(name,"",50,0,50);
 
-    sprintf(name,"h_nMatchedHitsMB2_fullSelection_SRMB4_%s",years[itr_year]);
+    name = "h_nMatchedHitsMB2_fullSelection_SRMB4_"+year;
     h_nMatchedHitsMB2_fullSelection_SRMB4[itr_year] = new TH1D(name,"",50,0,50);
 
-    sprintf(name,"h_nMatchedHitsMB3_fullSelection_SRMB4_%s",years[itr_year]);
+    name = "h_nMatchedHitsMB3_fullSelection_SRMB4_"+year;
     h_nMatchedHitsMB3_fullSelection_SRMB4[itr_year] = new TH1D(name,"",50,0,50);
 
-    sprintf(name,"h_nMatchedHitsMB2and3_lowClusterSize_fullSelection_SRMB4_%s",years[itr_year]);
+    name = "h_nMatchedHitsMB2and3_lowClusterSize_fullSelection_SRMB4_"+year;
     h_nMatchedHitsMB2and3_lowClusterSize_fullSelection_SRMB4[itr_year] = new TH1D(name,"",50,0,50);
 
-    sprintf(name,"h_nMatchedHitsMB2and3_highClusterSize_fullSelection_SRMB4_%s",years[itr_year]);
+    name = "h_nMatchedHitsMB2and3_highClusterSize_fullSelection_SRMB4_"+year;
     h_nMatchedHitsMB2and3_highClusterSize_fullSelection_SRMB4[itr_year] = new TH1D(name,"",50,0,50);
 
-    sprintf(name,"h_nMatchedHitsMB3_fullSelection_MB2CR_%s",years[itr_year]);
+    name = "h_nMatchedHitsMB3_fullSelection_MB2CR_"+year;
     h_nMatchedHitsMB3_fullSelection_MB2CR[itr_year] = new TH1D(name,"",50,0,50);
 
-    sprintf(name,"h_nMatchedHitsMB4_fullSelection_MB2CR_%s",years[itr_year]);
+    name = "h_nMatchedHitsMB4_fullSelection_MB2CR_"+year;
     h_nMatchedHitsMB4_fullSelection_MB2CR[itr_year] = new TH1D(name,"",50,0,50);
 
-    sprintf(name,"h_nMatchedHitsMB3and4_lowClusterSize_fullSelection_MB2CR_%s",years[itr_year]);
+    name = "h_nMatchedHitsMB3and4_lowClusterSize_fullSelection_MB2CR_"+year;
     h_nMatchedHitsMB3and4_lowClusterSize_fullSelection_MB2CR[itr_year] = new TH1D(name,"",50,0,50);
 
-    sprintf(name,"h_nMatchedHitsMB3and4_highClusterSize_fullSelection_MB2CR_%s",years[itr_year]);
+    name = "h_nMatchedHitsMB3and4_highClusterSize_fullSelection_MB2CR_"+year;
     h_nMatchedHitsMB3and4_highClusterSize_fullSelection_MB2CR[itr_year] = new TH1D(name,"",50,0,50);
 
-    sprintf(name,"h_nMatchedHitsMB2_fullSelectionWithAdjacentMB1Cut_SRMB3_%s",years[itr_year]);
+    name = "h_nMatchedHitsMB2_fullSelectionWithAdjacentMB1Cut_SRMB3_"+year;
     h_nMatchedHitsMB2_fullSelectionWithAdjacentMB1Cut_SRMB3[itr_year] = new TH1D(name,"",50,0,50);
 
-    sprintf(name,"h_nMatchedHitsMB4_fullSelectionWithAdjacentMB1Cut_SRMB3_%s",years[itr_year]);
+    name = "h_nMatchedHitsMB4_fullSelectionWithAdjacentMB1Cut_SRMB3_"+year;
     h_nMatchedHitsMB4_fullSelectionWithAdjacentMB1Cut_SRMB3[itr_year] = new TH1D(name,"",50,0,50);
 
-    sprintf(name,"h_nMatchedHitsMB2and4_lowClusterSize_fullSelectionWithAdjacentMB1Cut_SRMB3_%s",years[itr_year]);
+    name = "h_nMatchedHitsMB2and4_lowClusterSize_fullSelectionWithAdjacentMB1Cut_SRMB3_"+year;
     h_nMatchedHitsMB2and4_lowClusterSize_fullSelectionWithAdjacentMB1Cut_SRMB3[itr_year] = new TH1D(name,"",50,0,50);
 
-    sprintf(name,"h_nMatchedHitsMB2and4_highClusterSize_fullSelectionWithAdjacentMB1Cut_SRMB3_%s",years[itr_year]);
+    name = "h_nMatchedHitsMB2and4_highClusterSize_fullSelectionWithAdjacentMB1Cut_SRMB3_"+year;
     h_nMatchedHitsMB2and4_highClusterSize_fullSelectionWithAdjacentMB1Cut_SRMB3[itr_year] = new TH1D(name,"",50,0,50);
 
-    sprintf(name,"h_nMatchedHitsMB2_fullSelectionWithAdjacentMB1Cut_SRMB4_%s",years[itr_year]);
+    name = "h_nMatchedHitsMB2_fullSelectionWithAdjacentMB1Cut_SRMB4_"+year;
     h_nMatchedHitsMB2_fullSelectionWithAdjacentMB1Cut_SRMB4[itr_year] = new TH1D(name,"",50,0,50);
 
-    sprintf(name,"h_nMatchedHitsMB3_fullSelectionWithAdjacentMB1Cut_SRMB4_%s",years[itr_year]);
+    name = "h_nMatchedHitsMB3_fullSelectionWithAdjacentMB1Cut_SRMB4_"+year;
     h_nMatchedHitsMB3_fullSelectionWithAdjacentMB1Cut_SRMB4[itr_year] = new TH1D(name,"",50,0,50);
 
-    sprintf(name,"h_nMatchedHitsMB2and3_lowClusterSize_fullSelectionWithAdjacentMB1Cut_SRMB4_%s",years[itr_year]);
+    name = "h_nMatchedHitsMB2and3_lowClusterSize_fullSelectionWithAdjacentMB1Cut_SRMB4_"+year;
     h_nMatchedHitsMB2and3_lowClusterSize_fullSelectionWithAdjacentMB1Cut_SRMB4[itr_year] = new TH1D(name,"",50,0,50);
 
-    sprintf(name,"h_nMatchedHitsMB2and3_highClusterSize_fullSelectionWithAdjacentMB1Cut_SRMB4_%s",years[itr_year]);
+    name = "h_nMatchedHitsMB2and3_highClusterSize_fullSelectionWithAdjacentMB1Cut_SRMB4_"+year;
     h_nMatchedHitsMB2and3_highClusterSize_fullSelectionWithAdjacentMB1Cut_SRMB4[itr_year] = new TH1D(name,"",50,0,50);
 
-    sprintf(name,"h_nMatchedHitsMB3_fullSelectionWithAdjacentMB1Cut_MB2CR_%s",years[itr_year]);
+    name = "h_nMatchedHitsMB3_fullSelectionWithAdjacentMB1Cut_MB2CR_"+year;
     h_nMatchedHitsMB3_fullSelectionWithAdjacentMB1Cut_MB2CR[itr_year] = new TH1D(name,"",50,0,50);
 
-    sprintf(name,"h_nMatchedHitsMB4_fullSelectionWithAdjacentMB1Cut_MB2CR_%s",years[itr_year]);
+    name = "h_nMatchedHitsMB4_fullSelectionWithAdjacentMB1Cut_MB2CR_"+year;
     h_nMatchedHitsMB4_fullSelectionWithAdjacentMB1Cut_MB2CR[itr_year] = new TH1D(name,"",50,0,50);
 
-    sprintf(name,"h_nMatchedHitsMB3and4_lowClusterSize_fullSelectionWithAdjacentMB1Cut_MB2CR_%s",years[itr_year]);
+    name = "h_nMatchedHitsMB3and4_lowClusterSize_fullSelectionWithAdjacentMB1Cut_MB2CR_"+year;
     h_nMatchedHitsMB3and4_lowClusterSize_fullSelectionWithAdjacentMB1Cut_MB2CR[itr_year] = new TH1D(name,"",50,0,50);
 
-    sprintf(name,"h_nMatchedHitsMB3and4_highClusterSize_fullSelectionWithAdjacentMB1Cut_MB2CR_%s",years[itr_year]);
+    name = "h_nMatchedHitsMB3and4_highClusterSize_fullSelectionWithAdjacentMB1Cut_MB2CR_"+year;
     h_nMatchedHitsMB3and4_highClusterSize_fullSelectionWithAdjacentMB1Cut_MB2CR[itr_year] = new TH1D(name,"",50,0,50);
 
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelection_SR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelection_SR_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelection_SR[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
     
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelection_SRMB3_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelection_SRMB3_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelection_SRMB3[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
     
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelection_SRMB4_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelection_SRMB4_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelection_SRMB4[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithAdjacentMB1Cut_SR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithAdjacentMB1Cut_SR_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithAdjacentMB1Cut_SR[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithAdjacent0p8MB1Cut_SR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithAdjacent0p8MB1Cut_SR_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithAdjacent0p8MB1Cut_SR[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
     
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithAdjacentMB1Cut_SRMB3_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithAdjacentMB1Cut_SRMB3_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithAdjacentMB1Cut_SRMB3[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
     
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithAdjacentMB1Cut_SRMB4_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithAdjacentMB1Cut_SRMB4_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithAdjacentMB1Cut_SRMB4[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithOtherStationsCut_SR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithOtherStationsCut_SR_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithOtherStationsCut_SR[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
     
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithOtherStationsCut_SRMB3_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithOtherStationsCut_SRMB3_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithOtherStationsCut_SRMB3[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
     
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithOtherStationsCut_SRMB4_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithOtherStationsCut_SRMB4_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithOtherStationsCut_SRMB4[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
     
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithNHF50Cut_SR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithNHF50Cut_SR_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithNHF50Cut_SR[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelectionInvertedNHF50Cut_SR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelectionInvertedNHF50Cut_SR_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelectionInvertedNHF50Cut_SR[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithNHFLeadCut_SR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithNHFLeadCut_SR_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithNHFLeadCut_SR[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithInvertedNHFLeadCut_SR_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithInvertedNHFLeadCut_SR_"+year;
     h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithInvertedNHFLeadCut_SR[itr_year] = new TH2D(name,"",50,0,500,70,0,3.5);
 
-    sprintf(name,"h_nMB1Match_veryLowdPhiClusterMET_lowClusterSize_fullSelection_MB1CR_%s",years[itr_year]);
+    name = "h_nMB1Match_veryLowdPhiClusterMET_lowClusterSize_fullSelection_MB1CR_"+year;
     h_nMB1Match_veryLowdPhiClusterMET_lowClusterSize_fullSelection_MB1CR[itr_year] = new TH1D(name,"",100,0,200);
 
-    sprintf(name,"h_nMB1Match_lowdPhiClusterMET_lowClusterSize_fullSelection_MB1CR_%s",years[itr_year]);
+    name = "h_nMB1Match_lowdPhiClusterMET_lowClusterSize_fullSelection_MB1CR_"+year;
     h_nMB1Match_lowdPhiClusterMET_lowClusterSize_fullSelection_MB1CR[itr_year] = new TH1D(name,"",100,0,200);
 
-    sprintf(name,"h_nMB1Match_highdPhiClusterMET_lowClusterSize_fullSelection_MB1CR_%s",years[itr_year]);
+    name = "h_nMB1Match_highdPhiClusterMET_lowClusterSize_fullSelection_MB1CR_"+year;
     h_nMB1Match_highdPhiClusterMET_lowClusterSize_fullSelection_MB1CR[itr_year] = new TH1D(name,"",100,0,200);
 
-    sprintf(name,"h_nMB1Match_veryLowdPhiClusterMET_highClusterSize_fullSelection_MB1CR_%s",years[itr_year]);
+    name = "h_nMB1Match_veryLowdPhiClusterMET_highClusterSize_fullSelection_MB1CR_"+year;
     h_nMB1Match_veryLowdPhiClusterMET_highClusterSize_fullSelection_MB1CR[itr_year] = new TH1D(name,"",100,0,200);
 
-    sprintf(name,"h_nMB1Match_lowdPhiClusterMET_highClusterSize_fullSelection_MB1CR_%s",years[itr_year]);
+    name = "h_nMB1Match_lowdPhiClusterMET_highClusterSize_fullSelection_MB1CR_"+year;
     h_nMB1Match_lowdPhiClusterMET_highClusterSize_fullSelection_MB1CR[itr_year] = new TH1D(name,"",100,0,200);
 
-    sprintf(name,"h_nMB1Match_highdPhiClusterMET_highClusterSize_fullSelection_MB1CR_%s",years[itr_year]);
+    name = "h_nMB1Match_highdPhiClusterMET_highClusterSize_fullSelection_MB1CR_"+year;
     h_nMB1Match_highdPhiClusterMET_highClusterSize_fullSelection_MB1CR[itr_year] = new TH1D(name,"",100,0,200);
 
-    sprintf(name,"h_nMB1Match_veryLowdPhiClusterMET_lowClusterSize_fullSelection_MB1HitsCR_%s",years[itr_year]);
+    name = "h_nMB1Match_veryLowdPhiClusterMET_lowClusterSize_fullSelection_MB1HitsCR_"+year;
     h_nMB1Match_veryLowdPhiClusterMET_lowClusterSize_fullSelection_MB1HitsCR[itr_year] = new TH1D(name,"",100,0,200);
 
-    sprintf(name,"h_nMB1Match_lowdPhiClusterMET_lowClusterSize_fullSelection_MB1HitsCR_%s",years[itr_year]);
+    name = "h_nMB1Match_lowdPhiClusterMET_lowClusterSize_fullSelection_MB1HitsCR_"+year;
     h_nMB1Match_lowdPhiClusterMET_lowClusterSize_fullSelection_MB1HitsCR[itr_year] = new TH1D(name,"",100,0,200);
 
-    sprintf(name,"h_nMB1Match_highdPhiClusterMET_lowClusterSize_fullSelection_MB1HitsCR_%s",years[itr_year]);
+    name = "h_nMB1Match_highdPhiClusterMET_lowClusterSize_fullSelection_MB1HitsCR_"+year;
     h_nMB1Match_highdPhiClusterMET_lowClusterSize_fullSelection_MB1HitsCR[itr_year] = new TH1D(name,"",100,0,200);
 
-    sprintf(name,"h_nMB1Match_veryLowdPhiClusterMET_highClusterSize_fullSelection_MB1HitsCR_%s",years[itr_year]);
+    name = "h_nMB1Match_veryLowdPhiClusterMET_highClusterSize_fullSelection_MB1HitsCR_"+year;
     h_nMB1Match_veryLowdPhiClusterMET_highClusterSize_fullSelection_MB1HitsCR[itr_year] = new TH1D(name,"",100,0,200);
 
-    sprintf(name,"h_nMB1Match_lowdPhiClusterMET_highClusterSize_fullSelection_MB1HitsCR_%s",years[itr_year]);
+    name = "h_nMB1Match_lowdPhiClusterMET_highClusterSize_fullSelection_MB1HitsCR_"+year;
     h_nMB1Match_lowdPhiClusterMET_highClusterSize_fullSelection_MB1HitsCR[itr_year] = new TH1D(name,"",100,0,200);
 
-    sprintf(name,"h_nMB1Match_highdPhiClusterMET_highClusterSize_fullSelection_MB1HitsCR_%s",years[itr_year]);
+    name = "h_nMB1Match_highdPhiClusterMET_highClusterSize_fullSelection_MB1HitsCR_"+year;
     h_nMB1Match_highdPhiClusterMET_highClusterSize_fullSelection_MB1HitsCR[itr_year] = new TH1D(name,"",100,0,200);
 
-    sprintf(name,"h_dPhiClusterMET_nMB1Match_lowClusterSize_fullSelection_MB1HitsCR_%s",years[itr_year]);
+    name = "h_dPhiClusterMET_nMB1Match_lowClusterSize_fullSelection_MB1HitsCR_"+year;
     h_dPhiClusterMET_nMB1Match_lowClusterSize_fullSelection_MB1HitsCR[itr_year] = new TH2D(name,"",70,0,3.5,100,0,200);
 
-    sprintf(name,"h_dPhiClusterMET_nMB1Match_lowClusterSize_fullSelection_MB1Hits30CR_%s",years[itr_year]);
+    name = "h_dPhiClusterMET_nMB1Match_lowClusterSize_fullSelection_MB1Hits30CR_"+year;
     h_dPhiClusterMET_nMB1Match_lowClusterSize_fullSelection_MB1Hits30CR[itr_year] = new TH2D(name,"",70,0,3.5,100,0,200);
 
-    sprintf(name,"h_dPhiClusterMET_nMB1Match_lowClusterSize_fullSelection_MB1HitsNoMB1ClusterCR_%s",years[itr_year]);
+    name = "h_dPhiClusterMET_nMB1Match_lowClusterSize_fullSelection_MB1HitsNoMB1ClusterCR_"+year;
     h_dPhiClusterMET_nMB1Match_lowClusterSize_fullSelection_MB1HitsNoMB1ClusterCR[itr_year] = new TH2D(name,"",70,0,3.5,100,0,200);
 
-    sprintf(name,"h_dPhiClusterMET_nMB1Match_highClusterSize_fullSelection_MB1HitsCR_%s",years[itr_year]);
+    name = "h_dPhiClusterMET_nMB1Match_highClusterSize_fullSelection_MB1HitsCR_"+year;
     h_dPhiClusterMET_nMB1Match_highClusterSize_fullSelection_MB1HitsCR[itr_year] = new TH2D(name,"",70,0,3.5,100,0,200);
 
-    sprintf(name,"h_dPhiClusterMET_nMB1Match_highClusterSize_fullSelection_MB1Hits30CR_%s",years[itr_year]);
+    name = "h_dPhiClusterMET_nMB1Match_highClusterSize_fullSelection_MB1Hits30CR_"+year;
     h_dPhiClusterMET_nMB1Match_highClusterSize_fullSelection_MB1Hits30CR[itr_year] = new TH2D(name,"",70,0,3.5,100,0,200);
 
-    sprintf(name,"h_dPhiClusterMET_nMB1Match_highClusterSize_fullSelection_MB1HitsNoMB1ClusterCR_%s",years[itr_year]);
+    name = "h_dPhiClusterMET_nMB1Match_highClusterSize_fullSelection_MB1HitsNoMB1ClusterCR_"+year;
     h_dPhiClusterMET_nMB1Match_highClusterSize_fullSelection_MB1HitsNoMB1ClusterCR[itr_year] = new TH2D(name,"",70,0,3.5,100,0,200);
 
     
-    sprintf(name,"h_nRB1Match_dPhiJetMET_%s",years[itr_year]);
+    name = "h_nRB1Match_dPhiJetMET_"+year;
     h_nRB1Match_dPhiJetMET[itr_year] = new TH1D(name,"",30,0,30);
     
-    sprintf(name,"h_nRB1Match_MB1Veto_dPhiJetMET_%s",years[itr_year]);
+    name = "h_nRB1Match_MB1Veto_dPhiJetMET_"+year;
     h_nRB1Match_MB1Veto_dPhiJetMET[itr_year] = new TH1D(name,"",30,0,30);
     
-    sprintf(name,"h_nMB1MatchAdjacent_dPhiJetMET_%s",years[itr_year]);
+    name = "h_nMB1MatchAdjacent_dPhiJetMET_"+year;
     h_nMB1MatchAdjacent_dPhiJetMET[itr_year] = new TH1D(name,"",50,0,50);
     
-    sprintf(name,"h_nMB1MatchAdjacent_MB1Veto_dPhiJetMET_%s",years[itr_year]);
+    name = "h_nMB1MatchAdjacent_MB1Veto_dPhiJetMET_"+year;
     h_nMB1MatchAdjacent_MB1Veto_dPhiJetMET[itr_year] = new TH1D(name,"",30,0,30);
 
 
-    sprintf(name,"h_nMB1MatchAdjacent_dPhiClusterMET_%s",years[itr_year]);
+    name = "h_nMB1MatchAdjacent_dPhiClusterMET_"+year;
     h_nMB1MatchAdjacent_dPhiClusterMET[itr_year] = new TH1D(name,"",50,0,50);
     
-    sprintf(name,"h_nMB1MatchAdjacent_MB1Veto_dPhiClusterMET_%s",years[itr_year]);
+    name = "h_nMB1MatchAdjacent_MB1Veto_dPhiClusterMET_"+year;
     h_nMB1MatchAdjacent_MB1Veto_dPhiClusterMET[itr_year] = new TH1D(name,"",30,0,30);
 
-    sprintf(name,"h_nMB1MatchAdjacentPi2_dPhiClusterMET_%s",years[itr_year]);
+    name = "h_nMB1MatchAdjacentPi2_dPhiClusterMET_"+year;
     h_nMB1MatchAdjacentPi2_dPhiClusterMET[itr_year] = new TH1D(name,"",50,0,50);
     
-    sprintf(name,"h_nMB1MatchAdjacentPi2_MB1Veto_dPhiClusterMET_%s",years[itr_year]);
+    name = "h_nMB1MatchAdjacentPi2_MB1Veto_dPhiClusterMET_"+year;
     h_nMB1MatchAdjacentPi2_MB1Veto_dPhiClusterMET[itr_year] = new TH1D(name,"",30,0,30);
     
-    sprintf(name,"h_nMB1MatchAdjacent0p8_dPhiClusterMET_%s",years[itr_year]);
+    name = "h_nMB1MatchAdjacent0p8_dPhiClusterMET_"+year;
     h_nMB1MatchAdjacent0p8_dPhiClusterMET[itr_year] = new TH1D(name,"",50,0,50);
     
-    sprintf(name,"h_nMB1MatchAdjacent0p8_MB1Veto_dPhiClusterMET_%s",years[itr_year]);
+    name = "h_nMB1MatchAdjacent0p8_MB1Veto_dPhiClusterMET_"+year;
     h_nMB1MatchAdjacent0p8_MB1Veto_dPhiClusterMET[itr_year] = new TH1D(name,"",30,0,30);
 
-    sprintf(name,"h_nMB1MatchAdjacent0p8Pi2_dPhiClusterMET_%s",years[itr_year]);
+    name = "h_nMB1MatchAdjacent0p8Pi2_dPhiClusterMET_"+year;
     h_nMB1MatchAdjacent0p8Pi2_dPhiClusterMET[itr_year] = new TH1D(name,"",50,0,50);
     
-    sprintf(name,"h_nMB1MatchAdjacent0p8Pi2_MB1Veto_dPhiClusterMET_%s",years[itr_year]);
+    name = "h_nMB1MatchAdjacent0p8Pi2_MB1Veto_dPhiClusterMET_"+year;
     h_nMB1MatchAdjacent0p8Pi2_MB1Veto_dPhiClusterMET[itr_year] = new TH1D(name,"",30,0,30);
     
 
-    sprintf(name,"h_nMB1MatchJet_invertedJetVeto_%s",years[itr_year]);
+    name = "h_nMB1MatchJet_invertedJetVeto_"+year;
     h_nMB1MatchJet_invertedJetVeto[itr_year] = new TH1D(name,"",50,0,100);
 
-    sprintf(name,"h_matchedJetPt_invertedJetVeto_%s",years[itr_year]);
+    name = "h_matchedJetPt_invertedJetVeto_"+year;
     h_matchedJetPt_invertedJetVeto[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_matchedJetPt_nMB1Match_invertedJetVeto_%s",years[itr_year]);
+    name = "h_matchedJetPt_nMB1Match_invertedJetVeto_"+year;
     h_matchedJetPt_nMB1Match_invertedJetVeto[itr_year] = new TH2D(name,"",100,0,500,100,0,100);
 
-    sprintf(name,"h_matchedJetPt_nMB1Match_invertedJetVetoNoJetMET_%s",years[itr_year]);
+    name = "h_matchedJetPt_nMB1Match_invertedJetVetoNoJetMET_"+year;
     h_matchedJetPt_nMB1Match_invertedJetVetoNoJetMET[itr_year] = new TH2D(name,"",100,0,500,100,0,100);
 
-    sprintf(name,"h_matchedJetPt_nMB1Match_invertedJetVetoNoClusterMET_%s",years[itr_year]);
+    name = "h_matchedJetPt_nMB1Match_invertedJetVetoNoClusterMET_"+year;
     h_matchedJetPt_nMB1Match_invertedJetVetoNoClusterMET[itr_year] = new TH2D(name,"",100,0,500,100,0,100);
 
-    sprintf(name,"h_matchedJetPt_nMB1Match_invertedJetVetoAllMuonNoClusterMET_%s",years[itr_year]);
+    name = "h_matchedJetPt_nMB1Match_invertedJetVetoAllMuonNoClusterMET_"+year;
     h_matchedJetPt_nMB1Match_invertedJetVetoAllMuonNoClusterMET[itr_year] = new TH2D(name,"",100,0,500,100,0,100);
 
-    sprintf(name,"h_matchedJetPt_nMB1Match_invertedJetVetoLooseMuonNoClusterMET_%s",years[itr_year]);
+    name = "h_matchedJetPt_nMB1Match_invertedJetVetoLooseMuonNoClusterMET_"+year;
     h_matchedJetPt_nMB1Match_invertedJetVetoLooseMuonNoClusterMET[itr_year] = new TH2D(name,"",100,0,500,100,0,100);
 
 
-    sprintf(name,"h_jetNeutralHadronicEnergyFraction_passJetMET_%s",years[itr_year]);
+    name = "h_jetNeutralHadronicEnergyFraction_passJetMET_"+year;
     h_jetNeutralHadronicEnergyFraction_passJetMET[itr_year] = new TH1D(name,"",50,0,1);
 
-    sprintf(name,"h_jetNeutralHadronicEnergyFraction_passStationsWheels_%s",years[itr_year]);
+    name = "h_jetNeutralHadronicEnergyFraction_passStationsWheels_"+year;
     h_jetNeutralHadronicEnergyFraction_passStationsWheels[itr_year] = new TH1D(name,"",50,0,1);
 
-    sprintf(name,"h_jetNeutralHadronicEnergyFraction_SR_%s",years[itr_year]);
+    name = "h_jetNeutralHadronicEnergyFraction_SR_"+year;
     h_jetNeutralHadronicEnergyFraction_SR[itr_year] = new TH1D(name,"",50,0,1);
 
-    sprintf(name,"h_jetChargedHadronicEnergyFraction_passJetMET_%s",years[itr_year]);
+    name = "h_jetChargedHadronicEnergyFraction_passJetMET_"+year;
     h_jetChargedHadronicEnergyFraction_passJetMET[itr_year] = new TH1D(name,"",50,0,1);
 
-    sprintf(name,"h_jetChargedHadronicEnergyFraction_passStationsWheels_%s",years[itr_year]);
+    name = "h_jetChargedHadronicEnergyFraction_passStationsWheels_"+year;
     h_jetChargedHadronicEnergyFraction_passStationsWheels[itr_year] = new TH1D(name,"",50,0,1);
 
-    sprintf(name,"h_jetChargedHadronicEnergyFraction_SR_%s",years[itr_year]);
+    name = "h_jetChargedHadronicEnergyFraction_SR_"+year;
     h_jetChargedHadronicEnergyFraction_SR[itr_year] = new TH1D(name,"",50,0,1);
 
-    sprintf(name,"h_jetNeutralEMEnergyFraction_passJetMET_%s",years[itr_year]);
+    name = "h_jetNeutralEMEnergyFraction_passJetMET_"+year;
     h_jetNeutralEMEnergyFraction_passJetMET[itr_year] = new TH1D(name,"",50,0,1);
 
-    sprintf(name,"h_jetNeutralEMEnergyFraction_passStationsWheels_%s",years[itr_year]);
+    name = "h_jetNeutralEMEnergyFraction_passStationsWheels_"+year;
     h_jetNeutralEMEnergyFraction_passStationsWheels[itr_year] = new TH1D(name,"",50,0,1);
 
-    sprintf(name,"h_jetNeutralEMEnergyFraction_SR_%s",years[itr_year]);
+    name = "h_jetNeutralEMEnergyFraction_SR_"+year;
     h_jetNeutralEMEnergyFraction_SR[itr_year] = new TH1D(name,"",50,0,1);
 
-    sprintf(name,"h_jetChargedEMEnergyFraction_passJetMET_%s",years[itr_year]);
+    name = "h_jetChargedEMEnergyFraction_passJetMET_"+year;
     h_jetChargedEMEnergyFraction_passJetMET[itr_year] = new TH1D(name,"",50,0,1);
 
-    sprintf(name,"h_jetChargedEMEnergyFraction_passStationsWheels_%s",years[itr_year]);
+    name = "h_jetChargedEMEnergyFraction_passStationsWheels_"+year;
     h_jetChargedEMEnergyFraction_passStationsWheels[itr_year] = new TH1D(name,"",50,0,1);
 
-    sprintf(name,"h_jetChargedEMEnergyFraction_SR_%s",years[itr_year]);
+    name = "h_jetChargedEMEnergyFraction_SR_"+year;
     h_jetChargedEMEnergyFraction_SR[itr_year] = new TH1D(name,"",50,0,1);
 
-    sprintf(name,"h_jetChargedEMEnergyFraction_MB2CR_%s",years[itr_year]);
+    name = "h_jetChargedEMEnergyFraction_MB2CR_"+year;
     h_jetChargedEMEnergyFraction_MB2CR[itr_year] = new TH1D(name,"",50,0,1);
     
-    sprintf(name,"h_jetChargedEMEnergyFraction_MB2withMB1CR_%s",years[itr_year]);
+    name = "h_jetChargedEMEnergyFraction_MB2withMB1CR_"+year;
     h_jetChargedEMEnergyFraction_MB2withMB1CR[itr_year] = new TH1D(name,"",50,0,1);
     
-    sprintf(name,"h_jetChargedEMEnergyFraction_MB1CR_%s",years[itr_year]);
+    name = "h_jetChargedEMEnergyFraction_MB1CR_"+year;
     h_jetChargedEMEnergyFraction_MB1CR[itr_year] = new TH1D(name,"",50,0,1);
     
-    sprintf(name,"h_jetChargedEMEnergyFraction_MB1HitsCR_%s",years[itr_year]);
+    name = "h_jetChargedEMEnergyFraction_MB1HitsCR_"+year;
     h_jetChargedEMEnergyFraction_MB1HitsCR[itr_year] = new TH1D(name,"",50,0,1);
     
-    sprintf(name,"h_jetNeutralEMEnergyFraction_MB2CR_%s",years[itr_year]);
+    name = "h_jetNeutralEMEnergyFraction_MB2CR_"+year;
     h_jetNeutralEMEnergyFraction_MB2CR[itr_year] = new TH1D(name,"",50,0,1);
     
-    sprintf(name,"h_jetNeutralEMEnergyFraction_MB2withMB1CR_%s",years[itr_year]);
+    name = "h_jetNeutralEMEnergyFraction_MB2withMB1CR_"+year;
     h_jetNeutralEMEnergyFraction_MB2withMB1CR[itr_year] = new TH1D(name,"",50,0,1);
     
-    sprintf(name,"h_jetNeutralEMEnergyFraction_MB1CR_%s",years[itr_year]);
+    name = "h_jetNeutralEMEnergyFraction_MB1CR_"+year;
     h_jetNeutralEMEnergyFraction_MB1CR[itr_year] = new TH1D(name,"",50,0,1);
     
-    sprintf(name,"h_jetNeutralEMEnergyFraction_MB1HitsCR_%s",years[itr_year]);
+    name = "h_jetNeutralEMEnergyFraction_MB1HitsCR_"+year;
     h_jetNeutralEMEnergyFraction_MB1HitsCR[itr_year] = new TH1D(name,"",50,0,1);
     
-    sprintf(name,"h_jetChargedHadronicEnergyFraction_MB2CR_%s",years[itr_year]);
+    name = "h_jetChargedHadronicEnergyFraction_MB2CR_"+year;
     h_jetChargedHadronicEnergyFraction_MB2CR[itr_year] = new TH1D(name,"",50,0,1);
     
-    sprintf(name,"h_jetChargedHadronicEnergyFraction_MB2withMB1CR_%s",years[itr_year]);
+    name = "h_jetChargedHadronicEnergyFraction_MB2withMB1CR_"+year;
     h_jetChargedHadronicEnergyFraction_MB2withMB1CR[itr_year] = new TH1D(name,"",50,0,1);
     
-    sprintf(name,"h_jetChargedHadronicEnergyFraction_MB1CR_%s",years[itr_year]);
+    name = "h_jetChargedHadronicEnergyFraction_MB1CR_"+year;
     h_jetChargedHadronicEnergyFraction_MB1CR[itr_year] = new TH1D(name,"",50,0,1);
     
-    sprintf(name,"h_jetChargedHadronicEnergyFraction_MB1HitsCR_%s",years[itr_year]);
+    name = "h_jetChargedHadronicEnergyFraction_MB1HitsCR_"+year;
     h_jetChargedHadronicEnergyFraction_MB1HitsCR[itr_year] = new TH1D(name,"",50,0,1);
     
-    sprintf(name,"h_jetNeutralHadronicEnergyFraction_MB2CR_%s",years[itr_year]);
+    name = "h_jetNeutralHadronicEnergyFraction_MB2CR_"+year;
     h_jetNeutralHadronicEnergyFraction_MB2CR[itr_year] = new TH1D(name,"",50,0,1);
     
-    sprintf(name,"h_jetNeutralHadronicEnergyFraction_MB2withMB1CR_%s",years[itr_year]);
+    name = "h_jetNeutralHadronicEnergyFraction_MB2withMB1CR_"+year;
     h_jetNeutralHadronicEnergyFraction_MB2withMB1CR[itr_year] = new TH1D(name,"",50,0,1);
     
-    sprintf(name,"h_jetNeutralHadronicEnergyFraction_MB1CR_%s",years[itr_year]);
+    name = "h_jetNeutralHadronicEnergyFraction_MB1CR_"+year;
     h_jetNeutralHadronicEnergyFraction_MB1CR[itr_year] = new TH1D(name,"",50,0,1);
     
-    sprintf(name,"h_jetNeutralHadronicEnergyFraction_MB1HitsCR_%s",years[itr_year]);
+    name = "h_jetNeutralHadronicEnergyFraction_MB1HitsCR_"+year;
     h_jetNeutralHadronicEnergyFraction_MB1HitsCR[itr_year] = new TH1D(name,"",50,0,1);
     
-    sprintf(name,"h_leadingJetChargedEMEnergyFraction_passStationsWheels_%s",years[itr_year]);
+    name = "h_leadingJetChargedEMEnergyFraction_passStationsWheels_"+year;
     h_leadingJetChargedEMEnergyFraction_passStationsWheels[itr_year] = new TH1D(name,"",50,0,1);
 
-    sprintf(name,"h_leadingJetChargedEMEnergyFraction_SR_%s",years[itr_year]);
+    name = "h_leadingJetChargedEMEnergyFraction_SR_"+year;
     h_leadingJetChargedEMEnergyFraction_SR[itr_year] = new TH1D(name,"",50,0,1);
 
-    sprintf(name,"h_leadingJetNeutralHadronicEnergyFraction_passStationsWheels_%s",years[itr_year]);
+    name = "h_leadingJetNeutralHadronicEnergyFraction_passStationsWheels_"+year;
     h_leadingJetNeutralHadronicEnergyFraction_passStationsWheels[itr_year] = new TH1D(name,"",50,0,1);
     
-    sprintf(name,"h_leadingJetNeutralHadronicEnergyFraction_SR_%s",years[itr_year]);
+    name = "h_leadingJetNeutralHadronicEnergyFraction_SR_"+year;
     h_leadingJetNeutralHadronicEnergyFraction_SR[itr_year] = new TH1D(name,"",50,0,1);
     
-    sprintf(name,"h_leadingJetNeutralEMEnergyFraction_passStationsWheels_%s",years[itr_year]);
+    name = "h_leadingJetNeutralEMEnergyFraction_passStationsWheels_"+year;
     h_leadingJetNeutralEMEnergyFraction_passStationsWheels[itr_year] = new TH1D(name,"",50,0,1);
 
-    sprintf(name,"h_leadingJetNeutralEMEnergyFraction_SR_%s",years[itr_year]);
+    name = "h_leadingJetNeutralEMEnergyFraction_SR_"+year;
     h_leadingJetNeutralEMEnergyFraction_SR[itr_year] = new TH1D(name,"",50,0,1);
 
-    sprintf(name,"h_leadingJetChargedHadronicEnergyFraction_passStationsWheels_%s",years[itr_year]);
+    name = "h_leadingJetChargedHadronicEnergyFraction_passStationsWheels_"+year;
     h_leadingJetChargedHadronicEnergyFraction_passStationsWheels[itr_year] = new TH1D(name,"",50,0,1);
 
-    sprintf(name,"h_leadingJetChargedHadronicEnergyFraction_SR_%s",years[itr_year]);
+    name = "h_leadingJetChargedHadronicEnergyFraction_SR_"+year;
     h_leadingJetChargedHadronicEnergyFraction_SR[itr_year] = new TH1D(name,"",50,0,1);
 
     
-    sprintf(name,"h_dtRechitClusterSize_SRhighNHF_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_SRhighNHF_"+year;
     h_dtRechitClusterSize_SRhighNHF[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_MET_SRhighNHF_%s",years[itr_year]);
+    name = "h_MET_SRhighNHF_"+year;
     h_MET_SRhighNHF[itr_year] = new TH1D(name,"",100,0,1000);
 
-    sprintf(name,"h_dPhiClusterMET_SRhighNHF_%s",years[itr_year]);
+    name = "h_dPhiClusterMET_SRhighNHF_"+year;
     h_dPhiClusterMET_SRhighNHF[itr_year] = new TH1D(name,"",70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_MB2CRhighNHF_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_MB2CRhighNHF_"+year;
     h_dtRechitClusterSize_MB2CRhighNHF[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_MET_MB2CRhighNHF_%s",years[itr_year]);
+    name = "h_MET_MB2CRhighNHF_"+year;
     h_MET_MB2CRhighNHF[itr_year] = new TH1D(name,"",100,0,1000);
 
-    sprintf(name,"h_dPhiClusterMET_MB2CRhighNHF_%s",years[itr_year]);
+    name = "h_dPhiClusterMET_MB2CRhighNHF_"+year;
     h_dPhiClusterMET_MB2CRhighNHF[itr_year] = new TH1D(name,"",70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_MB1CRhighNHF_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_MB1CRhighNHF_"+year;
     h_dtRechitClusterSize_MB1CRhighNHF[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_MET_MB1CRhighNHF_%s",years[itr_year]);
+    name = "h_MET_MB1CRhighNHF_"+year;
     h_MET_MB1CRhighNHF[itr_year] = new TH1D(name,"",100,0,1000);
 
-    sprintf(name,"h_dPhiClusterMET_MB1CRhighNHF_%s",years[itr_year]);
+    name = "h_dPhiClusterMET_MB1CRhighNHF_"+year;
     h_dPhiClusterMET_MB1CRhighNHF[itr_year] = new TH1D(name,"",70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_MB2withMB1CRhighNHF_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_MB2withMB1CRhighNHF_"+year;
     h_dtRechitClusterSize_MB2withMB1CRhighNHF[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_MET_MB2withMB1CRhighNHF_%s",years[itr_year]);
+    name = "h_MET_MB2withMB1CRhighNHF_"+year;
     h_MET_MB2withMB1CRhighNHF[itr_year] = new TH1D(name,"",100,0,1000);
 
-    sprintf(name,"h_dPhiClusterMET_MB2withMB1CRhighNHF_%s",years[itr_year]);
+    name = "h_dPhiClusterMET_MB2withMB1CRhighNHF_"+year;
     h_dPhiClusterMET_MB2withMB1CRhighNHF[itr_year] = new TH1D(name,"",70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_MB1HitsCRhighNHF_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_MB1HitsCRhighNHF_"+year;
     h_dtRechitClusterSize_MB1HitsCRhighNHF[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_MET_MB1HitsCRhighNHF_%s",years[itr_year]);
+    name = "h_MET_MB1HitsCRhighNHF_"+year;
     h_MET_MB1HitsCRhighNHF[itr_year] = new TH1D(name,"",100,0,1000);
 
-    sprintf(name,"h_dPhiClusterMET_MB1HitsCRhighNHF_%s",years[itr_year]);
+    name = "h_dPhiClusterMET_MB1HitsCRhighNHF_"+year;
     h_dPhiClusterMET_MB1HitsCRhighNHF[itr_year] = new TH1D(name,"",70,0,3.5);
+    for (auto selsIt = selsStrings.begin(); selsIt != selsStrings.end(); selsIt++){
+	    TString tname = *selsIt+"_"+year;
+	    runNumHists[tname] = new TH1D("h_runNum_"+tname,";;",271000,326000,10000);
+	    etaClusterHists[tname] = new TH1D("h_eta_"+tname,";;",100,-2,2);
+	    phiClusterHists[tname] = new TH1D("h_phi_"+tname,";;",100,-3.141,3.141);
+	    etaPhiClusterHists[tname] = new TH2D("h_etaPhiCluster_"+tname,";;",100,-3.141,3.141,100,-2,2);
+    }
 
-    
-    sprintf(name,"h_MET_lowNHF_%s",years[itr_year]);
+    name = "h_MET_lowNHF_"+year;
     h_MET_lowNHF[itr_year] = new TH1D(name,"",100,0,1000);
 
-    sprintf(name,"h_MET_oneCluster_lowNHF_%s",years[itr_year]);
+    name = "h_MET_oneCluster_lowNHF_"+year;
     h_MET_oneCluster_lowNHF[itr_year] = new TH1D(name,"",100,0,1000);
 
-    sprintf(name,"h_MET_oneVetoCluster_lowNHF_%s",years[itr_year]);
+    name = "h_MET_oneVetoCluster_lowNHF_"+year;
     h_MET_oneVetoCluster_lowNHF[itr_year] = new TH1D(name,"",100,0,1000);
 
-    sprintf(name,"h_MET_highNHF_%s",years[itr_year]);
+    name = "h_MET_highNHF_"+year;
     h_MET_highNHF[itr_year] = new TH1D(name,"",100,0,1000);
 
-    sprintf(name,"h_MET_oneCluster_highNHF_%s",years[itr_year]);
+    name = "h_MET_oneCluster_highNHF_"+year;
     h_MET_oneCluster_highNHF[itr_year] = new TH1D(name,"",100,0,1000);
 
-    sprintf(name,"h_MET_oneVetoCluster_highNHF_%s",years[itr_year]);
+    name = "h_MET_oneVetoCluster_highNHF_"+year;
     h_MET_oneVetoCluster_highNHF[itr_year] = new TH1D(name,"",100,0,1000);
 
 
-    sprintf(name,"h_dtRechitClusterSize_SRlowNHF_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_SRlowNHF_"+year;
     h_dtRechitClusterSize_SRlowNHF[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_MET_SRlowNHF_%s",years[itr_year]);
+    name = "h_MET_SRlowNHF_"+year;
     h_MET_SRlowNHF[itr_year] = new TH1D(name,"",100,0,1000);
 
-    sprintf(name,"h_dPhiClusterMET_SRlowNHF_%s",years[itr_year]);
+    name = "h_dPhiClusterMET_SRlowNHF_"+year;
     h_dPhiClusterMET_SRlowNHF[itr_year] = new TH1D(name,"",70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_MB2CRlowNHF_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_MB2CRlowNHF_"+year;
     h_dtRechitClusterSize_MB2CRlowNHF[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_MET_MB2CRlowNHF_%s",years[itr_year]);
+    name = "h_MET_MB2CRlowNHF_"+year;
     h_MET_MB2CRlowNHF[itr_year] = new TH1D(name,"",100,0,1000);
 
-    sprintf(name,"h_dPhiClusterMET_MB2CRlowNHF_%s",years[itr_year]);
+    name = "h_dPhiClusterMET_MB2CRlowNHF_"+year;
     h_dPhiClusterMET_MB2CRlowNHF[itr_year] = new TH1D(name,"",70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_MB1CRlowNHF_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_MB1CRlowNHF_"+year;
     h_dtRechitClusterSize_MB1CRlowNHF[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_MET_MB1CRlowNHF_%s",years[itr_year]);
+    name = "h_MET_MB1CRlowNHF_"+year;
     h_MET_MB1CRlowNHF[itr_year] = new TH1D(name,"",100,0,1000);
 
-    sprintf(name,"h_dPhiClusterMET_MB1CRlowNHF_%s",years[itr_year]);
+    name = "h_dPhiClusterMET_MB1CRlowNHF_"+year;
     h_dPhiClusterMET_MB1CRlowNHF[itr_year] = new TH1D(name,"",70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_MB2withMB1CRlowNHF_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_MB2withMB1CRlowNHF_"+year;
     h_dtRechitClusterSize_MB2withMB1CRlowNHF[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_MET_MB2withMB1CRlowNHF_%s",years[itr_year]);
+    name = "h_MET_MB2withMB1CRlowNHF_"+year;
     h_MET_MB2withMB1CRlowNHF[itr_year] = new TH1D(name,"",100,0,1000);
 
-    sprintf(name,"h_dPhiClusterMET_MB2withMB1CRlowNHF_%s",years[itr_year]);
+    name = "h_dPhiClusterMET_MB2withMB1CRlowNHF_"+year;
     h_dPhiClusterMET_MB2withMB1CRlowNHF[itr_year] = new TH1D(name,"",70,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterSize_MB1HitsCRlowNHF_%s",years[itr_year]);
+    name = "h_dtRechitClusterSize_MB1HitsCRlowNHF_"+year;
     h_dtRechitClusterSize_MB1HitsCRlowNHF[itr_year] = new TH1D(name,"",50,0,500);
 
-    sprintf(name,"h_MET_MB1HitsCRlowNHF_%s",years[itr_year]);
+    name = "h_MET_MB1HitsCRlowNHF_"+year;
     h_MET_MB1HitsCRlowNHF[itr_year] = new TH1D(name,"",100,0,1000);
 
-    sprintf(name,"h_dPhiClusterMET_MB1HitsCRlowNHF_%s",years[itr_year]);
+    name = "h_dPhiClusterMET_MB1HitsCRlowNHF_"+year;
     h_dPhiClusterMET_MB1HitsCRlowNHF[itr_year] = new TH1D(name,"",70,0,3.5);
 
    
-    sprintf(name,"h_rpcBxMedian_MB1CR_%s",years[itr_year]);
+    name = "h_rpcBxMedian_MB1CR_"+year;
     h_rpcBxMedian_MB1CR[itr_year] = new TH1D(name,"",10,-4.5,5.5);
 
-    sprintf(name,"h_rpcBxMedian_MB2CR_%s",years[itr_year]);
+    name = "h_rpcBxMedian_MB2CR_"+year;
     h_rpcBxMedian_MB2CR[itr_year] = new TH1D(name,"",10,-4.5,5.5);
 
-    sprintf(name,"h_rpcBxMedian_MB2withMB1CR_%s",years[itr_year]);
+    name = "h_rpcBxMedian_MB2withMB1CR_"+year;
     h_rpcBxMedian_MB2withMB1CR[itr_year] = new TH1D(name,"",10,-4.5,5.5);
 
-    sprintf(name,"h_rpcBxMedian_SR_%s",years[itr_year]);
+    name = "h_rpcBxMedian_SR_"+year;
     h_rpcBxMedian_SR[itr_year] = new TH1D(name,"",10,-4.5,5.5);
 
-    sprintf(name,"h_rpcBxMedian_MB1HitsCR_%s",years[itr_year]);
+    name = "h_rpcBxMedian_MB1HitsCR_"+year;
     h_rpcBxMedian_MB1HitsCR[itr_year] = new TH1D(name,"",10,-4.5,5.5);
 
-
-    sprintf(name,"h_efficiency_%s",years[itr_year]);
+    name = "h_efficiency_"+year;
     h_efficiency[itr_year] = new TH1D(name,"",20,0,20);
 
     TFile *_file;
-    if(strcmp(years[itr_year],"All")==0){
-      _file = TFile::Open(dir+years[itr_year]+"/v4/v4/normalized/Run2_displacedJetMuonNtupler_V1p15_Data2016_Data2017_Data2018-HighMET_goodLumi.root");
+    if(year == "All"){
+      _file = TFile::Open(dir+year+"/v4/v4/normalized/Run2_displacedJetMuonNtupler_V1p15_Data2016_Data2017_Data2018-HighMET_goodLumi.root");
     }
     else{
       //_file = TFile::Open(dir+years[itr_year]+"/v1/v3/normalized/Run2_displacedJetMuonNtupler_V1p17_Data"+years[itr_year]+"_"+runNames[itr_year]+"-HighMET-"+dates[itr_year]+"_goodLumi.root");
-      _file = TFile::Open(dir+"Run2_displacedJetMuonNtupler_V1p17_Data"+years[itr_year]+"_"+runNames[itr_year]+"-HighMET-"+dates[itr_year]+"_goodLumi.root");
+      _file = TFile::Open(dir+"Run2_displacedJetMuonNtupler_V1p17_Data"+year+"_"+runNames[itr_year]+"-HighMET-"+dates[itr_year]+"_goodLumi.root");
     }
 
     TTreeReader treeReader("MuonSystem",_file);
@@ -1951,7 +1975,7 @@ void analyzeData_ABCD(){
     event100_clusterMET = 0;
     event150_clusterMET = 0;
     
-    cout << "Data" << years[itr_year] << endl;
+    cout << "Data" << year << endl;
     while(treeReader.Next()){
       if(evtNum%100000==0){ cout << evtNum << " of " << treeReader.GetEntries(1) << endl; }
       passFullVeto_clusterCR = false;
@@ -2265,8 +2289,27 @@ void analyzeData_ABCD(){
 	}
 	else{ h_nDtRechitClusters_dPhiJetMET[itr_year]->Fill(*nDtRechitClusters); }
 	if(nStations25<3 && nWheels25<3 && *nDtRechitClusters>0 && passOneJet){
-	  if(passNHFJetLead){ h_MET_oneCluster_lowNHF[itr_year]->Fill(*MET); }
-	  else{ h_MET_oneCluster_highNHF[itr_year]->Fill(*MET); }
+	    if(passNHFJetLead){ 
+		h_MET_oneCluster_lowNHF[itr_year]->Fill(*MET); 
+		runNumHists["oneCluster_lowNHF_"+year]->Fill(*runNum);
+		for(Int_t itr_clust=0; itr_clust<*nDtRechitClusters; itr_clust++){
+		    if(dtRechitClusterSize[itr_clust]>50){
+			etaPhiClusterHists["oneCluster_lowNHF_"+year]->Fill(dtRechitClusterPhi[itr_clust],dtRechitClusterEta[itr_clust]);
+			etaClusterHists["oneCluster_lowNHF_"+year]->Fill(dtRechitClusterEta[itr_clust]);
+			phiClusterHists["oneCluster_lowNHF_"+year]->Fill(dtRechitClusterPhi[itr_clust]);
+		    }
+		}
+	    }
+	    else{ h_MET_oneCluster_highNHF[itr_year]->Fill(*MET); 
+		runNumHists["oneCluster_highNHF_"+year]->Fill(*runNum);
+		for(Int_t itr_clust=0; itr_clust<*nDtRechitClusters; itr_clust++){
+		    if(dtRechitClusterSize[itr_clust]>50){
+			etaPhiClusterHists["oneCluster_highNHF_"+year]->Fill(dtRechitClusterPhi[itr_clust],dtRechitClusterEta[itr_clust]);
+			etaClusterHists["oneCluster_highNHF_"+year]->Fill(dtRechitClusterEta[itr_clust]);
+			phiClusterHists["oneCluster_highNHF_"+year]->Fill(dtRechitClusterPhi[itr_clust]);
+		    }
+		}
+	    }
 	}
 
 	for(Int_t itr_clust=0; itr_clust<*nDtRechitClusters; itr_clust++){
@@ -2404,8 +2447,20 @@ void analyzeData_ABCD(){
 	    h_dtRechitClusterMB1Veto[itr_year]->Fill(hitsMB1);
 
 	    if(nStations25<3 && nWheels25<3 && dtRechitClusterJetVetoPt[itr_clust]<20.0 && dtRechitClusterMuonVetoPt[itr_clust]<10.0 && passMB1){
-	      if(passNHFJetLead){ h_MET_oneVetoCluster_lowNHF[itr_year]->Fill(*MET); }
-	      else{ h_MET_oneVetoCluster_highNHF[itr_year]->Fill(*MET); }
+	      if(passNHFJetLead){
+		  h_MET_oneVetoCluster_lowNHF[itr_year]->Fill(*MET); 
+		  runNumHists["oneVetoCluster_lowNHF_"+year]->Fill(*runNum);
+		  etaPhiClusterHists["oneVetoCluster_lowNHF_"+year]->Fill(dtRechitClusterPhi[itr_clust],dtRechitClusterEta[itr_clust]);
+		  etaClusterHists["oneVetoCluster_lowNHF_"+year]->Fill(dtRechitClusterEta[itr_clust]);
+		  phiClusterHists["oneVetoCluster_lowNHF_"+year]->Fill(dtRechitClusterPhi[itr_clust]);
+	      
+	      }
+	      else{ h_MET_oneVetoCluster_highNHF[itr_year]->Fill(*MET); 
+		  runNumHists["oneVetoCluster_highNHF_"+year]->Fill(*runNum);
+		  etaPhiClusterHists["oneVetoCluster_highNHF_"+year]->Fill(dtRechitClusterPhi[itr_clust],dtRechitClusterEta[itr_clust]);
+		  etaClusterHists["oneVetoCluster_highNHF_"+year]->Fill(dtRechitClusterEta[itr_clust]);
+		  phiClusterHists["oneVetoCluster_highNHF_"+year]->Fill(dtRechitClusterPhi[itr_clust]);
+	      }
 	    }
 	    if(passJetMET && passStations25 && passWheels25){
 	      passNoVetoCluster = true;
