@@ -410,6 +410,31 @@ void analyzeData_ABCD(){
   TH1D *h_MET_lowNHF[4];
   TH1D *h_MET_oneCluster_lowNHF[4];
   TH1D *h_MET_oneVetoCluster_lowNHF[4];
+
+  TH1D *h_leadJetPt_highNHF[4];
+  TH1D *h_leadJetPt_oneCluster_highNHF[4];
+  TH1D *h_leadJetPt_lowNHF[4];
+  TH1D *h_leadJetPt_oneCluster_lowNHF[4];
+  TH1D *h_leadJetPt_oneVetoCluster_highNHF[4];
+  TH1D *h_leadJetPt_oneVetoCluster_lowNHF[4];
+  TH1D *h_leadJetPt_MB1CR[4];
+  TH1D *h_leadJetPt_MB2withMB1CR[4];
+  TH1D *h_leadJetPt_MB1HitsCR[4];
+  TH1D *h_leadJetPt_MB2CR[4];
+  TH1D *h_leadJetPt_SR[4];
+  
+  TH1D *h_leadJetPtMET_highNHF[4];
+  TH1D *h_leadJetPtMET_oneCluster_highNHF[4];
+  TH1D *h_leadJetPtMET_lowNHF[4];
+  TH1D *h_leadJetPtMET_oneCluster_lowNHF[4];
+  TH1D *h_leadJetPtMET_oneVetoCluster_highNHF[4];
+  TH1D *h_leadJetPtMET_oneVetoCluster_lowNHF[4];
+  TH1D *h_leadJetPtMET_MB1CR[4];
+  TH1D *h_leadJetPtMET_MB2withMB1CR[4];
+  TH1D *h_leadJetPtMET_MB1HitsCR[4];
+  TH1D *h_leadJetPtMET_MB2CR[4];
+  TH1D *h_leadJetPtMET_SR[4];
+
   TH1D *h_rpcBxMedian_MB1CR[4];
   TH1D *h_rpcBxMedian_MB2CR[4];
   TH1D *h_rpcBxMedian_MB2withMB1CR[4];
@@ -477,6 +502,7 @@ void analyzeData_ABCD(){
   Int_t nClustersVeto_dPhiJetMET = 0;
 
   Int_t evtNum = 0;
+  Bool_t HLT = false;
 
   Bool_t goodInvertedJet = false;
 
@@ -515,10 +541,10 @@ void analyzeData_ABCD(){
   Bool_t passRpcMatchMB2CRwithAdjacent = false;
   Bool_t passRpcMatchMB2CRwithAdjacent0p8 = false;
   Bool_t passRpcMatchMB2CRwithOther = false;
-  Bool_t passRpcMatchMB2CRwithNHF50 = true;
-  Bool_t passRpcMatchMB2CRinvertedNHF50 = true;
-  Bool_t passRpcMatchMB2CRwithNHFLead = true;
-  Bool_t passRpcMatchMB2CRinvertedNHFLead = true;
+  Bool_t passRpcMatchMB2CRwithNHF50 = false;
+  Bool_t passRpcMatchMB2CRinvertedNHF50 = false;
+  Bool_t passRpcMatchMB2CRwithNHFLead = false;
+  Bool_t passRpcMatchMB2CRinvertedNHFLead = false;
   Bool_t passRpcMatchMB2withMB1CR = false;
   Bool_t passRpcMatchMB2withMB1CRwithAdjacent = false;
   Bool_t passRpcMatchMB2withMB1CRwithNHF50 = false;
@@ -732,6 +758,10 @@ void analyzeData_ABCD(){
   ofstream eventListAdjacentMB1;
   eventListAdjacentMB1.open("events/AdjacentMB1Hits_events.txt");
 
+  ofstream eventListInvertedJetIDSR;
+  eventListInvertedJetIDSR.open("events/invertedJetID_SRevents.txt");
+  ofstream eventListInvertedJetIDABC;
+  eventListInvertedJetIDABC.open("events/invertedJetID_ABCevents.txt");
 
   Int_t nStations1 = 0;
   Int_t nStations25 = 0;
@@ -1820,6 +1850,73 @@ void analyzeData_ABCD(){
     name = "h_MET_oneVetoCluster_highNHF_"+year;
     h_MET_oneVetoCluster_highNHF[itr_year] = new TH1D(name,"",100,0,1000);
 
+    
+    name = "h_leadJetPt_highNHF_"+year;
+    h_leadJetPt_highNHF[itr_year] = new TH1D(name,"",200,0,2000);
+
+    name = "h_leadJetPt_lowNHF_"+year;
+    h_leadJetPt_lowNHF[itr_year] = new TH1D(name,"",200,0,2000);
+
+    name = "h_leadJetPt_oneCluster_highNHF_"+year;
+    h_leadJetPt_oneCluster_highNHF[itr_year] = new TH1D(name,"",200,0,2000);
+
+    name = "h_leadJetPt_oneCluster_lowNHF_"+year;
+    h_leadJetPt_oneCluster_lowNHF[itr_year] = new TH1D(name,"",200,0,2000);
+
+    name = "h_leadJetPt_oneVetoCluster_highNHF_"+year;
+    h_leadJetPt_oneVetoCluster_highNHF[itr_year] = new TH1D(name,"",200,0,2000);
+
+    name = "h_leadJetPt_oneVetoCluster_lowNHF_"+year;
+    h_leadJetPt_oneVetoCluster_lowNHF[itr_year] = new TH1D(name,"",200,0,2000);
+    
+    name = "h_leadJetPt_MB1CR_"+year;
+    h_leadJetPt_MB1CR[itr_year] = new TH1D(name,"",200,0,2000);
+
+    name = "h_leadJetPt_MB2withMB1CR_"+year;
+    h_leadJetPt_MB2withMB1CR[itr_year] = new TH1D(name,"",200,0,2000);
+
+    name = "h_leadJetPt_MB1HitsCR_"+year;
+    h_leadJetPt_MB1HitsCR[itr_year] = new TH1D(name,"",200,0,2000);
+
+    name = "h_leadJetPt_MB2CR_"+year;
+    h_leadJetPt_MB2CR[itr_year] = new TH1D(name,"",200,0,2000);
+
+    name = "h_leadJetPt_SR_"+year;
+    h_leadJetPt_SR[itr_year] = new TH1D(name,"",200,0,2000);
+
+    name = "h_leadJetPtMET_highNHF_"+year;
+    h_leadJetPtMET_highNHF[itr_year] = new TH1D(name,"",500,0,10);
+
+    name = "h_leadJetPtMET_lowNHF_"+year;
+    h_leadJetPtMET_lowNHF[itr_year] = new TH1D(name,"",500,0,10);
+
+    name = "h_leadJetPtMET_oneCluster_highNHF_"+year;
+    h_leadJetPtMET_oneCluster_highNHF[itr_year] = new TH1D(name,"",500,0,10);
+
+    name = "h_leadJetPtMET_oneCluster_lowNHF_"+year;
+    h_leadJetPtMET_oneCluster_lowNHF[itr_year] = new TH1D(name,"",500,0,10);
+
+    name = "h_leadJetPtMET_oneVetoCluster_highNHF_"+year;
+    h_leadJetPtMET_oneVetoCluster_highNHF[itr_year] = new TH1D(name,"",500,0,10);
+
+    name = "h_leadJetPtMET_oneVetoCluster_lowNHF_"+year;
+    h_leadJetPtMET_oneVetoCluster_lowNHF[itr_year] = new TH1D(name,"",500,0,10);
+    
+    name = "h_leadJetPtMET_MB1CR_"+year;
+    h_leadJetPtMET_MB1CR[itr_year] = new TH1D(name,"",500,0,10);
+
+    name = "h_leadJetPtMET_MB2withMB1CR_"+year;
+    h_leadJetPtMET_MB2withMB1CR[itr_year] = new TH1D(name,"",500,0,10);
+
+    name = "h_leadJetPtMET_MB1HitsCR_"+year;
+    h_leadJetPtMET_MB1HitsCR[itr_year] = new TH1D(name,"",500,0,10);
+
+    name = "h_leadJetPtMET_MB2CR_"+year;
+    h_leadJetPtMET_MB2CR[itr_year] = new TH1D(name,"",500,0,10);
+
+    name = "h_leadJetPtMET_SR_"+year;
+    h_leadJetPtMET_SR[itr_year] = new TH1D(name,"",500,0,10);
+
 
     name = "h_dtRechitClusterSize_SRlowNHF_"+year;
     h_dtRechitClusterSize_SRlowNHF[itr_year] = new TH1D(name,"",50,0,500);
@@ -1896,6 +1993,9 @@ void analyzeData_ABCD(){
 
     TTreeReader treeReader("MuonSystem",_file);
     
+    TTreeReaderValue<bool> Flag2_all(treeReader,"Flag2_all");
+    TTreeReaderArray<bool> HLTDecision(treeReader,"HLTDecision");
+
     TTreeReaderValue<unsigned int> runNum(treeReader,"runNum");
     TTreeReaderValue<unsigned int> lumiSec(treeReader,"lumiSec");
     TTreeReaderValue<unsigned int> eventNum(treeReader,"evtNum");
@@ -1999,7 +2099,7 @@ void analyzeData_ABCD(){
       passOneJet = false;
       passJetMET = false;
       passNHFJet50 = true;
-      passNHFJetLead = true;
+      passNHFJetLead = false;
       passStations25 = false;
       passWheels25 = false;
       passJetVeto = false;
@@ -2180,7 +2280,17 @@ void analyzeData_ABCD(){
       if(rand->Uniform()<0.5){ pmRand = -1; }
       else{ pmRand = 1; }
       
-      if(*MET > 200){
+      if(year=="2016"){
+	if(HLTDecision[310] || HLTDecision[467]){
+	  HLT = true;
+	}
+      }
+      else{
+	if(HLTDecision[310] || HLTDecision[467] || HLTDecision[703] || HLTDecision[717] || HLTDecision[710] || HLTDecision[709]){
+	  HLT = true;
+	}
+      }
+      if(*MET > 200 && *Flag2_all && HLT){
 	passMET = true;
 	dPhi_min = 999.;
 	dPhi_min_invertedJet = 999.;
@@ -2194,10 +2304,14 @@ void analyzeData_ABCD(){
 	  if(jetTightPassId[0] && fabs(jetEta[0])<=2.4){ 
 	    passNHFJetLead = true; 
 	    h_MET_lowNHF[itr_year]->Fill(*MET);
+	    h_leadJetPt_lowNHF[itr_year]->Fill(jetPt[0]);
+	    h_leadJetPtMET_lowNHF[itr_year]->Fill(jetPt[0]/(*MET));
 	  }
 	  else{ 
 	    passNHFJetLead = false; 
 	    h_MET_highNHF[itr_year]->Fill(*MET);
+	    h_leadJetPt_highNHF[itr_year]->Fill(jetPt[0]);
+	    h_leadJetPtMET_highNHF[itr_year]->Fill(jetPt[0]/(*MET));
 	  }
 	}
 	if(*nDtRechitClusters>0){
@@ -2293,6 +2407,8 @@ void analyzeData_ABCD(){
 	    if(nStations25<3 && nWheels25<3 && *nDtRechitClusters>0 && passOneJet){
 		if(passNHFJetLead){ 
 		    h_MET_oneCluster_lowNHF[itr_year]->Fill(*MET); 
+		    h_leadJetPt_oneCluster_lowNHF[itr_year]->Fill(jetPt[0]);
+		    h_leadJetPtMET_oneCluster_lowNHF[itr_year]->Fill(jetPt[0]/(*MET));
 		    runNumHists["oneCluster_lowNHF_"+year]->Fill(*runNum);
 			if(dtRechitClusterSize[itr_clust]>50){
 			    etaPhiClusterHists["oneCluster_lowNHF_"+year]->Fill(dtRechitClusterPhi[itr_clust],dtRechitClusterEta[itr_clust]);
@@ -2302,6 +2418,8 @@ void analyzeData_ABCD(){
 		}
 		else{ h_MET_oneCluster_highNHF[itr_year]->Fill(*MET); 
 		    runNumHists["oneCluster_highNHF_"+year]->Fill(*runNum);
+		    h_leadJetPt_oneCluster_highNHF[itr_year]->Fill(jetPt[0]);
+		    h_leadJetPtMET_oneCluster_highNHF[itr_year]->Fill(jetPt[0]/(*MET));
 			if(dtRechitClusterSize[itr_clust]>50){
 			    etaPhiClusterHists["oneCluster_highNHF_"+year]->Fill(dtRechitClusterPhi[itr_clust],dtRechitClusterEta[itr_clust]);
 			    etaClusterHists["oneCluster_highNHF_"+year]->Fill(dtRechitClusterEta[itr_clust]);
@@ -2445,13 +2563,18 @@ void analyzeData_ABCD(){
 	    if(nStations25<3 && nWheels25<3 && dtRechitClusterJetVetoPt[itr_clust]<20.0 && dtRechitClusterMuonVetoPt[itr_clust]<10.0 && passMB1){
 	      if(passNHFJetLead){
 		  h_MET_oneVetoCluster_lowNHF[itr_year]->Fill(*MET); 
+		  h_leadJetPt_oneVetoCluster_lowNHF[itr_year]->Fill(jetPt[0]);
+		  h_leadJetPtMET_oneVetoCluster_lowNHF[itr_year]->Fill(jetPt[0]/(*MET));
 		  runNumHists["oneVetoCluster_lowNHF_"+year]->Fill(*runNum);
 		  etaPhiClusterHists["oneVetoCluster_lowNHF_"+year]->Fill(dtRechitClusterPhi[itr_clust],dtRechitClusterEta[itr_clust]);
 		  etaClusterHists["oneVetoCluster_lowNHF_"+year]->Fill(dtRechitClusterEta[itr_clust]);
 		  phiClusterHists["oneVetoCluster_lowNHF_"+year]->Fill(dtRechitClusterPhi[itr_clust]);
 	      
 	      }
-	      else{ h_MET_oneVetoCluster_highNHF[itr_year]->Fill(*MET); 
+	      else{ 
+		  h_MET_oneVetoCluster_highNHF[itr_year]->Fill(*MET); 
+		  h_leadJetPt_oneVetoCluster_highNHF[itr_year]->Fill(jetPt[0]);
+		  h_leadJetPtMET_oneVetoCluster_highNHF[itr_year]->Fill(jetPt[0]/(*MET));
 		  runNumHists["oneVetoCluster_highNHF_"+year]->Fill(*runNum);
 		  etaPhiClusterHists["oneVetoCluster_highNHF_"+year]->Fill(dtRechitClusterPhi[itr_clust],dtRechitClusterEta[itr_clust]);
 		  etaClusterHists["oneVetoCluster_highNHF_"+year]->Fill(dtRechitClusterEta[itr_clust]);
@@ -2529,6 +2652,8 @@ void analyzeData_ABCD(){
 			      clusterSizeMB1HitsCRwithNHFLead = dtRechitClusterSize[itr_clust];
 			      dPhiClusterMETMB1HitsCRwithNHFLead = fabs(dPhiClusterMET);
 			    }
+			    h_leadJetPt_MB1HitsCR[itr_year]->Fill(jetPt[0]);
+			    h_leadJetPtMET_MB1HitsCR[itr_year]->Fill(jetPt[0]/(*MET));
 			  }
 			  else{
 			    passRpcMatchMB1HitsCRinvertedNHFLead = true;
@@ -2617,6 +2742,8 @@ void analyzeData_ABCD(){
 			      clusterSizeMB1CRwithNHFLead = dtRechitClusterSize[itr_clust];
 			      dPhiClusterMETMB1CRwithNHFLead = fabs(dPhiClusterMET);
 			    }
+			    h_leadJetPt_MB1CR[itr_year]->Fill(jetPt[0]);
+			    h_leadJetPtMET_MB1CR[itr_year]->Fill(jetPt[0]/(*MET));
 			  }
 			}
 		      }
@@ -2742,7 +2869,9 @@ void analyzeData_ABCD(){
 			  if(dtRechitClusterSize[itr_clust]>clusterSizeMB2CRwithNHFLead){
 			    clusterSizeMB2CRwithNHFLead = dtRechitClusterSize[itr_clust];
 			    dPhiClusterMETMB2CRwithNHFLead = fabs(dPhiClusterMET);
-			  }		      
+			  }
+			  h_leadJetPt_MB2CR[itr_year]->Fill(jetPt[0]);
+			  h_leadJetPtMET_MB2CR[itr_year]->Fill(jetPt[0]/(*MET));
 			}
 			else{
 			  passRpcMatchMB2CRinvertedNHFLead = true;
@@ -2815,7 +2944,9 @@ void analyzeData_ABCD(){
 			  if(dtRechitClusterSize[itr_clust]>clusterSizeMB2withMB1CRwithNHFLead){
 			    clusterSizeMB2withMB1CRwithNHFLead = dtRechitClusterSize[itr_clust];
 			    dPhiClusterMETMB2withMB1CRwithNHFLead = fabs(dPhiClusterMET);
-			  } 
+			  }
+			  h_leadJetPt_MB2withMB1CR[itr_year]->Fill(jetPt[0]);
+			  h_leadJetPtMET_MB2withMB1CR[itr_year]->Fill(jetPt[0]/(*MET));
 			}
 			else{
 			  passRpcMatchMB2withMB1CRinvertedNHFLead = true;
@@ -2982,6 +3113,8 @@ void analyzeData_ABCD(){
 			  clusterSizeSRwithNHFLead = dtRechitClusterSize[itr_clust];
 			  dPhiClusterMETSRwithNHFLead = fabs(dPhiClusterMET);
 			}
+			h_leadJetPt_SR[itr_year]->Fill(jetPt[0]);
+			h_leadJetPtMET_SR[itr_year]->Fill(jetPt[0]/(*MET));
 		      }
 		      if(!passNHFJetLead && nMB1MatchClusterAdjacent0p8Plus<8 && nMB1MatchClusterAdjacent0p8Minus<8){
 			passABCDinvertedNHFLead = true;
@@ -3872,6 +4005,8 @@ void analyzeData_ABCD(){
 	}
 	if(passRpcMatchMB1HitsCRinvertedNHFLead){
 	  h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithInvertedNHFLeadCut_MB1HitsCR[itr_year]->Fill(clusterSizeMB1HitsCRinvertedNHFLead,fabs(dPhiClusterMETMB1HitsCRinvertedNHFLead));
+	  if(clusterSizeMB1HitsCRinvertedNHFLead>=100 && fabs(dPhiClusterMETMB1HitsCRinvertedNHFLead)<1.0){ eventListInvertedJetIDSR << *runNum << ":" << *lumiSec << ":" << *eventNum << endl; }
+	  else{ eventListInvertedJetIDABC << *runNum << ":" << *lumiSec << ":" << *eventNum << endl; }
 	}
       }
       if(passRpcMatch){
@@ -3968,6 +4103,8 @@ void analyzeData_ABCD(){
 	}
 	if(passRpcMatchMB2CRinvertedNHFLead){
 	  h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithInvertedNHFLeadCut_MB2CR[itr_year]->Fill(clusterSizeMB2CRinvertedNHFLead,fabs(dPhiClusterMETMB2CRinvertedNHFLead));
+	  if(clusterSizeMB2CRinvertedNHFLead>=100 && fabs(dPhiClusterMETMB2CRinvertedNHFLead)<1.0){ eventListInvertedJetIDSR << *runNum << ":" << *lumiSec << ":" << *eventNum << endl; }
+	  else{ eventListInvertedJetIDABC << *runNum << ":" << *lumiSec << ":" << *eventNum << endl; }
 	}
       }
       if(passRpcMatchMB2withMB1CR){
@@ -3990,6 +4127,8 @@ void analyzeData_ABCD(){
 	}
 	if(passRpcMatchMB2withMB1CRinvertedNHFLead){
 	  h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithInvertedNHFLeadCut_MB2withMB1CR[itr_year]->Fill(clusterSizeMB2withMB1CRinvertedNHFLead,fabs(dPhiClusterMETMB2withMB1CRinvertedNHFLead));
+	  if(clusterSizeMB2withMB1CRinvertedNHFLead>=100 && fabs(dPhiClusterMETMB2withMB1CRinvertedNHFLead)<1.0){ eventListInvertedJetIDSR << *runNum << ":" << *lumiSec << ":" << *eventNum << endl; }
+	  else{ eventListInvertedJetIDABC << *runNum << ":" << *lumiSec << ":" << *eventNum << endl; }
 	}
       }
 
@@ -4038,6 +4177,8 @@ void analyzeData_ABCD(){
 	}
 	if(passABCDinvertedNHFLead){
 	  h_dtRechitClusterSize_dPhiClusterMET_fullSelectionWithInvertedNHFLeadCut_SR[itr_year]->Fill(clusterSizeSRinvertedNHFLead,fabs(dPhiClusterMETSRinvertedNHFLead));
+	  if(clusterSizeSRinvertedNHFLead>=100 && fabs(dPhiClusterMETSRinvertedNHFLead)<1.0){ eventListInvertedJetIDSR << *runNum << ":" << *lumiSec << ":" << *eventNum << endl; }
+	  else{ eventListInvertedJetIDABC << *runNum << ":" << *lumiSec << ":" << *eventNum << endl; }
 	}
       }
       
@@ -4111,4 +4252,6 @@ void analyzeData_ABCD(){
   eventListSRB.close();
   eventListMB2CR.close();
   eventListAdjacentMB1.close();
+  eventListInvertedJetIDSR.close();
+  eventListInvertedJetIDABC.close();
 }
