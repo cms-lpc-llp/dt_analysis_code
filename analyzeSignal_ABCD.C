@@ -45,13 +45,13 @@ void analyzeSignal_ABCD(){
   //char mX[5][20] = {"darkphoton_m_2","darkphoton_m_5","darkphoton_m_10","darkphoton_m_15","darkphoton_m_20"};
   //char mX[2][10] = {"450"};
   //char ctau[2][20] = {"1m","10m"};
-  //char ctau[6][20] = {"1","10","100","1000","10000","100000"};
-  char ctau[2][20] = {"1000","10000"};
+  char ctau[11][20] = {"1","3","10","30","100","300","1000","3000","10000","30000","100000"};
+  //char ctau[2][20] = {"1000","10000"};
   //char ctau[4][20] = {"500mm_xi_1","1000mm_xi_1","5000mm_xi_1","10000mm_xi_1"};
   //char ctau[8][25] = {"500mm_xi_1","1000mm_xi_1","5000mm_xi_1","10000mm_xi_1","500mm_xi_2p5","1000mm_xi_2p5","5000mm_xi_2p5","10000mm_xi_2p5"};
   //char ctau[4][20] = {"500_xi_1","500_xi_2p5","1000_xi_1","1000_xi_2p5"};
-  Float_t lifetime = 10000;
-  //Float_t lifetime[2] = {1000,10000};
+  //Float_t lifetime = 10000;
+  Int_t lifetime[11] = {1,3,10,30,100,300,1000,3000,10000,30000,100000};
   char years[3][20] = {"MC_Fall18","MC_Fall17","MC_Summer16"};
   //char years[3][20] = {"2018","2017","2016"};
   Float_t lumi[3] = {59.74,41.53,35.92};
@@ -234,6 +234,7 @@ void analyzeSignal_ABCD(){
 
   Int_t evtNum = 0;
   Int_t totalNum = 0;
+  Bool_t HLT = false;
 
   Bool_t passMuon = false;
   Bool_t passMuonLoose = false;
@@ -388,7 +389,7 @@ void analyzeSignal_ABCD(){
   Int_t pmRand = 0;
 
   for(Int_t itr_mX=0; itr_mX<3; itr_mX++){
-    for(Int_t itr_ctau=0; itr_ctau<2; itr_ctau++){
+    for(Int_t itr_ctau=0; itr_ctau<11; itr_ctau++){
       sprintf(name,"h_nDtRechitClusters_dPhiJetMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
       h_nDtRechitClusters_dPhiJetMET[itr_mX][itr_ctau] = new TH1D(name,"",5,0,5);
       
@@ -839,20 +840,32 @@ void analyzeSignal_ABCD(){
       TFile *_file;
       
       if(strcmp(years[itr_year],"MC_Summer16")==0){
-	_file = TFile::Open(dir+years[itr_year]+"/v1/v3/normalized/ggH_HToSSTobbbb_MH-125_MS-"+mX[itr_mX]+"_ctau-"+ctau[itr_ctau]+"_TuneCUETP8M1_13TeV-powheg-pythia8_1pb_weighted.root");
-	//_file = TFile::Open(dir+years[itr_year]+"/v3/v5/normalized/ggH_HToSSTobbbb_MH-125_MS-"+mX[itr_mX]+"_ctau-"+ctau[itr_ctau]+"_TuneCUETP8M1_13TeV-powheg-pythia8_1pb_weighted.root");
+	if(lifetime[itr_ctau]%3==0){
+	  _file = TFile::Open(dir+years[itr_year]+"/v1/v3/normalized/ggH_HToSSTobbbb_MH-125_MS-"+mX[itr_mX]+"_ctau-"+ctau[itr_ctau+1]+"_TuneCUETP8M1_13TeV-powheg-pythia8_1pb_weighted.root");
+	  //_file = TFile::Open(dir+years[itr_year]+"/v3/v5/normalized/ggH_HToSSTobbbb_MH-125_MS-"+mX[itr_mX]+"_ctau-"+ctau[itr_ctau]+"_TuneCUETP8M1_13TeV-powheg-pythia8_1pb_weighted.root");
+	}	  
+	else{
+	  _file = TFile::Open(dir+years[itr_year]+"/v1/v3/normalized/ggH_HToSSTobbbb_MH-125_MS-"+mX[itr_mX]+"_ctau-"+ctau[itr_ctau]+"_TuneCUETP8M1_13TeV-powheg-pythia8_1pb_weighted.root");
+	}
       }
       else{
-	_file = TFile::Open(dir+years[itr_year]+"/v1/v3/normalized/ggH_HToSSTobbbb_MH-125_MS-"+mX[itr_mX]+"_ctau-"+ctau[itr_ctau]+"_TuneCP5_13TeV-powheg-pythia8_1pb_weighted.root");
-	//_file = TFile::Open(dir+years[itr_year]+"/v3/v5/normalized/ggH_HToSSTobbbb_MH-125_MS-"+mX[itr_mX]+"_ctau-"+ctau[itr_ctau]+"_TuneCP5_13TeV-powheg-pythia8_1pb_weighted.root");
-	//_file = TFile::Open(dir+years[itr_year]+"/HV_params_"+mX[itr_mX]+"_ctau_"+ctau[itr_ctau]+"_LLPNTUPLE_v0_filter.root");
+	if(lifetime[itr_ctau]%3==0){
+	  _file = TFile::Open(dir+years[itr_year]+"/v1/v3/normalized/ggH_HToSSTobbbb_MH-125_MS-"+mX[itr_mX]+"_ctau-"+ctau[itr_ctau+1]+"_TuneCP5_13TeV-powheg-pythia8_1pb_weighted.root");
+	  //_file = TFile::Open(dir+years[itr_year]+"/v3/v5/normalized/ggH_HToSSTobbbb_MH-125_MS-"+mX[itr_mX]+"_ctau-"+ctau[itr_ctau]+"_TuneCP5_13TeV-powheg-pythia8_1pb_weighted.root");
+	  //_file = TFile::Open(dir+years[itr_year]+"/HV_params_"+mX[itr_mX]+"_ctau_"+ctau[itr_ctau]+"_LLPNTUPLE_v0_filter.root");
+	}
+	else{
+	  _file = TFile::Open(dir+years[itr_year]+"/v1/v3/normalized/ggH_HToSSTobbbb_MH-125_MS-"+mX[itr_mX]+"_ctau-"+ctau[itr_ctau]+"_TuneCP5_13TeV-powheg-pythia8_1pb_weighted.root");
+	}
       }
-      
       //_file = TFile::Open(dir+"signalPointsGGHWithRPCWithFlags/signal_1000_"+mX[itr_mX]+"_"+ctau[itr_ctau]+".root");
       //_file = TFile::Open(dir+"signalPointsGenFilter/HiddenValleyGenFilter_"+mX[itr_mX]+"_ctau_"+ctau[itr_ctau]+".py_privateMC_102X_LLPNTUPLE_v2_generationGenFilter_forHV_2018_MS.root");
       
       TTreeReader treeReader("MuonSystem",_file);
       //TTreeReader treeReader("ntuples/llp",_file);
+
+      TTreeReaderValue<bool> Flag2_all(treeReader,"Flag2_all");
+      TTreeReaderArray<bool> HLTDecision(treeReader,"HLTDecision");
 
       TTreeReaderValue<unsigned int> runNum(treeReader,"runNum");
       //TTreeReaderValue<unsigned int> lumiSec(treeReader,"lumiSec");
@@ -955,15 +968,20 @@ void analyzeSignal_ABCD(){
       //weight = 48.58*1000*0.01*137/500000;
       //weight = 0.1845*1000*1.00*137/treeReader.GetEntries(1);
       while(treeReader.Next()){
-       	//weight = 100.;
-	//weight = weight*exp((gLLP_ctau[0]+gLLP_ctau[1])*(10./lifetime - 100./lifetime));
-	//weight = weight*lumi[itr_year]/treeReader.GetEntries(1);
-	/*decay1 = sqrt(pow(gLLP_decay_vertex_x[0],2)+pow(gLLP_decay_vertex_y[0],2)+pow(gLLP_decay_vertex_z[0],2));
-	decay2 = sqrt(pow(gLLP_decay_vertex_x[1],2)+pow(gLLP_decay_vertex_y[1],2)+pow(gLLP_decay_vertex_z[1],2));
-	ctau[itr_ctau]1 = decay1 / (gLLP_beta[0]*(1.0/sqrt(1-gLLP_beta[0]*gLLP_beta[0])));
-	ctau[itr_ctau]1 = decay2 / (gLLP_beta[1]*(1.0/sqrt(1-gLLP_beta[1]*gLLP_beta[1])));
-	weight = weight*exp((ctau[itr_ctau]1+ctau[itr_ctau]2)*(10./lifetime[itr_mX] - 100./(3*lifetime[itr_mX])));
-	*/
+	weight = 48.58*1000*0.01*lumi[itr_year]/treeReader.GetEntries(1);
+       	if(lifetime[itr_ctau]%3==0){
+	  //weight = 100.;
+	  //weight = weight*exp((gLLP_ctau[0]+gLLP_ctau[1])*(10./lifetime - 100./lifetime));
+	  //weight = weight*lumi[itr_year]/treeReader.GetEntries(1);
+	  
+	  decay1 = sqrt(pow(gLLP_decay_vertex_x[0],2)+pow(gLLP_decay_vertex_y[0],2)+pow(gLLP_decay_vertex_z[0],2));
+	  decay2 = sqrt(pow(gLLP_decay_vertex_x[1],2)+pow(gLLP_decay_vertex_y[1],2)+pow(gLLP_decay_vertex_z[1],2));
+	  ctau1 = decay1 / (gLLP_beta[0]*(1.0/sqrt(1-gLLP_beta[0]*gLLP_beta[0])));
+	  ctau2 = decay2 / (gLLP_beta[1]*(1.0/sqrt(1-gLLP_beta[1]*gLLP_beta[1])));
+	  weight = weight*pow(lifetime[itr_ctau+1],2)/pow(lifetime[itr_ctau],2)*exp((ctau1+ctau2)*(10./lifetime[itr_ctau+1] - 10./lifetime[itr_ctau]));
+	  
+	}
+
 	gLLP_plotted_id_sr1.clear();
 	gLLP_plotted_id_sr2.clear();
 	gLLP_plotted.clear();
@@ -1072,7 +1090,18 @@ void analyzeSignal_ABCD(){
 	if(rand->Uniform()<0.5){ pmRand = -1; }
 	else{ pmRand = 1; }
 	
-	if(*MET > 200){
+	HLT = false;
+	if(strcmp(years[itr_year],"MC_Summer16")==0){
+	  if(HLTDecision[310] || HLTDecision[467]){
+	    HLT = true;
+	  }
+	}
+	else{
+	  if(HLTDecision[310] || HLTDecision[467] || HLTDecision[703] || HLTDecision[717] || HLTDecision[710] || HLTDecision[709]){
+	    HLT = true;
+	  }
+	}
+	if(*MET > 200 && *Flag2_all & HLT){
 	  passMET = true;
 	  for(Int_t itr_llp=0; itr_llp<2; itr_llp++){
 	      float decayR = sqrt(pow(gLLP_decay_vertex_x[itr_llp],2)+pow(gLLP_decay_vertex_y[itr_llp],2));
