@@ -1,3 +1,15 @@
+#include "TFile.h"
+#include "TH1.h"
+#include "TH2.h"
+#include "TMath.h"
+#include "TRandom3.h"
+#include "TVector3.h"
+#include <TTreeReader.h>
+#include <TTreeReaderValue.h>
+#include <TTreeReaderArray.h>
+#include <vector> 
+#include <map> 
+#include <fstream>      // std::ofstream
 R__LOAD_LIBRARY(libTreePlayer)
 
 int getStation(float hitX, float hitY){
@@ -34,10 +46,9 @@ int getRPCLayer(float hitX, float hitY){
 
 void analyzeSignal_ABCD(){
 
-  char name[50];
-  char title[100];
+  TString name;
   //char mX[1][20] = {"photon_m_10"};
-  char mX[3][10] = {"15","40","55"};
+  std::vector<TString> mX = {"15","40","55"};
   //char mX[5][20] = {"vector_m_2","vector_m_5","vector_m_10","vector_m_15","vector_m_20"};
   //char mX[4][20] = {"photon_m_7","photon_m_10","photon_m_15","photon_m_20"};
   //char mX[5][20] = {"higgs_m_4","higgs_m_5","higgs_m_10","higgs_m_15","higgs_m_20"};
@@ -45,16 +56,19 @@ void analyzeSignal_ABCD(){
   //char mX[5][20] = {"darkphoton_m_2","darkphoton_m_5","darkphoton_m_10","darkphoton_m_15","darkphoton_m_20"};
   //char mX[2][10] = {"450"};
   //char ctau[2][20] = {"1m","10m"};
-  char ctau[11][20] = {"1","3","10","30","100","300","1000","3000","10000","30000","100000"};
+  std::vector<TString> ctau = {"1","3","10","30","100","300","1000","3000","10000","30000","100000"};
   //char ctau[2][20] = {"1000","10000"};
   //char ctau[4][20] = {"500mm_xi_1","1000mm_xi_1","5000mm_xi_1","10000mm_xi_1"};
   //char ctau[8][25] = {"500mm_xi_1","1000mm_xi_1","5000mm_xi_1","10000mm_xi_1","500mm_xi_2p5","1000mm_xi_2p5","5000mm_xi_2p5","10000mm_xi_2p5"};
   //char ctau[4][20] = {"500_xi_1","500_xi_2p5","1000_xi_1","1000_xi_2p5"};
   //Float_t lifetime = 10000;
-  Int_t lifetime[11] = {1,3,10,30,100,300,1000,3000,10000,30000,100000};
-  char years[3][20] = {"MC_Fall18","MC_Fall17","MC_Summer16"};
+  std::vector<TString> years = {"MC_Fall18","MC_Fall17","MC_Summer16"};
   //char years[3][20] = {"2018","2017","2016"};
-  Float_t lumi[3] = {59.74,41.53,35.92};
+  std::map<TString,Float_t> lumi;
+  lumi["MC_Fall18"] = 59.74;
+  lumi["MC_Fall17"] = 41.53;
+  lumi["MC_Summer16"] = 35.92;
+  // Float_t lumi[3] = {59.74,41.53,35.92};
   Double_t weight = 1.0;
   Float_t decay1 = 0.0;
   Float_t decay2 = 0.0;
@@ -388,413 +402,413 @@ void analyzeSignal_ABCD(){
   TRandom3 *rand = new TRandom3();
   Int_t pmRand = 0;
 
-  for(Int_t itr_mX=0; itr_mX<3; itr_mX++){
-    for(Int_t itr_ctau=0; itr_ctau<11; itr_ctau++){
-      sprintf(name,"h_nDtRechitClusters_dPhiJetMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+  for(Int_t itr_mX=0; itr_mX<mX.size(); itr_mX++){
+    for(Int_t itr_ctau=0; itr_ctau<ctau.size(); itr_ctau++){
+      name = "h_nDtRechitClusters_dPhiJetMET_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_nDtRechitClusters_dPhiJetMET[itr_mX][itr_ctau] = new TH1D(name,"",5,0,5);
       
-      sprintf(name,"h_nDtRechitClustersVeto_dPhiJetMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      name = "h_nDtRechitClustersVeto_dPhiJetMET_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_nDtRechitClustersVeto_dPhiJetMET[itr_mX][itr_ctau] = new TH1D(name,"",5,0,5);
       
-      sprintf(name,"h_dtRechitClustersDR_dPhiJetMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      name = "h_dtRechitClustersDR_dPhiJetMET_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_dtRechitClustersDR_dPhiJetMET[itr_mX][itr_ctau] = new TH1D(name,"",50,0,2);
       
-      sprintf(name,"h_dtRechitClustersVetoDR_dPhiJetMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      name = "h_dtRechitClustersVetoDR_dPhiJetMET_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_dtRechitClustersVetoDR_dPhiJetMET[itr_mX][itr_ctau] = new TH1D(name,"",50,0,2);
       
-      sprintf(name,"h_dtRechitClusterNSegmentStation2_dPhiJetMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      name = "h_dtRechitClusterNSegmentStation2_dPhiJetMET_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_dtRechitClusterNSegmentStation2_dPhiJetMET[itr_mX][itr_ctau] = new TH1D(name,"",50,0,500);
       
-      sprintf(name,"h_dtRechitClusterNSegmentStation3_dPhiJetMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      name = "h_dtRechitClusterNSegmentStation3_dPhiJetMET_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_dtRechitClusterNSegmentStation3_dPhiJetMET[itr_mX][itr_ctau] = new TH1D(name,"",50,0,500);
       
-      sprintf(name,"h_dtRechitClusterNSegmentStation4_dPhiJetMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      name = "h_dtRechitClusterNSegmentStation4_dPhiJetMET_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_dtRechitClusterNSegmentStation4_dPhiJetMET[itr_mX][itr_ctau] = new TH1D(name,"",50,0,500);
 
-      sprintf(name,"h_dtRechitClusterMaxStation_dPhiJetMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      name = "h_dtRechitClusterMaxStation_dPhiJetMET_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_dtRechitClusterMaxStation_dPhiJetMET[itr_mX][itr_ctau] = new TH1D(name,"",5,0,5);
 
-      sprintf(name,"h_dtRechitClusterNStation_dPhiJetMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      name = "h_dtRechitClusterNStation_dPhiJetMET_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_dtRechitClusterNStation_dPhiJetMET[itr_mX][itr_ctau] = new TH1D(name,"",5,0,5);
 
-      sprintf(name,"h_dtRechitClusterMaxStationRatio_dPhiJetMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      name = "h_dtRechitClusterMaxStationRatio_dPhiJetMET_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_dtRechitClusterMaxStationRatio_dPhiJetMET[itr_mX][itr_ctau] = new TH1D(name,"",50,0,1);
 
-      sprintf(name,"h_dtRechitClusterMaxChamberRatio_dPhiJetMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      name = "h_dtRechitClusterMaxChamberRatio_dPhiJetMET_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_dtRechitClusterMaxChamberRatio_dPhiJetMET[itr_mX][itr_ctau] = new TH1D(name,"",50,0,1);
       
-      sprintf(name,"h_dtRechitClusterNChamber_dPhiJetMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      name = "h_dtRechitClusterNChamber_dPhiJetMET_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_dtRechitClusterNChamber_dPhiJetMET[itr_mX][itr_ctau] = new TH1D(name,"",6,0,6);
 
-      sprintf(name,"h_dtRechitClusterMaxChamber_dPhiJetMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      name = "h_dtRechitClusterMaxChamber_dPhiJetMET_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_dtRechitClusterMaxChamber_dPhiJetMET[itr_mX][itr_ctau] = new TH1D(name,"",6,0,6);
 
-      sprintf(name,"h_dtRechitClusterX_dPhiJetMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      name = "h_dtRechitClusterX_dPhiJetMET_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_dtRechitClusterX_dPhiJetMET[itr_mX][itr_ctau] = new TH1D(name,"",100,-800,800);
 
-      sprintf(name,"h_dtRechitClusterY_dPhiJetMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      name = "h_dtRechitClusterY_dPhiJetMET_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_dtRechitClusterY_dPhiJetMET[itr_mX][itr_ctau] = new TH1D(name,"",100,-800,800);
 
-      sprintf(name,"h_dtRechitClusterZ_dPhiJetMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      name = "h_dtRechitClusterZ_dPhiJetMET_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_dtRechitClusterZ_dPhiJetMET[itr_mX][itr_ctau] = new TH1D(name,"",100,-600,600);
 
-      sprintf(name,"h_dtRechitClusterEta_dPhiJetMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      name = "h_dtRechitClusterEta_dPhiJetMET_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_dtRechitClusterEta_dPhiJetMET[itr_mX][itr_ctau] = new TH1D(name,"",50,-1.5,1.5);
 
-      sprintf(name,"h_dtRechitClusterPhi_dPhiJetMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      name = "h_dtRechitClusterPhi_dPhiJetMET_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_dtRechitClusterPhi_dPhiJetMET[itr_mX][itr_ctau] = new TH1D(name,"",100,-3.5,3.5);
 
-      sprintf(name,"h_dtRechitClusterTime_dPhiJetMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      name = "h_dtRechitClusterTime_dPhiJetMET_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_dtRechitClusterTime_dPhiJetMET[itr_mX][itr_ctau] = new TH1D(name,"",50,300,800);
 
-      sprintf(name,"h_dtRechitClusterXSpread_dPhiJetMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      name = "h_dtRechitClusterXSpread_dPhiJetMET_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_dtRechitClusterXSpread_dPhiJetMET[itr_mX][itr_ctau] = new TH1D(name,"",100,0,500);
 
-      sprintf(name,"h_dtRechitClusterYSpread_dPhiJetMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      name = "h_dtRechitClusterYSpread_dPhiJetMET_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_dtRechitClusterYSpread_dPhiJetMET[itr_mX][itr_ctau] = new TH1D(name,"",100,0,500);
 
-      sprintf(name,"h_dtRechitClusterZSpread_dPhiJetMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      name = "h_dtRechitClusterZSpread_dPhiJetMET_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_dtRechitClusterZSpread_dPhiJetMET[itr_mX][itr_ctau] = new TH1D(name,"",100,0,140);
 
-      sprintf(name,"h_dtRechitClusterEtaSpread_dPhiJetMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      name = "h_dtRechitClusterEtaSpread_dPhiJetMET_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_dtRechitClusterEtaSpread_dPhiJetMET[itr_mX][itr_ctau] = new TH1D(name,"",50,0,0.5);
 
-      sprintf(name,"h_dtRechitClusterPhiSpread_dPhiJetMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      name = "h_dtRechitClusterPhiSpread_dPhiJetMET_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_dtRechitClusterPhiSpread_dPhiJetMET[itr_mX][itr_ctau] = new TH1D(name,"",50,0,1);
 
-      sprintf(name,"h_dtRechitClusterTimeSpread_dPhiJetMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      name = "h_dtRechitClusterTimeSpread_dPhiJetMET_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_dtRechitClusterTimeSpread_dPhiJetMET[itr_mX][itr_ctau] = new TH1D(name,"",100,0,150);
 
-      sprintf(name,"h_dtRechitClusterMajorAxis_dPhiJetMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      name = "h_dtRechitClusterMajorAxis_dPhiJetMET_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_dtRechitClusterMajorAxis_dPhiJetMET[itr_mX][itr_ctau] = new TH1D(name,"",50,0,1);
 
-      sprintf(name,"h_dtRechitClusterMinorAxis_dPhiJetMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      name = "h_dtRechitClusterMinorAxis_dPhiJetMET_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_dtRechitClusterMinorAxis_dPhiJetMET[itr_mX][itr_ctau] = new TH1D(name,"",50,0,1);
       
-      sprintf(name,"h_dtRechitClusterSize_signalRegion_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      name = "h_dtRechitClusterSize_signalRegion_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_dtRechitClusterSize_signalRegion[itr_mX][itr_ctau] = new TH1D(name,"",250,0,500);
 
-      sprintf(name,"h_dtRechitClusterSize_signalRegionNew_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      name = "h_dtRechitClusterSize_signalRegionNew_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_dtRechitClusterSize_signalRegionNew[itr_mX][itr_ctau] = new TH1D(name,"",250,0,500);
 
-      sprintf(name,"h_dtRechitClusterSizeTotal_signalRegionNew_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      name = "h_dtRechitClusterSizeTotal_signalRegionNew_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_dtRechitClusterSizeTotal_signalRegionNew[itr_mX][itr_ctau] = new TH1D(name,"",250,0,500);
       
-      sprintf(name,"h_dtRechitClusterSize_fullSelection_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      name = "h_dtRechitClusterSize_fullSelection_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_dtRechitClusterSize_fullSelection_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",250,0,500);
 
 
-      sprintf(name,"h_nRB1Match_dPhiJetMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      name = "h_nRB1Match_dPhiJetMET_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_nRB1Match_dPhiJetMET[itr_mX][itr_ctau] = new TH1D(name,"",30,0,30);
       
-      sprintf(name,"h_nRB1Match_MB1Veto_dPhiJetMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      name = "h_nRB1Match_MB1Veto_dPhiJetMET_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_nRB1Match_MB1Veto_dPhiJetMET[itr_mX][itr_ctau] = new TH1D(name,"",30,0,30);
       
-      sprintf(name,"h_nMB1MatchAdjacent_dPhiJetMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      name = "h_nMB1MatchAdjacent_dPhiJetMET_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_nMB1MatchAdjacent_dPhiJetMET[itr_mX][itr_ctau] = new TH1D(name,"",50,0,50);
       
-      sprintf(name,"h_nMB1MatchAdjacent_MB1Veto_dPhiJetMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      name = "h_nMB1MatchAdjacent_MB1Veto_dPhiJetMET_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_nMB1MatchAdjacent_MB1Veto_dPhiJetMET[itr_mX][itr_ctau] = new TH1D(name,"",30,0,30);
 
-      sprintf(name,"h_nMB1MatchAdjacent_dPhiClusterMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      name = "h_nMB1MatchAdjacent_dPhiClusterMET_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_nMB1MatchAdjacent_dPhiClusterMET[itr_mX][itr_ctau] = new TH1D(name,"",50,0,50);
       
-      sprintf(name,"h_nMB1MatchAdjacent_MB1Veto_dPhiClusterMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      name = "h_nMB1MatchAdjacent_MB1Veto_dPhiClusterMET_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_nMB1MatchAdjacent_MB1Veto_dPhiClusterMET[itr_mX][itr_ctau] = new TH1D(name,"",30,0,30);
 
-      sprintf(name,"h_nMB1MatchAdjacentPi2_dPhiClusterMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      name = "h_nMB1MatchAdjacentPi2_dPhiClusterMET_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_nMB1MatchAdjacentPi2_dPhiClusterMET[itr_mX][itr_ctau] = new TH1D(name,"",50,0,50);
       
-      sprintf(name,"h_nMB1MatchAdjacentPi2_MB1Veto_dPhiClusterMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      name = "h_nMB1MatchAdjacentPi2_MB1Veto_dPhiClusterMET_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_nMB1MatchAdjacentPi2_MB1Veto_dPhiClusterMET[itr_mX][itr_ctau] = new TH1D(name,"",30,0,30);
 
-      sprintf(name,"h_nMB1MatchAdjacent0p8_dPhiClusterMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      name = "h_nMB1MatchAdjacent0p8_dPhiClusterMET_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_nMB1MatchAdjacent0p8_dPhiClusterMET[itr_mX][itr_ctau] = new TH1D(name,"",50,0,50);
       
-      sprintf(name,"h_nMB1MatchAdjacent0p8_MB1Veto_dPhiClusterMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      name = "h_nMB1MatchAdjacent0p8_MB1Veto_dPhiClusterMET_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_nMB1MatchAdjacent0p8_MB1Veto_dPhiClusterMET[itr_mX][itr_ctau] = new TH1D(name,"",30,0,30);
 
-      sprintf(name,"h_nMB1MatchAdjacent0p8Pi2_dPhiClusterMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      name = "h_nMB1MatchAdjacent0p8Pi2_dPhiClusterMET_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_nMB1MatchAdjacent0p8Pi2_dPhiClusterMET[itr_mX][itr_ctau] = new TH1D(name,"",50,0,50);
       
-      sprintf(name,"h_nMB1MatchAdjacent0p8Pi2_MB1Veto_dPhiClusterMET_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+      name = "h_nMB1MatchAdjacent0p8Pi2_MB1Veto_dPhiClusterMET_"+mX[itr_mX]+"_"+ctau[itr_ctau];
       h_nMB1MatchAdjacent0p8Pi2_MB1Veto_dPhiClusterMET[itr_mX][itr_ctau] = new TH1D(name,"",30,0,30);
 
 
-    sprintf(name,"h_dtRechitClusterSize_fullSelection_rpcCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_dtRechitClusterSize_fullSelection_rpcCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_dtRechitClusterSize_fullSelection_rpcCR[itr_mX][itr_ctau] = new TH1D(name,"",250,0,500);
 
-    sprintf(name,"h_nRPCMatched_fullVeto_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_nRPCMatched_fullVeto_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_nRPCMatched_fullVeto_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",20,0,20);
 
-    sprintf(name,"h_rpcSpread_fullVeto_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_rpcSpread_fullVeto_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_rpcSpread_fullVeto_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",10,0,10);
 
-    sprintf(name,"h_rpcBx_fullVeto_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_rpcBx_fullVeto_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_rpcBx_fullVeto_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",10,-4.5,5.5);
 
-    sprintf(name,"h_dPhiJetMET_fullVeto_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_dPhiJetMET_fullVeto_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_dPhiJetMET_fullVeto_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",35,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterMaxStation_fullVeto_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_dtRechitClusterMaxStation_fullVeto_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_dtRechitClusterMaxStation_fullVeto_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_nRPCMatched_Nminus1_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_nRPCMatched_Nminus1_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_nRPCMatched_Nminus1_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",20,0,20);
 
-    sprintf(name,"h_rpcSpread_Nminus1_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_rpcSpread_Nminus1_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_rpcSpread_Nminus1_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",10,0,10);
 
-    sprintf(name,"h_rpcBx_Nminus1_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_rpcBx_Nminus1_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_rpcBx_Nminus1_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",10,-4.5,5.5);
 
-    sprintf(name,"h_dPhiJetMET_Nminus1_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_dPhiJetMET_Nminus1_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_dPhiJetMET_Nminus1_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",35,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterMaxStation_Nminus1_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_dtRechitClusterMaxStation_Nminus1_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_dtRechitClusterMaxStation_Nminus1_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",5,0,5);
     
-    sprintf(name,"h_dPhiClusterMET_fullVeto_rpcCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_dPhiClusterMET_fullVeto_rpcCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_dPhiClusterMET_fullVeto_rpcCR[itr_mX][itr_ctau] = new TH1D(name,"",35,0,3.5);
 
-    sprintf(name,"h_dPhiJetMET_fullVeto_rpcCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_dPhiJetMET_fullVeto_rpcCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_dPhiJetMET_fullVeto_rpcCR[itr_mX][itr_ctau] = new TH1D(name,"",35,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterMaxStation_fullVeto_rpcCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_dtRechitClusterMaxStation_fullVeto_rpcCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_dtRechitClusterMaxStation_fullVeto_rpcCR[itr_mX][itr_ctau] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_dPhiClusterMET_Nminus1_rpcCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_dPhiClusterMET_Nminus1_rpcCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_dPhiClusterMET_Nminus1_rpcCR[itr_mX][itr_ctau] = new TH1D(name,"",35,0,3.5);
 
-    sprintf(name,"h_dPhiJetMET_Nminus1_rpcCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_dPhiJetMET_Nminus1_rpcCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_dPhiJetMET_Nminus1_rpcCR[itr_mX][itr_ctau] = new TH1D(name,"",35,0,3.5);
 
-    sprintf(name,"h_dtRechitClusterMaxStation_Nminus1_rpcCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_dtRechitClusterMaxStation_Nminus1_rpcCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_dtRechitClusterMaxStation_Nminus1_rpcCR[itr_mX][itr_ctau] = new TH1D(name,"",5,0,5);
 
 
 
-    sprintf(name,"h_nStations1_50hits_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_nStations1_50hits_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_nStations1_50hits_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_nStations1_100hits_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_nStations1_100hits_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_nStations1_100hits_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_nStations1_150hits_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_nStations1_150hits_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_nStations1_150hits_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_nStations25_50hits_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_nStations25_50hits_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_nStations25_50hits_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_nStations25_100hits_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_nStations25_100hits_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_nStations25_100hits_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_nStations25_150hits_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_nStations25_150hits_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_nStations25_150hits_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_nStations50_50hits_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_nStations50_50hits_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_nStations50_50hits_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_nStations50_100hits_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_nStations50_100hits_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_nStations50_100hits_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_nStations50_150hits_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_nStations50_150hits_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_nStations50_150hits_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_nWheels1_50hits_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_nWheels1_50hits_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_nWheels1_50hits_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",6,0,6);
 
-    sprintf(name,"h_nWheels1_100hits_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_nWheels1_100hits_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_nWheels1_100hits_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",6,0,6);
 
-    sprintf(name,"h_nWheels1_150hits_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_nWheels1_150hits_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_nWheels1_150hits_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",6,0,6);
 
-    sprintf(name,"h_nWheels25_50hits_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_nWheels25_50hits_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_nWheels25_50hits_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",6,0,6);
 
-    sprintf(name,"h_nWheels25_100hits_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_nWheels25_100hits_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_nWheels25_100hits_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",6,0,6);
 
-    sprintf(name,"h_nWheels25_150hits_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_nWheels25_150hits_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_nWheels25_150hits_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",6,0,6);
 
-    sprintf(name,"h_nWheels50_50hits_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_nWheels50_50hits_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_nWheels50_50hits_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",6,0,6);
 
-    sprintf(name,"h_nWheels50_100hits_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_nWheels50_100hits_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_nWheels50_100hits_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",6,0,6);
 
-    sprintf(name,"h_nWheels50_150hits_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_nWheels50_150hits_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_nWheels50_150hits_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",6,0,6);
 
 
-    sprintf(name,"h_nRPCStations1_50hits_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_nRPCStations1_50hits_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_nRPCStations1_50hits_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_nRPCStations1_100hits_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_nRPCStations1_100hits_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_nRPCStations1_100hits_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_nRPCStations1_150hits_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_nRPCStations1_150hits_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_nRPCStations1_150hits_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_nRPCStations5_50hits_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_nRPCStations5_50hits_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_nRPCStations5_50hits_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_nRPCStations5_100hits_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_nRPCStations5_100hits_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_nRPCStations5_100hits_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_nRPCStations5_150hits_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_nRPCStations5_150hits_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_nRPCStations5_150hits_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_nRPCStations10_50hits_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_nRPCStations10_50hits_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_nRPCStations10_50hits_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_nRPCStations10_100hits_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_nRPCStations10_100hits_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_nRPCStations10_100hits_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_nRPCStations10_150hits_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_nRPCStations10_150hits_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_nRPCStations10_150hits_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",5,0,5);
 
-    sprintf(name,"h_nRPCWheels1_50hits_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_nRPCWheels1_50hits_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_nRPCWheels1_50hits_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",6,0,6);
 
-    sprintf(name,"h_nRPCWheels1_100hits_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_nRPCWheels1_100hits_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_nRPCWheels1_100hits_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",6,0,6);
 
-    sprintf(name,"h_nRPCWheels1_150hits_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_nRPCWheels1_150hits_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_nRPCWheels1_150hits_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",6,0,6);
 
-    sprintf(name,"h_nRPCWheels5_50hits_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_nRPCWheels5_50hits_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_nRPCWheels5_50hits_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",6,0,6);
 
-    sprintf(name,"h_nRPCWheels5_100hits_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_nRPCWheels5_100hits_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_nRPCWheels5_100hits_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",6,0,6);
 
-    sprintf(name,"h_nRPCWheels5_150hits_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_nRPCWheels5_150hits_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_nRPCWheels5_150hits_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",6,0,6);
 
-    sprintf(name,"h_nRPCWheels10_50hits_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_nRPCWheels10_50hits_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_nRPCWheels10_50hits_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",6,0,6);
 
-    sprintf(name,"h_nRPCWheels10_100hits_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_nRPCWheels10_100hits_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_nRPCWheels10_100hits_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",6,0,6);
 
-    sprintf(name,"h_nRPCWheels10_150hits_clusterMETCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_nRPCWheels10_150hits_clusterMETCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_nRPCWheels10_150hits_clusterMETCR[itr_mX][itr_ctau] = new TH1D(name,"",6,0,6);
 
     
-    sprintf(name,"h_dtRechitClusterJetVetoPt_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_dtRechitClusterJetVetoPt_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_dtRechitClusterJetVetoPt[itr_mX][itr_ctau] = new TH1D(name,"",20,0,200);
 
-    sprintf(name,"h_dtRechitClusterMuonVetoPt_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_dtRechitClusterMuonVetoPt_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_dtRechitClusterMuonVetoPt[itr_mX][itr_ctau] = new TH1D(name,"",20,0,200);
 
-    sprintf(name,"h_dtRechitClusterMB1Veto_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_dtRechitClusterMB1Veto_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_dtRechitClusterMB1Veto[itr_mX][itr_ctau] = new TH1D(name,"",60,0,60);
 
 
-    sprintf(name,"h_jetNeutralEMEnergyFraction_SR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_jetNeutralEMEnergyFraction_SR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_jetNeutralEMEnergyFraction_SR[itr_mX][itr_ctau] = new TH1D(name,"",50,0,1);
 
-    sprintf(name,"h_jetChargedEMEnergyFraction_SR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_jetChargedEMEnergyFraction_SR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_jetChargedEMEnergyFraction_SR[itr_mX][itr_ctau] = new TH1D(name,"",50,0,1);
 
-    sprintf(name,"h_jetNeutralHadronicEnergyFraction_SR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_jetNeutralHadronicEnergyFraction_SR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_jetNeutralHadronicEnergyFraction_SR[itr_mX][itr_ctau] = new TH1D(name,"",50,0,1);
 
-    sprintf(name,"h_jetChargedHadronicEnergyFraction_SR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_jetChargedHadronicEnergyFraction_SR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_jetChargedHadronicEnergyFraction_SR[itr_mX][itr_ctau] = new TH1D(name,"",50,0,1);
 
-    sprintf(name,"h_leadingJetNeutralEMEnergyFraction_SR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_leadingJetNeutralEMEnergyFraction_SR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_leadingJetNeutralEMEnergyFraction_SR[itr_mX][itr_ctau] = new TH1D(name,"",50,0,1);
 
-    sprintf(name,"h_leadingJetChargedEMEnergyFraction_SR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_leadingJetChargedEMEnergyFraction_SR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_leadingJetChargedEMEnergyFraction_SR[itr_mX][itr_ctau] = new TH1D(name,"",50,0,1);
 
-    sprintf(name,"h_leadingJetNeutralHadronicEnergyFraction_SR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_leadingJetNeutralHadronicEnergyFraction_SR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_leadingJetNeutralHadronicEnergyFraction_SR[itr_mX][itr_ctau] = new TH1D(name,"",50,0,1);
 
-    sprintf(name,"h_leadingJetChargedHadronicEnergyFraction_SR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_leadingJetChargedHadronicEnergyFraction_SR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_leadingJetChargedHadronicEnergyFraction_SR[itr_mX][itr_ctau] = new TH1D(name,"",50,0,1);
 
 
-    sprintf(name,"h_efficiency_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_efficiency_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_efficiency[itr_mX][itr_ctau] = new TH1D(name,"",20,0,20);
 
-    sprintf(name,"h_efficiency_MB1CR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_efficiency_MB1CR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_efficiency_MB1CR[itr_mX][itr_ctau] = new TH1D(name,"",20,0,20);
 
-    sprintf(name,"h_decayVertexRadius_noVeto_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_decayVertexRadius_noVeto_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_decayVertexRadius_noVeto[itr_mX][itr_ctau] = new TH1D(name,"",80,0,800);
 
-    sprintf(name,"h_decayVertexRadius_clusterReco_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_decayVertexRadius_clusterReco_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_decayVertexRadius_clusterReco[itr_mX][itr_ctau] = new TH1D(name,"",80,0,800);
 
-    sprintf(name,"h_decayVertexRadius_clusterReco_signalRegionGt2_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_decayVertexRadius_clusterReco_signalRegionGt2_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_decayVertexRadius_clusterReco_signalRegionGt2[itr_mX][itr_ctau] = new TH1D(name,"",80,0,800);
 
-    sprintf(name,"h_decayVertexRadius_clusterReco_signalRegionEq2_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_decayVertexRadius_clusterReco_signalRegionEq2_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_decayVertexRadius_clusterReco_signalRegionEq2[itr_mX][itr_ctau] = new TH1D(name,"",80,0,800);
 
-    // sprintf(name,"h_decayVertexRadius_clusterReco_noMax_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    // name = "h_decayVertexRadius_clusterReco_noMax_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     // h_decayVertexRadius_clusterReco_noMax[itr_mX][itr_ctau] = new TH1D(name,"",80,0,800);
     //
-    // sprintf(name,"h_decayVertexRadius_clusterReco_noMB1_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    // name = "h_decayVertexRadius_clusterReco_noMB1_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     // h_decayVertexRadius_clusterReco_noMB1[itr_mX][itr_ctau] = new TH1D(name,"",80,0,800);
     //
-    // sprintf(name,"h_decayVertexRadius_clusterReco_noMB1_noMax_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    // name = "h_decayVertexRadius_clusterReco_noMB1_noMax_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     // h_decayVertexRadius_clusterReco_noMB1_noMax[itr_mX][itr_ctau] = new TH1D(name,"",80,0,800);
 
-    sprintf(name,"h_decayVertexZ_noVeto_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_decayVertexZ_noVeto_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_decayVertexZ_noVeto[itr_mX][itr_ctau] = new TH1D(name,"",80,0,800);
 
-    sprintf(name,"h_decayVertexZ_clusterReco_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_decayVertexZ_clusterReco_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_decayVertexZ_clusterReco[itr_mX][itr_ctau] = new TH1D(name,"",80,0,800);
 
-    sprintf(name,"h_decayVertexZ_clusterReco_signalRegionGt2_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_decayVertexZ_clusterReco_signalRegionGt2_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_decayVertexZ_clusterReco_signalRegionGt2[itr_mX][itr_ctau] = new TH1D(name,"",80,0,800);
 
-    sprintf(name,"h_decayVertexZ_clusterReco_signalRegionEq2_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_decayVertexZ_clusterReco_signalRegionEq2_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_decayVertexZ_clusterReco_signalRegionEq2[itr_mX][itr_ctau] = new TH1D(name,"",80,0,800);
 
-    // sprintf(name,"h_decayVertexZ_clusterReco_noMax_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    // name = "h_decayVertexZ_clusterReco_noMax_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     // h_decayVertexZ_clusterReco_noMax[itr_mX][itr_ctau] = new TH1D(name,"",80,0,800);
     //
-    // sprintf(name,"h_decayVertexZ_clusterReco_noMB1_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    // name = "h_decayVertexZ_clusterReco_noMB1_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     // h_decayVertexZ_clusterReco_noMB1[itr_mX][itr_ctau] = new TH1D(name,"",80,0,800);
 
-    sprintf(name,"h_leadJetPt_MB1CR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_leadJetPt_MB1CR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_leadJetPt_MB1CR[itr_mX][itr_ctau] = new TH1D(name,"",200,0,2000);
 
-    sprintf(name,"h_leadJetPt_MB2CR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_leadJetPt_MB2CR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_leadJetPt_MB2CR[itr_mX][itr_ctau] = new TH1D(name,"",200,0,2000);
 
-    sprintf(name,"h_leadJetPt_MB2withMB1CR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_leadJetPt_MB2withMB1CR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_leadJetPt_MB2withMB1CR[itr_mX][itr_ctau] = new TH1D(name,"",200,0,2000);
 
-    sprintf(name,"h_leadJetPt_MB1HitsCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_leadJetPt_MB1HitsCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_leadJetPt_MB1HitsCR[itr_mX][itr_ctau] = new TH1D(name,"",200,0,2000);
 
-    sprintf(name,"h_leadJetPt_SR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_leadJetPt_SR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_leadJetPt_SR[itr_mX][itr_ctau] = new TH1D(name,"",200,0,2000);
     
-    sprintf(name,"h_leadJetPtMET_MB1CR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_leadJetPtMET_MB1CR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_leadJetPtMET_MB1CR[itr_mX][itr_ctau] = new TH1D(name,"",500,0,10);
 
-    sprintf(name,"h_leadJetPtMET_MB2CR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_leadJetPtMET_MB2CR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_leadJetPtMET_MB2CR[itr_mX][itr_ctau] = new TH1D(name,"",500,0,10);
 
-    sprintf(name,"h_leadJetPtMET_MB2withMB1CR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_leadJetPtMET_MB2withMB1CR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_leadJetPtMET_MB2withMB1CR[itr_mX][itr_ctau] = new TH1D(name,"",500,0,10);
 
-    sprintf(name,"h_leadJetPtMET_MB1HitsCR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_leadJetPtMET_MB1HitsCR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_leadJetPtMET_MB1HitsCR[itr_mX][itr_ctau] = new TH1D(name,"",500,0,10);
 
-    sprintf(name,"h_leadJetPtMET_SR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_leadJetPtMET_SR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_leadJetPtMET_SR[itr_mX][itr_ctau] = new TH1D(name,"",500,0,10);
 
-    sprintf(name,"h_leadJetEta_SR_%s_%s",mX[itr_mX],ctau[itr_ctau]);
+    name = "h_leadJetEta_SR_"+mX[itr_mX]+"_"+ctau[itr_ctau];
     h_leadJetEta_SR[itr_mX][itr_ctau] = new TH1D(name,"",200,-5,5);
     
     
@@ -831,8 +845,10 @@ void analyzeSignal_ABCD(){
     evtNum = 0;
     totalNum = 0;
 
+    Int_t lifetime = ctau[itr_ctau].Atoi();
+
     cout << mX[itr_mX] << "_" << ctau[itr_ctau] << endl;
-    for(Int_t itr_year = 0; itr_year<3; itr_year++){
+    for(Int_t itr_year = 0; itr_year<years.size(); itr_year++){
       cout << "  " << years[itr_year] << endl;
 
       evtNum = 0;
@@ -840,7 +856,7 @@ void analyzeSignal_ABCD(){
       TFile *_file;
       
       if(strcmp(years[itr_year],"MC_Summer16")==0){
-	if(lifetime[itr_ctau]%3==0){
+	if(lifetime%3==0){
 	  _file = TFile::Open(dir+years[itr_year]+"/v1/v3/normalized/ggH_HToSSTobbbb_MH-125_MS-"+mX[itr_mX]+"_ctau-"+ctau[itr_ctau+1]+"_TuneCUETP8M1_13TeV-powheg-pythia8_1pb_weighted.root");
 	  //_file = TFile::Open(dir+years[itr_year]+"/v3/v5/normalized/ggH_HToSSTobbbb_MH-125_MS-"+mX[itr_mX]+"_ctau-"+ctau[itr_ctau]+"_TuneCUETP8M1_13TeV-powheg-pythia8_1pb_weighted.root");
 	}	  
@@ -849,7 +865,7 @@ void analyzeSignal_ABCD(){
 	}
       }
       else{
-	if(lifetime[itr_ctau]%3==0){
+	if(lifetime%3==0){
 	  _file = TFile::Open(dir+years[itr_year]+"/v1/v3/normalized/ggH_HToSSTobbbb_MH-125_MS-"+mX[itr_mX]+"_ctau-"+ctau[itr_ctau+1]+"_TuneCP5_13TeV-powheg-pythia8_1pb_weighted.root");
 	  //_file = TFile::Open(dir+years[itr_year]+"/v3/v5/normalized/ggH_HToSSTobbbb_MH-125_MS-"+mX[itr_mX]+"_ctau-"+ctau[itr_ctau]+"_TuneCP5_13TeV-powheg-pythia8_1pb_weighted.root");
 	  //_file = TFile::Open(dir+years[itr_year]+"/HV_params_"+mX[itr_mX]+"_ctau_"+ctau[itr_ctau]+"_LLPNTUPLE_v0_filter.root");
@@ -963,13 +979,13 @@ void analyzeSignal_ABCD(){
       std::vector<bool> gLLP_plotted; 
       std::vector<bool> gLLP_plotted_id_sr1; 
       std::vector<bool> gLLP_plotted_id_sr2; 
-      weight = 48.58*1000*0.01*lumi[itr_year]/treeReader.GetEntries(1);
+      weight = 48.58*1000*0.01*lumi[years[itr_year]]/treeReader.GetEntries(1);
       //weight = 48.58*1000*0.01*lumi[itr_year]/1E6;
       //weight = 48.58*1000*0.01*137/500000;
       //weight = 0.1845*1000*1.00*137/treeReader.GetEntries(1);
       while(treeReader.Next()){
-	weight = 48.58*1000*0.01*lumi[itr_year]/treeReader.GetEntries(1);
-       	if(lifetime[itr_ctau]%3==0){
+	weight = 48.58*1000*0.01*lumi[years[itr_year]]/treeReader.GetEntries(1);
+       	if(lifetime%3==0){
 	  //weight = 100.;
 	  //weight = weight*exp((gLLP_ctau[0]+gLLP_ctau[1])*(10./lifetime - 100./lifetime));
 	  //weight = weight*lumi[itr_year]/treeReader.GetEntries(1);
@@ -978,7 +994,8 @@ void analyzeSignal_ABCD(){
 	  decay2 = sqrt(pow(gLLP_decay_vertex_x[1],2)+pow(gLLP_decay_vertex_y[1],2)+pow(gLLP_decay_vertex_z[1],2));
 	  ctau1 = decay1 / (gLLP_beta[0]*(1.0/sqrt(1-gLLP_beta[0]*gLLP_beta[0])));
 	  ctau2 = decay2 / (gLLP_beta[1]*(1.0/sqrt(1-gLLP_beta[1]*gLLP_beta[1])));
-	  weight = weight*pow(lifetime[itr_ctau+1],2)/pow(lifetime[itr_ctau],2)*exp((ctau1+ctau2)*(10./lifetime[itr_ctau+1] - 10./lifetime[itr_ctau]));
+	  Int_t upLifetime = ctau[itr_ctau+1].Atoi();
+	  weight = weight*pow(upLifetime,2)/pow(lifetime,2)*exp((ctau1+ctau2)*(10./upLifetime - 10./lifetime));
 	  
 	}
 
