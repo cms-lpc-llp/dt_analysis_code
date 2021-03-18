@@ -2280,6 +2280,7 @@ void analyzeData_ABCD(){
       if(rand->Uniform()<0.5){ pmRand = -1; }
       else{ pmRand = 1; }
       
+      HLT = false;
       if(year=="2016"){
 	if(HLTDecision[310] || HLTDecision[467]){
 	  HLT = true;
